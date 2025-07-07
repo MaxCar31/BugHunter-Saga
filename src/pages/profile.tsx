@@ -61,7 +61,7 @@ const ProfileTopSection = () => {
   const joinedAt = useBoundStore((x) => x.joinedAt).format("MMMM YYYY");
   const followingCount = 0;
   const followersCount = 0;
-  const language = useBoundStore((x) => x.language);
+  const module = useBoundStore((x) => x.module);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -90,7 +90,7 @@ const ProfileTopSection = () => {
           </div>
         </div>
 
-        <Flag language={language} width={40} />
+        <Flag module={module} width={40} />
       </div>
       <Link
         href="/settings/account"

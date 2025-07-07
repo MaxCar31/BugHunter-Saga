@@ -1,19 +1,19 @@
 import type { StaticImageData } from "next/image";
 import _flagsSvg from "../../public/flags.svg";
-import type { Language } from "~/utils/languages";
+import type { Module } from "~/utils/modules.ts";
 
 const flagsSvg = _flagsSvg as StaticImageData;
 
 export const Flag = ({
-  language,
+  module,
   width = 84,
 }: {
-  language: Language;
+  module: Module;
   width?: number;
 }) => {
   const height = width * (19.3171 / 24);
   return (
-    <svg viewBox={language.viewBox} style={{ height, width }}>
+    <svg viewBox={module.viewBox} style={{ height, width }}>
       <image
         height={flagsSvg.height}
         href={flagsSvg.src}
