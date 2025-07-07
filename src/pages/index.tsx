@@ -30,17 +30,12 @@ const Home: NextPage = () => {
             ¡La forma gratuita, divertida y efectiva de aprender técnicas de testing!
           </p>
           <div className="mx-auto mt-4 flex w-fit flex-col items-center gap-3">
-            <Link
-              href="/register"
-              className="w-full rounded-2xl border-b-4 border-[#f29e3b] bg-[#f29e3b] px-10 py-3 text-center font-bold uppercase transition md:min-w-[320px]"
-            >
-              Comenzar
-            </Link>
+
             <button
-              className="w-full rounded-2xl border-2 border-b-4 border-[#042c60] bg-[#235390] px-8 py-3 font-bold uppercase transition hover:bg-[#204b82] md:min-w-[320px]"
+              className="w-full rounded-2xl border-b-4 border-[#f29e3b] bg-[#f29e3b] px-10 py-3 text-center font-bold uppercase transition md:min-w-[320px]"
               onClick={() => setLoginScreenState("LOGIN")}
             >
-              Ya tengo una cuenta
+              Comenzar
             </button>
           </div>
         </div>

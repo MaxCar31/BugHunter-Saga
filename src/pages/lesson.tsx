@@ -18,26 +18,10 @@ import {
 import womanPng from "../../public/woman.png";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
+import { getModuleBLessons, type ModuleBLesson } from "~/utils/moduleB-lessons";
 
-const lessonProblem1 = {
-  type: "SELECT_1_OF_3",
-  question: `¿Cuál de estas técnicas es más apropiada para validar rangos de entrada?`,
-  answers: [
-    { icon: <AppleSvg />, name: "Partición de Equivalencia" },
-    { icon: <BoySvg />, name: "Pruebas de Mutación" },
-    { icon: <WomanSvg />, name: "Pruebas de Carga" },
-  ],
-  correctAnswer: 0,
-} as const;
-
-const lessonProblem2 = {
-  type: "WRITE_IN_ENGLISH",
-  question: "Complete la definición: Una _____ es un conjunto de condiciones que determinan el resultado de una prueba",
-  answerTiles: ["tabla", "de", "decisión", "matriz", "condición", "resultado"],
-  correctAnswer: [0, 1, 2],
-} as const;
-
-const lessonProblems = [lessonProblem1, lessonProblem2];
+// Usar las lecciones del Módulo B
+const lessonProblems = getModuleBLessons(1);
 
 const numbersEqual = (a: readonly number[], b: readonly number[]): boolean => {
   return a.length === b.length && a.every((_, i) => a[i] === b[i]);
@@ -74,9 +58,10 @@ const Lesson: NextPage = () => {
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
   const [reviewLessonShown, setReviewLessonShown] = useState(false);
 
-  const problem = lessonProblems[lessonProblem] ?? lessonProblem1;
+  const problem = lessonProblems[lessonProblem] ?? lessonProblems[0]!;
 
-  const totalCorrectAnswersNeeded = 2;
+  // Solo contar problemas que no sean INFO
+  const totalCorrectAnswersNeeded = lessonProblems.filter(p => p.type !== "INFO").length;
 
   const [isStartingLesson, setIsStartingLesson] = useState(true);
   const hearts =
@@ -85,34 +70,47 @@ const Lesson: NextPage = () => {
       ? 3 - incorrectAnswerCount
       : null;
 
-  const { correctAnswer } = problem;
-  const isAnswerCorrect = Array.isArray(correctAnswer)
+  // Solo verificar correctAnswer si no es una pantalla INFO y si problem existe
+  const correctAnswer = problem && problem.type !== "INFO" && "correctAnswer" in problem 
+    ? problem.correctAnswer 
+    : null;
+  const isAnswerCorrect = problem && problem.type === "INFO" ? false : Array.isArray(correctAnswer)
     ? numbersEqual(selectedAnswers, correctAnswer)
     : selectedAnswer === correctAnswer;
 
   const onCheckAnswer = () => {
+    // No hay verificación de respuesta para pantallas INFO
+    if (!problem || problem.type === "INFO") {
+      return;
+    }
+    
     setCorrectAnswerShown(true);
     if (isAnswerCorrect) {
       setCorrectAnswerCount((x) => x + 1);
     } else {
       setIncorrectAnswerCount((x) => x + 1);
     }
-    setQuestionResults((questionResults) => [
-      ...questionResults,
-      {
-        question: problem.question,
-        yourResponse:
-          problem.type === "SELECT_1_OF_3"
-            ? problem.answers[selectedAnswer ?? 0]?.name ?? ""
-            : selectedAnswers.map((i) => problem.answerTiles[i]).join(" "),
-        correctResponse:
-          problem.type === "SELECT_1_OF_3"
-            ? problem.answers[problem.correctAnswer].name
-            : problem.correctAnswer
-                .map((i) => problem.answerTiles[i])
-                .join(" "),
-      },
-    ]);
+    
+    // Solo agregar resultados para problemas con preguntas
+    if (problem.type === "SELECT_1_OF_3") {
+      setQuestionResults((questionResults) => [
+        ...questionResults,
+        {
+          question: problem.question,
+          yourResponse: problem.answers[selectedAnswer ?? 0]?.name ?? "",
+          correctResponse: problem.answers[problem.correctAnswer].name,
+        },
+      ]);
+    } else if (problem.type === "WRITE_IN_ENGLISH") {
+      setQuestionResults((questionResults) => [
+        ...questionResults,
+        {
+          question: problem.question,
+          yourResponse: selectedAnswers.map((i) => problem.answerTiles[i]).join(" "),
+          correctResponse: problem.correctAnswer.map((i) => problem.answerTiles[i]).join(" "),
+        },
+      ]);
+    }
   };
 
   const onFinish = () => {
@@ -181,6 +179,20 @@ const Lesson: NextPage = () => {
   }
 
   switch (problem.type) {
+    case "INFO": {
+      return (
+        <ProblemInfo
+          problem={problem}
+          correctAnswerCount={correctAnswerCount}
+          totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+          quitMessageShown={quitMessageShown}
+          setQuitMessageShown={setQuitMessageShown}
+          onFinish={onFinish}
+          hearts={hearts}
+        />
+      );
+    }
+
     case "SELECT_1_OF_3": {
       return (
         <ProblemSelect1Of3
@@ -428,6 +440,86 @@ const CheckAnswer = ({
   );
 };
 
+const ProblemInfo = ({
+  problem,
+  correctAnswerCount,
+  totalCorrectAnswersNeeded,
+  quitMessageShown,
+  setQuitMessageShown,
+  onFinish,
+  hearts,
+}: {
+  problem: ModuleBLesson;
+  correctAnswerCount: number;
+  totalCorrectAnswersNeeded: number;
+  quitMessageShown: boolean;
+  setQuitMessageShown: React.Dispatch<React.SetStateAction<boolean>>;
+  onFinish: () => void;
+  hearts: number | null;
+}) => {
+  // Type guard para asegurar que es una lección tipo INFO
+  if (problem.type !== "INFO") {
+    return null;
+  }
+
+  const { moduleTitle, introduction, objectives } = problem;
+
+  return (
+    <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
+      <div className="flex grow flex-col items-center gap-5">
+        <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
+          <ProgressBar
+            correctAnswerCount={correctAnswerCount}
+            totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+            setQuitMessageShown={setQuitMessageShown}
+            hearts={hearts}
+          />
+        </div>
+        <section className="flex max-w-4xl grow flex-col gap-8 self-center sm:items-center sm:justify-center sm:px-5">
+          <div className="text-center">
+            <h1 className="mb-4 text-3xl font-bold text-[#f2a445] sm:text-4xl">
+              {moduleTitle}
+            </h1>
+            <div className="mb-6 text-left text-lg leading-relaxed text-gray-700 sm:text-center">
+              {introduction.split('\n').map((line, i) => (
+                <p key={i} className="mb-3">{line}</p>
+              ))}
+            </div>
+          </div>
+          
+          <div className="w-full max-w-2xl">
+            <h2 className="mb-4 text-xl font-bold text-gray-800">Objetivos del Nivel:</h2>
+            <ul className="space-y-3">
+              {objectives.map((objective, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#f2a445]"></div>
+                  <span className="text-gray-700">{objective}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <section className="border-gray-200 sm:border-t-2 sm:p-10">
+        <div className="mx-auto flex max-w-5xl justify-center">
+          <button
+            onClick={onFinish}
+            className="w-full rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
+          >
+            Comenzar
+          </button>
+        </div>
+      </section>
+
+      <QuitMessage
+        quitMessageShown={quitMessageShown}
+        setQuitMessageShown={setQuitMessageShown}
+      />
+    </div>
+  );
+};
+
 const ProblemSelect1Of3 = ({
   problem,
   correctAnswerCount,
@@ -443,7 +535,7 @@ const ProblemSelect1Of3 = ({
   onSkip,
   hearts,
 }: {
-  problem: typeof lessonProblem1;
+  problem: ModuleBLesson;
   correctAnswerCount: number;
   totalCorrectAnswersNeeded: number;
   selectedAnswer: number | null;
@@ -457,6 +549,11 @@ const ProblemSelect1Of3 = ({
   onSkip: () => void;
   hearts: number | null;
 }) => {
+  // Type guard para asegurar que es una lección tipo SELECT_1_OF_3
+  if (problem.type !== "SELECT_1_OF_3") {
+    return null;
+  }
+
   const { question, answers, correctAnswer } = problem;
 
   return (
@@ -502,7 +599,7 @@ const ProblemSelect1Of3 = ({
       </div>
 
       <CheckAnswer
-        correctAnswer={answers[correctAnswer].name}
+        correctAnswer={answers[correctAnswer]?.name ?? ""}
         correctAnswerShown={correctAnswerShown}
         isAnswerCorrect={isAnswerCorrect}
         isAnswerSelected={selectedAnswer !== null}
@@ -534,7 +631,7 @@ const ProblemWriteInEnglish = ({
   onSkip,
   hearts,
 }: {
-  problem: typeof lessonProblem2;
+  problem: ModuleBLesson;
   correctAnswerCount: number;
   totalCorrectAnswersNeeded: number;
   selectedAnswers: number[];
@@ -548,6 +645,11 @@ const ProblemWriteInEnglish = ({
   onSkip: () => void;
   hearts: number | null;
 }) => {
+  // Type guard para asegurar que es una lección tipo WRITE_IN_ENGLISH
+  if (problem.type !== "WRITE_IN_ENGLISH") {
+    return null;
+  }
+
   const { question, correctAnswer, answerTiles } = problem;
 
   return (
@@ -563,12 +665,12 @@ const ProblemWriteInEnglish = ({
         </div>
         <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-24">
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl">
-            Write this in English
+            Completa la definición
           </h1>
 
           <div className="w-full">
             <div className="flex items-center gap-2 px-2">
-              <Image src={womanPng} alt="" width={92} height={115} />
+              <Image src="/logo.svg" alt="" width={92} height={115} />
               <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
                 {question}
                 <div
