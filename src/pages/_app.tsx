@@ -7,13 +7,15 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
-        <title>React Duolingo Clone</title>
+        <title>BugHunter Saga – Plataforma Gamificada de Pruebas de Software</title>
         <meta
           name="description"
-          content="Duolingo web app clone written with React"
+          content="BugHunter Saga es una plataforma gamificada para aprender técnicas de pruebas de software como Partición de Equivalencia, Tablas de Decisión y Pruebas de Sentencia."
         />
+        <meta name="keywords" content="gamificación, pruebas de software, ingeniería de software, tablas de decisión, calidad de software, TIC EPN" />
+        <meta name="author" content="Max Mateo Carrión Chida" />
         <link rel="icon" href="/favicon.ico" />
-        <meta name="theme-color" content="#0A0" />
+        <meta name="theme-color" content="#1D3557" />
         <link rel="manifest" href="/app.webmanifest" />
       </Head>
       <Component {...pageProps} />

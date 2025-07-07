@@ -72,7 +72,7 @@ export const RightBar = () => {
               </Link>
             </div>
           </div>
-          <span
+          {/* <span
             className="relative flex items-center gap-2 rounded-xl p-3 font-bold text-orange-500 hover:bg-gray-100"
             onMouseEnter={() => setStreakShown(true)}
             onMouseLeave={() => {
@@ -107,8 +107,8 @@ export const RightBar = () => {
               </p>
               <Calendar now={now} setNow={setNow} />
             </div>
-          </span>
-          <span
+          </span> */}
+          {/* <span
             className="relative flex items-center gap-2 rounded-xl p-3 font-bold text-red-500 hover:bg-gray-100"
             onMouseEnter={() => setGemsShown(true)}
             onMouseLeave={() => setGemsShown(false)}
@@ -141,7 +141,7 @@ export const RightBar = () => {
                 </Link>
               </div>
             </div>
-          </span>
+          </span> */}
         </article>
         {loggedIn && lessonsCompleted < 10 ? (
           <UnlockLeaderboardsSection />
@@ -172,15 +172,7 @@ const UnlockLeaderboardsSection = () => {
   const lessonsNeededToUnlockLeaderboards = 10 - lessonsCompleted;
 
   return (
-    <article className="flex flex-col gap-5 rounded-2xl border-2 border-gray-200 p-6 text-gray-700">
-      <h2 className="text-xl font-bold">¡Desbloquear Clasificación!</h2>
-      <div className="flex items-center gap-6">
-        <LockedLeaderboardsSvg />
-        <p className="text-sm leading-6 text-gray-500">
-          Completa {lessonsNeededToUnlockLeaderboards} lección{lessonsNeededToUnlockLeaderboards === 1 ? "" : "es"} más para comenzar a competir
-        </p>
-      </div>
-    </article>
+  <></>
   );
 };
 
@@ -271,9 +263,6 @@ const XpProgressSection = () => {
     <article className="flex flex-col gap-5 rounded-2xl border-2 border-gray-200 p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-700">Meta Diaria</h2>
-        <Link href="/settings/coach" className="uppercase text-blue-400">
-          Editar meta
-        </Link>
       </div>
       <div className="flex gap-5">
         <TreasureClosedSvg />

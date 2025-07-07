@@ -7,14 +7,14 @@ type BottomBarItem = {
   icon: JSX.Element;
 };
 
-export type Tab = "Learn" | "Shop" | "Profile" | "Leaderboards";
+export type Tab = "Aprender" | "Tienda" | "Perfil" | "Clasificaciones";
 
 export const useBottomBarItems = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
 
   const bottomBarItems: BottomBarItem[] = [
     {
-      name: "Learn",
+      name: "Aprender",
       href: "/learn",
       icon: (
         <svg
@@ -46,52 +46,52 @@ export const useBottomBarItems = () => {
         </svg>
       ),
     },
+    // {
+    //   name: "Tienda",
+    //   href: "/shop",
+    //   icon: (
+    //     <svg
+    //       width="46"
+    //       height="46"
+    //       viewBox="0 0 46 46"
+    //       fill="none"
+    //       className="h-[50px] w-[50px]"
+    //     >
+    //       <path
+    //         d="M40 36V17H6V36C6 38.2091 7.73969 40 9.88571 40H36.1143C38.2603 40 40 38.2091 40 36Z"
+    //         fill="#A56644"
+    //       />
+    //       <path d="M4 10C4 7.79086 5.79086 6 8 6H17V17H4V10Z" fill="#EA2B2B" />
+    //       <path
+    //         d="M4 17H17V17.5C17 21.0899 14.0899 24 10.5 24C6.91015 24 4 21.0899 4 17.5V17Z"
+    //         fill="#FF4945"
+    //       />
+    //       <path
+    //         d="M17 17H29V17.5C29 21.0899 26.3137 24 23 24C19.6863 24 17 21.0899 17 17.5V17Z"
+    //         fill="white"
+    //       />
+    //       <path
+    //         d="M29 17H42V17.5C42 21.0899 39.0899 24 35.5 24C31.9101 24 29 21.0899 29 17.5V17Z"
+    //         fill="#FF4945"
+    //       />
+    //       <path d="M17 6H29V17H17V6Z" fill="#D0D0D0" />
+    //       <path
+    //         d="M29 6H38C40.2091 6 42 7.79086 42 10V17H29V6Z"
+    //         fill="#EA2B2B"
+    //       />
+    //       <path
+    //         d="M11 30C11 28.8954 11.8954 28 13 28H18C19.1046 28 20 28.8954 20 30V40H11V30Z"
+    //         fill="#B9E8FF"
+    //       />
+    //       <path
+    //         d="M24 30C24 28.8954 24.8954 28 26 28H34C35.1046 28 36 28.8954 36 30V34C36 35.1046 35.1046 36 34 36H26C24.8954 36 24 35.1046 24 34V30Z"
+    //         fill="#B9E8FF"
+    //       />
+    //     </svg>
+    //   ),
+    // },
     {
-      name: "Shop",
-      href: "/shop",
-      icon: (
-        <svg
-          width="46"
-          height="46"
-          viewBox="0 0 46 46"
-          fill="none"
-          className="h-[50px] w-[50px]"
-        >
-          <path
-            d="M40 36V17H6V36C6 38.2091 7.73969 40 9.88571 40H36.1143C38.2603 40 40 38.2091 40 36Z"
-            fill="#A56644"
-          />
-          <path d="M4 10C4 7.79086 5.79086 6 8 6H17V17H4V10Z" fill="#EA2B2B" />
-          <path
-            d="M4 17H17V17.5C17 21.0899 14.0899 24 10.5 24C6.91015 24 4 21.0899 4 17.5V17Z"
-            fill="#FF4945"
-          />
-          <path
-            d="M17 17H29V17.5C29 21.0899 26.3137 24 23 24C19.6863 24 17 21.0899 17 17.5V17Z"
-            fill="white"
-          />
-          <path
-            d="M29 17H42V17.5C42 21.0899 39.0899 24 35.5 24C31.9101 24 29 21.0899 29 17.5V17Z"
-            fill="#FF4945"
-          />
-          <path d="M17 6H29V17H17V6Z" fill="#D0D0D0" />
-          <path
-            d="M29 6H38C40.2091 6 42 7.79086 42 10V17H29V6Z"
-            fill="#EA2B2B"
-          />
-          <path
-            d="M11 30C11 28.8954 11.8954 28 13 28H18C19.1046 28 20 28.8954 20 30V40H11V30Z"
-            fill="#B9E8FF"
-          />
-          <path
-            d="M24 30C24 28.8954 24.8954 28 26 28H34C35.1046 28 36 28.8954 36 30V34C36 35.1046 35.1046 36 34 36H26C24.8954 36 24 35.1046 24 34V30Z"
-            fill="#B9E8FF"
-          />
-        </svg>
-      ),
-    },
-    {
-      name: "Profile",
+      name: "Perfil",
       href: loggedIn ? "/profile" : "/learn?sign-up",
       icon: (
         <svg
@@ -136,25 +136,25 @@ export const useBottomBarItems = () => {
     },
   ];
 
-  if (loggedIn) {
-    bottomBarItems.splice(1, 0, {
-      name: "Leaderboards",
-      href: "/leaderboard",
-      icon: (
-        <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-          <path
-            d="M7 9.5C7 7.84314 8.34315 6.5 10 6.5H36C37.6569 6.5 39 7.84315 39 9.5V23.5C39 32.3366 31.8366 39.5 23 39.5C14.1634 39.5 7 32.3366 7 23.5V9.5Z"
-            fill="#FEC701"
-          />
-          <path
-            opacity="0.3"
-            d="M39.0001 13.3455V9.5C39.0001 7.84315 37.657 6.5 36.0001 6.5H31.5706L8.30957 29.8497C9.68623 33.0304 12.0656 35.6759 15.0491 37.3877L39.0001 13.3455Z"
-            fill="white"
-          />
-        </svg>
-      ),
-    });
-  }
+  // if (loggedIn) {
+  //   bottomBarItems.splice(1, 0, {
+  //     name: "Clasificaciones",
+  //     href: "/leaderboard",
+  //     icon: (
+  //       <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+  //         <path
+  //           d="M7 9.5C7 7.84314 8.34315 6.5 10 6.5H36C37.6569 6.5 39 7.84315 39 9.5V23.5C39 32.3366 31.8366 39.5 23 39.5C14.1634 39.5 7 32.3366 7 23.5V9.5Z"
+  //           fill="#FEC701"
+  //         />
+  //         <path
+  //           opacity="0.3"
+  //           d="M39.0001 13.3455V9.5C39.0001 7.84315 37.657 6.5 36.0001 6.5H31.5706L8.30957 29.8497C9.68623 33.0304 12.0656 35.6759 15.0491 37.3877L39.0001 13.3455Z"
+  //           fill="white"
+  //         />
+  //       </svg>
+  //     ),
+  //   });
+  // }
 
   return bottomBarItems;
 };
