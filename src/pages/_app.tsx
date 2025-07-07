@@ -14,7 +14,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         />
         <meta name="keywords" content="gamificación, pruebas de software, ingeniería de software, tablas de decisión, calidad de software, TIC EPN" />
         <meta name="author" content="Max Mateo Carrión Chida" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.svg" />
         <meta name="theme-color" content="#1D3557" />
         <link rel="manifest" href="/app.webmanifest" />
       </Head>

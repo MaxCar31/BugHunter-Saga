@@ -7,6 +7,7 @@ import type { LoginScreenState } from "./LoginScreen";
 import { LoginScreen } from "./LoginScreen";
 import { GlobeIconSvg, PodcastIconSvg } from "./Svgs";
 import { useBoundStore } from "~/hooks/useBoundStore";
+import Image from "next/image";
 
 const LeftBarMoreMenuSvg = (props: ComponentProps<"svg">) => {
   return (
@@ -39,12 +40,18 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
   return (
     <>
       <nav className="fixed bottom-0 left-0 top-0 hidden flex-col gap-5 border-r-2 border-[#e5e5e5] bg-white p-3 md:flex lg:w-64 lg:p-5">
-        <Link
-          href="/learn"
-          className="mb-5 ml-5 mt-5 hidden text-3xl font-bold text-[#58cc02] lg:block"
-        >
-          duolingo
-        </Link>
+    <Link
+      href="/learn"
+      className="ml-2 hidden lg:block"
+    >
+      <Image
+        src="/Logotipo.svg"
+        alt="BugHunter Saga"
+        width={150}
+        height={60}
+        className="text-[#58cc02]"
+      />
+    </Link>
         <ul className="flex flex-col items-stretch gap-3">
           {bottomBarItems.map((item) => {
             return (
