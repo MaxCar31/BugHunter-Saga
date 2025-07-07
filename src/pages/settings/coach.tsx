@@ -191,7 +191,7 @@ const Coach: NextPage = () => {
               </div>
             </div>
           </div>
-          <SettingsRightNav selectedTab="Edit Daily Goal" />
+          {/* <SettingsRightNav selectedTab="Edit Daily Goal" /> */}
         </div>
       </div>
     </div>
