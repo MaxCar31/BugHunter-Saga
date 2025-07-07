@@ -6,7 +6,7 @@ import { ModuleHeader } from "~/components/ModuleHeader";
 import { useLoginScreen, LoginScreen } from "~/components/LoginScreen";
 import _bgSnow from "../../public/bg-snow.svg";
 import type { StaticImageData } from "next/image";
-import  { ModuleCarousel } from "~/components/ModuleCarousel";
+import Image from "next/image";
 
 const bgSnow = _bgSnow as StaticImageData;
 
@@ -18,16 +18,21 @@ const Home: NextPage = () => {
       style={{ backgroundImage: `url(${bgSnow.src})` }}
     >
       <ModuleHeader />
-      <div className="flex w-full flex-col items-center justify-center gap-3 px-4 py-16 md:flex-row md:gap-36">
-        <GlobeSvg className="h-fit w-7/12 md:w-[360px]" />
+      <div className="flex w-full flex-col items-center justify-center gap-3 px-4 py-16 md:flex-row md:gap-12">
+            <Image
+                src="/Logo.svg"
+                alt="BugHunter Saga"
+                width={350}
+                height={60}
+              />
         <div>
-          <p className="mb-6 max-w-[600px] text-center text-3xl font-bold md:mb-12">
+          <p className=" max-w-[600px] text-center text-3xl font-bold md:mb-12">
             ¡La forma gratuita, divertida y efectiva de aprender técnicas de testing!
           </p>
           <div className="mx-auto mt-4 flex w-fit flex-col items-center gap-3">
             <Link
               href="/register"
-              className="w-full rounded-2xl border-b-4 border-green-700 bg-green-600 px-10 py-3 text-center font-bold uppercase transition hover:border-green-600 hover:bg-green-500 md:min-w-[320px]"
+              className="w-full rounded-2xl border-b-4 border-[#f29e3b] bg-[#f29e3b] px-10 py-3 text-center font-bold uppercase transition md:min-w-[320px]"
             >
               Comenzar
             </Link>
@@ -40,7 +45,6 @@ const Home: NextPage = () => {
           </div>
         </div>
       </div>
-      <ModuleCarousel />
       <LoginScreen
         loginScreenState={loginScreenState}
         setLoginScreenState={setLoginScreenState}

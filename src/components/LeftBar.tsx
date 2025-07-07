@@ -47,7 +47,7 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
       <Image
         src="/Logotipo.svg"
         alt="BugHunter Saga"
-        width={150}
+        width={160}
         height={60}
         className="text-[#58cc02]"
       />
@@ -104,7 +104,7 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
                 </Link>
                 <Link
                   className="flex items-center gap-4 px-5 py-2 text-left uppercase hover:bg-gray-100"
-                  href="https://podcast.duolingo.com"
+                  href="https://podcast.bughuntersaga.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -129,7 +129,7 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
                 </Link>
                 <Link
                   className="px-5 py-2 text-left uppercase hover:bg-gray-100"
-                  href="https://support.duolingo.com/hc/en-us"
+                  href="https://support.bughuntersaga.com/hc/en-us"
                 >
                   Help
                 </Link>

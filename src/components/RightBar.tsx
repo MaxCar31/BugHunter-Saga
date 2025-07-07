@@ -24,7 +24,11 @@ export const RightBar = () => {
   const lingots = useBoundStore((x) => x.lingots);
   const streak = useBoundStore((x) => x.streak);
   const module = useBoundStore((x) => x.module);
-  const lessonsCompleted = useBoundStore((x) => x.lessonsCompleted);
+  const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
+  
+  // Calculamos el total de lecciones completadas en todos los módulos
+  const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
+    .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
 
   const [modulesShown, setModulesShown] = useState(false);
   const [streakShown, setStreakShown] = useState(false);
@@ -143,15 +147,15 @@ export const RightBar = () => {
             </div>
           </span> */}
         </article>
-        {loggedIn && lessonsCompleted < 10 ? (
+        {loggedIn && totalLessonsCompleted < 10 ? (
           <UnlockLeaderboardsSection />
-        ) : loggedIn && lessonsCompleted >= 10 ? (
+        ) : loggedIn && totalLessonsCompleted >= 10 ? (
           <LeaderboardRankSection />
         ) : null}
         <DailyQuestsSection />
         <XpProgressSection />
         {!loggedIn && (
-          <CreateAProfileSection setLoginScreenState={setLoginScreenState} />
+          <></>
         )}
       </aside>
       <LoginScreen
@@ -163,13 +167,17 @@ export const RightBar = () => {
 };
 
 const UnlockLeaderboardsSection = () => {
-  const lessonsCompleted = useBoundStore((x) => x.lessonsCompleted);
+  const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
+  
+  // Calculamos el total de lecciones completadas en todos los módulos
+  const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
+    .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
 
-  if (lessonsCompleted >= 10) {
+  if (totalLessonsCompleted >= 10) {
     return null;
   }
 
-  const lessonsNeededToUnlockLeaderboards = 10 - lessonsCompleted;
+  const lessonsNeededToUnlockLeaderboards = 10 - totalLessonsCompleted;
 
   return (
   <></>
@@ -287,26 +295,4 @@ const XpProgressSection = () => {
   );
 };
 
-const CreateAProfileSection = ({
-  setLoginScreenState,
-}: {
-  setLoginScreenState: React.Dispatch<React.SetStateAction<LoginScreenState>>;
-}) => {
-  return (
-    <article className="flex flex-col gap-5 rounded-2xl border-2 border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-700">Crear un perfil para guardar tu progreso</h2>
-      <button
-        className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 py-3 uppercase text-white transition hover:border-blue-400 hover:bg-blue-300"
-        onClick={() => setLoginScreenState("SIGNUP")}
-      >
-        Crear un perfil
-      </button>
-      <button
-        className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 py-3 uppercase text-white transition hover:border-blue-400 hover:bg-blue-300"
-        onClick={() => setLoginScreenState("LOGIN")}
-      >
-        Ya tengo una cuenta
-      </button>
-    </article>
-  );
-};
+

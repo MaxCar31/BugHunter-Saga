@@ -8,36 +8,56 @@ export const ModuleIcon = ({
   width?: number;
 }) => {
   const getModuleIcon = (moduleCode: string) => {
+    const height = Math.round((width * 66) / 82); // Maintain 82:66 aspect ratio
+
     switch (moduleCode) {
       case "mod-a":
         return (
-          <svg width={width} viewBox="0 0 82 66" fill="none">
-            <rect width="82" height="66" rx="8" fill="#58cc02"/>
-            <text x="41" y="40" textAnchor="middle" fill="white" fontSize="24" fontWeight="bold">A</text>
-            <text x="41" y="56" textAnchor="middle" fill="white" fontSize="8">EQ</text>
-          </svg>
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src="/ModuloA.png"
+            alt="Module A"
+            width={width}
+            height={height}
+            style={{ borderRadius: "8px" }}
+          />
         );
       case "mod-b":
         return (
-          <svg width={width} viewBox="0 0 82 66" fill="none">
-            <rect width="82" height="66" rx="8" fill="#ce82ff"/>
-            <text x="41" y="40" textAnchor="middle" fill="white" fontSize="24" fontWeight="bold">B</text>
-            <text x="41" y="56" textAnchor="middle" fill="white" fontSize="8">DT</text>
-          </svg>
+            // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src="/ModuloB.png"
+            alt="Module B"
+            width={width}
+            height={height}
+            style={{ borderRadius: "8px" }}
+          />
         );
       case "mod-c":
         return (
-          <svg width={width} viewBox="0 0 82 66" fill="none">
-            <rect width="82" height="66" rx="8" fill="#00cd9c"/>
-            <text x="41" y="40" textAnchor="middle" fill="white" fontSize="24" fontWeight="bold">C</text>
-            <text x="41" y="56" textAnchor="middle" fill="white" fontSize="8">ST</text>
-          </svg>
+            // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src="/ModuloC.png"
+            alt="Module C"
+            width={width}
+            height={height}
+            style={{ borderRadius: "8px" }}
+          />
         );
       default:
         return (
           <svg width={width} viewBox="0 0 82 66" fill="none">
-            <rect width="82" height="66" rx="8" fill="#999"/>
-            <text x="41" y="40" textAnchor="middle" fill="white" fontSize="24" fontWeight="bold">?</text>
+            <rect width="82" height="66" rx="8" fill="#999" />
+            <text
+              x="41"
+              y="40"
+              textAnchor="middle"
+              fill="white"
+              fontSize="24"
+              fontWeight="bold"
+            >
+              ?
+            </text>
           </svg>
         );
     }

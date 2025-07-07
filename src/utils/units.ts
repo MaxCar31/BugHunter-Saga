@@ -20,9 +20,9 @@ export const units: readonly Unit[] = [
   {
     unitNumber: 1,
     description: "Fundamentos de Partición de Equivalencia",
-    backgroundColor: "bg-[#58cc02]",
-    textColor: "text-[#58cc02]",
-    borderColor: "border-[#46a302]",
+    backgroundColor: "bg-[#f2a445]",
+    textColor: "text-[#f2a445]",
+    borderColor: "border-[#d18a2a]",
     tiles: [
       {
         type: "star",
@@ -42,11 +42,11 @@ export const units: readonly Unit[] = [
     ],
   },
   {
-    unitNumber: 2,
+    unitNumber: 1,
     description: "Tablas de Decisión en Testing",
-    backgroundColor: "bg-[#ce82ff]",
-    textColor: "text-[#ce82ff]",
-    borderColor: "border-[#a568cc]",
+    backgroundColor: "bg-[#f2a445]",
+    textColor: "text-[#f2a445]",
+    borderColor: "border-[#d18a2a]",
     tiles: [
       { type: "fast-forward", description: "Introducción a Tablas de Decisión" },
       { type: "dumbbell", description: "Práctica personalizada" },
@@ -62,11 +62,11 @@ export const units: readonly Unit[] = [
     ],
   },
   {
-    unitNumber: 3,
+    unitNumber: 1,
     description: "Pruebas de Sentencia y Cobertura",
-    backgroundColor: "bg-[#00cd9c]",
-    textColor: "text-[#00cd9c]",
-    borderColor: "border-[#00a47d]",
+    backgroundColor: "bg-[#f2a445]",
+    textColor: "text-[#f2a445]",
+    borderColor: "border-[#d18a2a]",
     tiles: [
       { type: "fast-forward", description: "Introducción a Pruebas de Sentencia" },
       { type: "book", description: "Análisis de código" },
@@ -81,3 +81,17 @@ export const units: readonly Unit[] = [
     ],
   },
 ];
+
+// Función para obtener la unidad correspondiente a un módulo
+export const getUnitForModule = (moduleCode: string): Unit | null => {
+  switch (moduleCode) {
+    case "mod-a":
+      return units[0] ?? null;
+    case "mod-b":
+      return units[1] ?? null;
+    case "mod-c":
+      return units[2] ?? null;
+    default:
+      return null;
+  }
+};

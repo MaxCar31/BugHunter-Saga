@@ -30,19 +30,17 @@ import { TopBar } from "~/components/TopBar";
 import { BottomBar } from "~/components/BottomBar";
 import { RightBar } from "~/components/RightBar";
 import { LeftBar } from "~/components/LeftBar";
-import { useRouter } from "next/router";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
-import { units } from "~/utils/units";
+import { getUnitForModule } from "~/utils/units";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
 
-const tileStatus = (tile: Tile, lessonsCompleted: number): TileStatus => {
+const tileStatus = (tile: Tile, lessonsCompleted: number, currentUnit: Unit | null): TileStatus => {
   const lessonsPerTile = 4;
   const tilesCompleted = Math.floor(lessonsCompleted / lessonsPerTile);
-  const tiles = units.flatMap((unit) => unit.tiles);
-  const tileIndex = tiles.findIndex((t) => t === tile);
+  const tileIndex = currentUnit?.tiles.findIndex((t) => t === tile) ?? -1;
 
   if (tileIndex < tilesCompleted) {
     return "COMPLETE";
@@ -197,16 +195,14 @@ const getTileColors = ({
 const TileTooltip = ({
   selectedTile,
   index,
-  unitNumber,
-  tilesLength,
+  unit,
   description,
   status,
   closeTooltip,
 }: {
   selectedTile: number | null;
   index: number;
-  unitNumber: number;
-  tilesLength: number;
+  unit: Unit;
   description: string;
   status: TileStatus;
   closeTooltip: () => void;
@@ -227,9 +223,8 @@ const TileTooltip = ({
     return () => window.removeEventListener("click", containsTileTooltip, true);
   }, [selectedTile, tileTooltipRef, closeTooltip, index]);
 
-  const unit = units.find((unit) => unit.unitNumber === unitNumber);
-  const activeBackgroundColor = unit?.backgroundColor ?? "bg-green-500";
-  const activeTextColor = unit?.textColor ?? "text-green-500";
+  const activeBackgroundColor = unit.backgroundColor;
+  const activeTextColor = unit.textColor;
 
   return (
     <div
@@ -261,7 +256,11 @@ const TileTooltip = ({
                 : "bg-yellow-400",
           ].join(" ")}
           style={{
-            left: getTileTooltipLeftOffset({ index, unitNumber, tilesLength }),
+            left: getTileTooltipLeftOffset({ 
+              index, 
+              unitNumber: unit.unitNumber, 
+              tilesLength: unit.tiles.length 
+            }),
           }}
         ></div>
         <div
@@ -307,8 +306,6 @@ const TileTooltip = ({
 };
 
 const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
-  const router = useRouter();
-
   const [selectedTile, setSelectedTile] = useState<null | number>(null);
 
   useEffect(() => {
@@ -319,11 +316,12 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
 
   const closeTooltip = useCallback(() => setSelectedTile(null), []);
 
-  const lessonsCompleted = useBoundStore((x) => x.lessonsCompleted);
-  const increaseLessonsCompleted = useBoundStore(
-    (x) => x.increaseLessonsCompleted,
-  );
+  const currentModule = useBoundStore((x) => x.module);
+  const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
+  const increaseLessonsCompleted = useBoundStore((x) => x.increaseLessonsCompleted);
   const increaseLingots = useBoundStore((x) => x.increaseLingots);
+  
+  const lessonsCompleted = getLessonsCompletedForModule(currentModule.code);
 
   return (
     <>
@@ -335,7 +333,7 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
       />
       <div className="relative mb-8 mt-[67px] flex max-w-2xl flex-col items-center gap-4">
         {unit.tiles.map((tile, i): JSX.Element => {
-          const status = tileStatus(tile, lessonsCompleted);
+          const status = tileStatus(tile, lessonsCompleted, unit);
           return (
             <Fragment key={i}>
               {(() => {
@@ -392,9 +390,8 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
                               tile.type === "fast-forward" &&
                               status === "LOCKED"
                             ) {
-                              void router.push(
-                                `/lesson?fast-forward=${unit.unitNumber}`,
-                              );
+                              // Saltar directamente al tile fast-forward en el módulo actual
+                              increaseLessonsCompleted(currentModule.code, i * 4);
                               return;
                             }
                             setSelectedTile(i);
@@ -418,7 +415,7 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
                         ].join(" ")}
                         onClick={() => {
                           if (status === "ACTIVE") {
-                            increaseLessonsCompleted(4);
+                            increaseLessonsCompleted(currentModule.code, 4);
                             increaseLingots(1);
                           }
                         }}
@@ -438,8 +435,7 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
               <TileTooltip
                 selectedTile={selectedTile}
                 index={i}
-                unitNumber={unit.unitNumber}
-                tilesLength={unit.tiles.length}
+                unit={unit}
                 description={(() => {
                   switch (tile.type) {
                     case "book":
@@ -467,28 +463,11 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
   );
 };
 
-const getTopBarColors = (
-  scrollY: number,
-): {
-  backgroundColor: `bg-${string}`;
-  borderColor: `border-${string}`;
-} => {
-  const defaultColors = {
-    backgroundColor: "bg-[#58cc02]",
-    borderColor: "border-[#46a302]",
-  } as const;
-
-  if (scrollY < 680) {
-    return defaultColors;
-  } else if (scrollY < 1830) {
-    return units[1] ?? defaultColors;
-  } else {
-    return units[2] ?? defaultColors;
-  }
-};
-
 const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
+  
+  const currentModule = useBoundStore((x) => x.module);
+  const currentUnit = getUnitForModule(currentModule.code);
 
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
@@ -498,7 +477,15 @@ const Learn: NextPage = () => {
     return () => document.removeEventListener("scroll", updateScrollY);
   }, [scrollY]);
 
-  const topBarColors = getTopBarColors(scrollY);
+  // Los colores del topbar ahora vienen del módulo actual
+  const topBarColors = {
+    backgroundColor: currentModule.backgroundColor,
+    borderColor: currentModule.borderColor,
+  };
+
+  if (!currentUnit) {
+    return <div>Error: No se pudo cargar la unidad del módulo seleccionado</div>;
+  }
 
   return (
     <>
@@ -506,13 +493,11 @@ const Learn: NextPage = () => {
         backgroundColor={topBarColors.backgroundColor}
         borderColor={topBarColors.borderColor}
       />
-      <LeftBar selectedTab="Learn" />
+      <LeftBar selectedTab="Aprender" />
 
       <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
         <div className="flex max-w-2xl grow flex-col">
-          {units.map((unit) => (
-            <UnitSection unit={unit} key={unit.unitNumber} />
-          ))}
+          <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
           <div className="sticky bottom-28 left-0 right-0 flex items-end justify-between">
             <Link
               href="/lesson?practice"
@@ -537,7 +522,7 @@ const Learn: NextPage = () => {
 
       <div className="pt-[90px]"></div>
 
-      <BottomBar selectedTab="Learn" />
+      <BottomBar selectedTab="Aprender" />
       <LoginScreen
         loginScreenState={loginScreenState}
         setLoginScreenState={setLoginScreenState}
@@ -617,7 +602,7 @@ const UnitHeader = ({
   backgroundColor: `bg-${string}`;
   borderColor: `border-${string}`;
 }) => {
-  const module = useBoundStore((x) => x.module);
+  const currentModule = useBoundStore((x) => x.module);
   return (
     <article
       className={["max-w-2xl text-white sm:rounded-xl", backgroundColor].join(
@@ -630,7 +615,7 @@ const UnitHeader = ({
           <p className="text-lg">{description}</p>
         </div>
         <Link
-          href={`/guidebook/${module.code}/${unitNumber}`}
+          href={`/guidebook/${currentModule.code}/${unitNumber}`}
           className={[
             "flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 transition hover:text-gray-100",
             borderColor,

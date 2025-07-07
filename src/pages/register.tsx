@@ -21,18 +21,18 @@ const Register: NextPage = () => {
         <h1 className="mt-20 text-center text-3xl font-extrabold tracking-tight text-white">
           Selecciona tu módulo de Testing...
         </h1>
-        <section className="mx-auto grid w-full max-w-5xl grow grid-cols-1 flex-col gap-x-2 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <section className="mx-auto flex w-full max-w-2xl grow flex-col gap-4">
           {modules.map((module) => (
             <Link
               key={module.name}
               href="/learn"
               className={
-                "flex cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-b-4 border-gray-400 px-5 py-8 text-xl font-bold hover:bg-gray-300 hover:bg-opacity-20"
+                "flex cursor-pointer items-center gap-6 rounded-2xl border-2 border-b-4 border-gray-400 px-6 py-6 text-xl font-bold hover:bg-gray-300 hover:bg-opacity-20"
               }
               onClick={() => setModule(module)}
             >
               <ModuleIcon module={module} />
-              <div className="text-center">
+              <div className="flex-1">
                 <div>{module.name}</div>
                 <div className="text-sm font-normal text-gray-300 mt-2">{module.description}</div>
               </div>

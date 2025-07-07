@@ -671,6 +671,7 @@ const LessonComplete = ({
   const increaseLessonsCompleted = useBoundStore(
     (x) => x.increaseLessonsCompleted,
   );
+  const currentModule = useBoundStore((x) => x.module);
   return (
     <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
       <div className="flex grow flex-col items-center justify-center gap-8 font-bold">
@@ -721,7 +722,7 @@ const LessonComplete = ({
               addToday();
               increaseLingots(isPractice ? 0 : 1);
               if (!isPractice) {
-                increaseLessonsCompleted();
+                increaseLessonsCompleted(currentModule.code);
               }
             }}
           >
@@ -938,7 +939,6 @@ const LessonFastForwardEndPass = ({
   setReviewLessonShown: React.Dispatch<React.SetStateAction<boolean>>;
   questionResults: QuestionResult[];
 }) => {
-  const jumpToUnit = useBoundStore((x) => x.jumpToUnit);
   return (
     <div className="flex min-h-screen flex-col px-5 py-8 text-center">
       <div className="flex grow flex-col items-center justify-center gap-5">
@@ -959,7 +959,6 @@ const LessonFastForwardEndPass = ({
           <Link
             className="flex w-full items-center justify-center rounded-2xl border-b-4 border-green-600 bg-green-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
             href="/learn"
-            onClick={() => jumpToUnit(unitNumber)}
           >
             Continue
           </Link>

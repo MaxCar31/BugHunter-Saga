@@ -118,7 +118,11 @@ const Leaderboard: NextPage = () => {
   const router = useRouter();
   const loggedIn = useBoundStore((x) => x.loggedIn);
 
-  const lessonsCompleted = useBoundStore((x) => x.lessonsCompleted);
+  const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
+  
+  // Calculamos el total de lecciones completadas en todos los módulos
+  const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
+    .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -128,8 +132,8 @@ const Leaderboard: NextPage = () => {
 
   const lessonsToUnlockLeaderboard = 10;
   const lessonsRemainingToUnlockLeaderboard =
-    lessonsToUnlockLeaderboard - lessonsCompleted;
-  const leaderboardIsUnlocked = lessonsCompleted >= lessonsToUnlockLeaderboard;
+    lessonsToUnlockLeaderboard - totalLessonsCompleted;
+  const leaderboardIsUnlocked = totalLessonsCompleted >= lessonsToUnlockLeaderboard;
 
   const leaderboardLeague = "Bronze League";
 
@@ -137,7 +141,7 @@ const Leaderboard: NextPage = () => {
 
   return (
     <div>
-      <LeftBar selectedTab="Leaderboards" />
+      <LeftBar selectedTab="Clasificaciones" />
       <div className="flex justify-center gap-3 pt-14 md:ml-24 md:p-6 md:pt-10 lg:ml-64 lg:gap-12">
         <div className="flex w-full max-w-xl flex-col items-center gap-5 pb-28 md:px-5">
           {!leaderboardIsUnlocked && (
@@ -200,7 +204,7 @@ const Leaderboard: NextPage = () => {
         </div>
         {!leaderboardIsUnlocked && <LeaderboardExplanationSection />}
       </div>
-      <BottomBar selectedTab="Leaderboards" />
+      <BottomBar selectedTab="Clasificaciones" />
     </div>
   );
 };

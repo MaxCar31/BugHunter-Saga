@@ -185,7 +185,7 @@ export const TopBar = ({
                   <div className="flex grow flex-col">
                     <Link
                       className="flex items-center gap-2 p-2 font-bold text-gray-700"
-                      href="https://podcast.duolingo.com"
+                      href="https://podcast.bughuntersaga.com"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -194,7 +194,7 @@ export const TopBar = ({
                     </Link>
                     <Link
                       className="flex items-center gap-2 border-t-2 border-gray-300 p-2 font-bold text-gray-700"
-                      href="https://schools.duolingo.com"
+                      href="https://schools.bughuntersaga.com"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
