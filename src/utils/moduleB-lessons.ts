@@ -1,31 +1,7 @@
-
-
-// Definición de tipos para las lecciones del Módulo B
-export type LessonInfo = {
-  type: "INFO";
-  moduleTitle: string;
-  introduction: string;
-  objectives: string[];
-};
-
-export type LessonSelectOneOfThree = {
-  type: "SELECT_1_OF_3";
-  question: string;
-  answers: Array<{  name: string }>;
-  correctAnswer: number;
-};
-
-export type LessonWriteInEnglish = {
-  type: "WRITE_IN_ENGLISH";
-  question: string;
-  answerTiles: string[];
-  correctAnswer: number[];
-};
-
-export type ModuleBLesson = LessonInfo | LessonSelectOneOfThree | LessonWriteInEnglish;
+import { ModuleLesson } from "./lessons";
 
 // Lecciones del Módulo B - Nivel 1: Introducción a Tablas de Decisión
-export const moduleBLevel1Lessons: readonly ModuleBLesson[] = [
+export const moduleBLevel1Lessons: readonly ModuleLesson[] = [
   {
     type: "INFO",
     moduleTitle: "Módulo B – Tablas de Decisión",
@@ -44,7 +20,7 @@ Esta técnica es especialmente útil en testing para:
     ]
   },
   {
-    type: "SELECT_1_OF_3",
+    type: "MULTIPLE_CHOICE",
     question: "¿Qué representa una fila en una tabla de decisión?",
     answers: [
       { name: "Una regla de decisión" },
@@ -54,15 +30,19 @@ Esta técnica es especialmente útil en testing para:
     correctAnswer: 0,
   },
   {
-    type: "WRITE_IN_ENGLISH",
+    type: "FILL_IN_THE_BLANK",
     question: "Una tabla de decisión representa combinaciones de _____ y sus correspondientes _____",
     answerTiles: ["condiciones", "acciones", "reglas", "resultados", "decisiones", "casos"],
     correctAnswer: [0, 3], // ["condiciones", "resultados"]
   },
 ] as const;
 
+
+// Exporta por defecto para que coincida con el import en createQuestionsSlice.ts
+export default moduleBLevel1Lessons;
+
 // Función helper para obtener lecciones por nivel
-export const getModuleBLessons = (level: number): readonly ModuleBLesson[] => {
+export const getModuleBLessons = (level: number): readonly ModuleLesson[] => {
   switch (level) {
     case 1:
       return moduleBLevel1Lessons;
