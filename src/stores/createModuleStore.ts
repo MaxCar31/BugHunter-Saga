@@ -20,7 +20,7 @@ export const createModuleSlice: BoundStateCreator<ModuleSlice> = (set, get) => {
   };
 
   // Carga preguntas para el módulo por defecto (Módulo A) al inicializar el slice
-  get().loadQuestions(defaultModule.code);
+  // get().loadQuestions(defaultModule.code);
 
   return slice;
 };

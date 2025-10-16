@@ -47,3 +47,10 @@ export const useBoundStore = create<BoundState>((...args) => ({
   ...createXpSlice(...args),
   ...createQuestionsSlice(...args), // Agrega el slice de preguntas al store
 }));
+
+// Inicializar las preguntas del módulo por defecto DESPUÉS de crear el store
+// Esto se ejecuta una sola vez cuando se importa el módulo
+if (typeof window !== 'undefined') {
+  const currentModule = useBoundStore.getState().module;
+  useBoundStore.getState().loadQuestions(currentModule.code);
+}
