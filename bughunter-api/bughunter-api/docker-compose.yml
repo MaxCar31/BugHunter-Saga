@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15
-    container_name: banco-postgres
+    container_name: bughunter-postgres
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
