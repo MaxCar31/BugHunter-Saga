@@ -11,7 +11,7 @@ export const ModuleIcon = ({
     const height = Math.round((width * 66) / 82); // Maintain 82:66 aspect ratio
 
     switch (moduleCode) {
-      case "mod-a":
+      case "moduleA":
         return (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -22,9 +22,9 @@ export const ModuleIcon = ({
             style={{ borderRadius: "8px" }}
           />
         );
-      case "mod-b":
+      case "moduleB":
         return (
-            // eslint-disable-next-line @next/next/no-img-element
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src="/ModuloB.png"
             alt="Module B"
@@ -33,9 +33,9 @@ export const ModuleIcon = ({
             style={{ borderRadius: "8px" }}
           />
         );
-      case "mod-c":
+      case "moduleC":
         return (
-            // eslint-disable-next-line @next/next/no-img-element
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src="/ModuloC.png"
             alt="Module C"

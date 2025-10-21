@@ -9,9 +9,9 @@ export type Unit = {
 
 export type Tile =
   | {
-      type: "star" | "dumbbell" | "book" | "trophy" | "fast-forward";
-      description: string;
-    }
+    type: "star" | "dumbbell" | "book" | "trophy" | "fast-forward";
+    description: string;
+  }
   | { type: "treasure" };
 
 export type TileType = Tile["type"];
@@ -85,11 +85,11 @@ export const units: readonly Unit[] = [
 // Función para obtener la unidad correspondiente a un módulo
 export const getUnitForModule = (moduleCode: string): Unit | null => {
   switch (moduleCode) {
-    case "mod-a":
+    case "moduleA":
       return units[0] ?? null;
-    case "mod-b":
+    case "moduleB":
       return units[1] ?? null;
-    case "mod-c":
+    case "moduleC":
       return units[2] ?? null;
     default:
       return null;

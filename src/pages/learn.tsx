@@ -165,9 +165,9 @@ const getTileTooltipLeftOffset = ({
     unitNumber % 2 === 1
       ? tileTooltipLeftOffsets
       : [
-          ...tileTooltipLeftOffsets.slice(4),
-          ...tileTooltipLeftOffsets.slice(0, 4),
-        ];
+        ...tileTooltipLeftOffsets.slice(4),
+        ...tileTooltipLeftOffsets.slice(0, 4),
+      ];
 
   return offsets[index % offsets.length] ?? tileTooltipLeftOffsets[0];
 };
@@ -256,10 +256,10 @@ const TileTooltip = ({
                 : "bg-yellow-400",
           ].join(" ")}
           style={{
-            left: getTileTooltipLeftOffset({ 
-              index, 
-              unitNumber: unit.unitNumber, 
-              tilesLength: unit.tiles.length 
+            left: getTileTooltipLeftOffset({
+              index,
+              unitNumber: unit.unitNumber,
+              tilesLength: unit.tiles.length
             }),
           }}
         ></div>
@@ -320,7 +320,7 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
   const increaseLessonsCompleted = useBoundStore((x) => x.increaseLessonsCompleted);
   const increaseLingots = useBoundStore((x) => x.increaseLingots);
-  
+
   const lessonsCompleted = getLessonsCompletedForModule(currentModule.code);
 
   return (
@@ -465,9 +465,27 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
 
 const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
-  
+
   const currentModule = useBoundStore((x) => x.module);
-  const currentUnit = getUnitForModule(currentModule.code);
+  const currentUnit = getUnitForModule(currentModule?.code || "");
+
+  // Check if module is set and valid; if not, show a message with a link to select one
+  if (!currentModule || !currentModule.code || !currentUnit) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">No se ha seleccionado un módulo</h1>
+          <p className="text-gray-600 mb-6">Por favor, selecciona un módulo para continuar aprendiendo.</p>
+          <Link
+            href="/register"
+            className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
+          >
+            Seleccionar Módulo
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
@@ -482,10 +500,6 @@ const Learn: NextPage = () => {
     backgroundColor: currentModule.backgroundColor,
     borderColor: currentModule.borderColor,
   };
-
-  if (!currentUnit) {
-    return <div>Error: No se pudo cargar la unidad del módulo seleccionado</div>;
-  }
 
   return (
     <>

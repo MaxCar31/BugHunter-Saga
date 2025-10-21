@@ -1,11 +1,9 @@
 import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
-  AppleSvg,
   BigCloseSvg,
-  BoySvg,
   CloseSvg,
   DoneSvg,
   LessonFastForwardEndFailSvg,
@@ -13,15 +11,19 @@ import {
   LessonFastForwardStartSvg,
   LessonTopBarEmptyHeart,
   LessonTopBarHeart,
-  WomanSvg,
 } from "~/components/Svgs";
-import womanPng from "../../public/woman.png";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
-import { getModuleBLessons, type ModuleBLesson } from "~/utils/moduleB-lessons";
+import { type ModuleLesson } from "~/utils/lessons";
 
-// Usar las lecciones del Módulo B
-const lessonProblems = getModuleBLessons(1);
+// Importar componentes refactorizados
+import { ProgressBar } from "~/components/lessons/ProgressBar";
+import { QuitMessage } from "~/components/lessons/QuitMessage";
+import { CheckAnswer } from "~/components/lessons/CheckAnswer";
+import { ReviewLesson } from "~/components/lessons/ReviewLesson";
+import { ProblemInfo } from "~/components/lessons/ProblemInfo";
+import { FillInTheBlankQuestion } from "~/components/lessons/FillInTheBlankQuestion";
+// Elimina import de getModuleBLessons (ya no se usa)
 
 const numbersEqual = (a: readonly number[], b: readonly number[]): boolean => {
   return a.length === b.length && a.every((_, i) => a[i] === b[i]);
@@ -42,6 +44,32 @@ const formatTime = (timeMs: number): string => {
 
 const Lesson: NextPage = () => {
   const router = useRouter();
+  const currentModule = useBoundStore((x) => x.module);
+  const getQuestionsForModule = useBoundStore((x) => x.getQuestionsForModule);
+  const loadQuestions = useBoundStore((x) => x.loadQuestions);
+
+  // Carga preguntas dinámicamente al montar o cambiar módulo
+  useEffect(() => {
+    if (currentModule.code) {
+      loadQuestions(currentModule.code);
+    }
+  }, [currentModule.code, loadQuestions]);
+
+  // Obtiene preguntas del módulo actual desde el store
+  const lessonProblems = getQuestionsForModule(currentModule.code);
+
+  // Verificación: Si no hay preguntas, mostrar mensaje de carga
+  if (lessonProblems.length === 0) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Cargando preguntas...</h1>
+          <p className="text-gray-600">Por favor, espera mientras se cargan las lecciones para el módulo {currentModule.name}.</p>
+          <p className="text-sm text-gray-500 mt-2">Si el problema persiste, verifica que el archivo {currentModule.code}_lesson.ts exista en ~/utils/.</p>
+        </div>
+      </div>
+    );
+  }
 
   const [lessonProblem, setLessonProblem] = useState(0);
   const [correctAnswerCount, setCorrectAnswerCount] = useState(0);
@@ -63,16 +91,34 @@ const Lesson: NextPage = () => {
   // Solo contar problemas que no sean INFO
   const totalCorrectAnswersNeeded = lessonProblems.filter(p => p.type !== "INFO").length;
 
+  // Si no hay preguntas no-INFO, mostrar mensaje de error
+  if (totalCorrectAnswersNeeded === 0) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">No hay preguntas disponibles</h1>
+          <p className="text-gray-600">El módulo {currentModule.name} no tiene lecciones configuradas.</p>
+          <Link
+            href="/learn"
+            className="mt-4 inline-block rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
+          >
+            Volver a Aprender
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const [isStartingLesson, setIsStartingLesson] = useState(true);
   const hearts =
     "fast-forward" in router.query &&
-    !isNaN(Number(router.query["fast-forward"]))
+      !isNaN(Number(router.query["fast-forward"]))
       ? 3 - incorrectAnswerCount
       : null;
 
   // Solo verificar correctAnswer si no es una pantalla INFO y si problem existe
-  const correctAnswer = problem && problem.type !== "INFO" && "correctAnswer" in problem 
-    ? problem.correctAnswer 
+  const correctAnswer = problem && problem.type !== "INFO" && "correctAnswer" in problem
+    ? problem.correctAnswer
     : null;
   const isAnswerCorrect = problem && problem.type === "INFO" ? false : Array.isArray(correctAnswer)
     ? numbersEqual(selectedAnswers, correctAnswer)
@@ -83,16 +129,16 @@ const Lesson: NextPage = () => {
     if (!problem || problem.type === "INFO") {
       return;
     }
-    
+
     setCorrectAnswerShown(true);
     if (isAnswerCorrect) {
       setCorrectAnswerCount((x) => x + 1);
     } else {
       setIncorrectAnswerCount((x) => x + 1);
     }
-    
+
     // Solo agregar resultados para problemas con preguntas
-    if (problem.type === "SELECT_1_OF_3") {
+    if (problem.type === "MULTIPLE_CHOICE") {
       setQuestionResults((questionResults) => [
         ...questionResults,
         {
@@ -101,7 +147,7 @@ const Lesson: NextPage = () => {
           correctResponse: problem.answers[problem.correctAnswer].name,
         },
       ]);
-    } else if (problem.type === "WRITE_IN_ENGLISH") {
+    } else if (problem.type === "FILL_IN_THE_BLANK") {
       setQuestionResults((questionResults) => [
         ...questionResults,
         {
@@ -193,9 +239,9 @@ const Lesson: NextPage = () => {
       );
     }
 
-    case "SELECT_1_OF_3": {
+    case "MULTIPLE_CHOICE": {
       return (
-        <ProblemSelect1Of3
+        <MultipleChoiceQuestion
           problem={problem}
           correctAnswerCount={correctAnswerCount}
           totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
@@ -213,9 +259,9 @@ const Lesson: NextPage = () => {
       );
     }
 
-    case "WRITE_IN_ENGLISH": {
+    case "FILL_IN_THE_BLANK": {
       return (
-        <ProblemWriteInEnglish
+        <FillInTheBlankQuestion
           problem={problem}
           correctAnswerCount={correctAnswerCount}
           totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
@@ -237,290 +283,7 @@ const Lesson: NextPage = () => {
 
 export default Lesson;
 
-const ProgressBar = ({
-  correctAnswerCount,
-  totalCorrectAnswersNeeded,
-  setQuitMessageShown,
-  hearts,
-}: {
-  correctAnswerCount: number;
-  totalCorrectAnswersNeeded: number;
-  setQuitMessageShown: (isShown: boolean) => void;
-  hearts: null | number;
-}) => {
-  return (
-    <header className="flex items-center gap-4">
-      {correctAnswerCount === 0 ? (
-        <Link href="/learn" className="text-gray-400">
-          <CloseSvg />
-          <span className="sr-only">Exit lesson</span>
-        </Link>
-      ) : (
-        <button
-          className="text-gray-400"
-          onClick={() => setQuitMessageShown(true)}
-        >
-          <CloseSvg />
-          <span className="sr-only">Exit lesson</span>
-        </button>
-      )}
-      <div
-        className="h-4 grow rounded-full bg-gray-200"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={1}
-        aria-valuenow={correctAnswerCount / totalCorrectAnswersNeeded}
-      >
-        <div
-          className={
-            "h-full rounded-full bg-green-500 transition-all duration-700 " +
-            (correctAnswerCount > 0 ? "px-2 pt-1 " : "")
-          }
-          style={{
-            width: `${(correctAnswerCount / totalCorrectAnswersNeeded) * 100}%`,
-          }}
-        >
-          <div className="h-[5px] w-full rounded-full bg-green-400"></div>
-        </div>
-      </div>
-      {hearts !== null &&
-        [1, 2, 3].map((heart) => {
-          if (heart <= hearts) {
-            return <LessonTopBarHeart key={heart} />;
-          }
-          return <LessonTopBarEmptyHeart key={heart} />;
-        })}
-    </header>
-  );
-};
-
-const QuitMessage = ({
-  quitMessageShown,
-  setQuitMessageShown,
-}: {
-  quitMessageShown: boolean;
-  setQuitMessageShown: (isShown: boolean) => void;
-}) => {
-  return (
-    <>
-      <div
-        className={
-          quitMessageShown
-            ? "fixed bottom-0 left-0 right-0 top-0 z-30 bg-black bg-opacity-60 transition-all duration-300"
-            : "pointer-events-none fixed bottom-0 left-0 right-0 top-0 z-30 bg-black bg-opacity-0 transition-all duration-300"
-        }
-        onClick={() => setQuitMessageShown(false)}
-        aria-label="Close quit message"
-        role="button"
-      ></div>
-
-      <article
-        className={
-          quitMessageShown
-            ? "fixed bottom-0 left-0 right-0 z-40 flex flex-col gap-4 bg-white px-5 py-12 text-center transition-all duration-300 sm:flex-row"
-            : "fixed -bottom-96 left-0 right-0 z-40 flex flex-col bg-white px-5 py-12 text-center transition-all duration-300 sm:flex-row"
-        }
-        aria-hidden={!quitMessageShown}
-      >
-        <div className="flex grow flex-col gap-4">
-          <h2 className="text-lg font-bold sm:text-2xl">
-            Are you sure you want to quit?
-          </h2>
-          <p className="text-gray-500 sm:text-lg">
-            All progress for this lesson will be lost.
-          </p>
-        </div>
-        <div className="flex grow flex-col items-center justify-center gap-4 sm:flex-row-reverse">
-          <Link
-            className="flex w-full items-center justify-center rounded-2xl border-b-4 border-blue-500 bg-blue-400 py-3 font-bold uppercase text-white transition hover:brightness-105 sm:w-48"
-            href="/learn"
-          >
-            Quit
-          </Link>
-          <button
-            className="w-full rounded-2xl py-3 font-bold uppercase text-blue-400 transition hover:brightness-90 sm:w-48 sm:border-2 sm:border-b-4 sm:border-gray-300 sm:text-gray-400 sm:hover:bg-gray-100"
-            onClick={() => setQuitMessageShown(false)}
-          >
-            Stay
-          </button>
-        </div>
-      </article>
-    </>
-  );
-};
-
-const CheckAnswer = ({
-  isAnswerSelected,
-  isAnswerCorrect,
-  correctAnswerShown,
-  correctAnswer,
-  onCheckAnswer,
-  onFinish,
-  onSkip,
-}: {
-  isAnswerSelected: boolean;
-  isAnswerCorrect: boolean;
-  correctAnswerShown: boolean;
-  correctAnswer: string;
-  onCheckAnswer: () => void;
-  onFinish: () => void;
-  onSkip: () => void;
-}) => {
-  return (
-    <>
-      <section className="border-gray-200 sm:border-t-2 sm:p-10">
-        <div className="mx-auto flex max-w-5xl sm:justify-between">
-          <button
-            className="hidden rounded-2xl border-2 border-b-4 border-gray-200 bg-white p-3 font-bold uppercase text-gray-400 transition hover:border-gray-300 hover:bg-gray-200 sm:block sm:min-w-[150px] sm:max-w-fit"
-            onClick={onSkip}
-          >
-            Skip
-          </button>
-          {!isAnswerSelected ? (
-            <button
-              className="grow rounded-2xl bg-gray-200 p-3 font-bold uppercase text-gray-400 sm:min-w-[150px] sm:max-w-fit sm:grow-0"
-              disabled
-            >
-              Check
-            </button>
-          ) : (
-            <button
-              onClick={onCheckAnswer}
-              className="grow rounded-2xl border-b-4 border-green-600 bg-green-500 p-3 font-bold uppercase text-white sm:min-w-[150px] sm:max-w-fit sm:grow-0"
-            >
-              Check
-            </button>
-          )}
-        </div>
-      </section>
-
-      <div
-        className={
-          correctAnswerShown
-            ? isAnswerCorrect
-              ? "fixed bottom-0 left-0 right-0 bg-lime-100 font-bold text-green-600 transition-all"
-              : "fixed bottom-0 left-0 right-0 bg-red-100 font-bold text-red-500 transition-all"
-            : "fixed -bottom-52 left-0 right-0"
-        }
-      >
-        <div className="flex max-w-5xl flex-col gap-4 p-5 sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:p-10 sm:py-14">
-          <>
-            {isAnswerCorrect ? (
-              <div className="mb-2 flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="hidden rounded-full bg-white p-5 text-green-500 sm:block">
-                  <DoneSvg />
-                </div>
-                <div className="text-2xl">Good job!</div>
-              </div>
-            ) : (
-              <div className="mb-2 flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="hidden rounded-full bg-white p-5 text-red-500 sm:block">
-                  <BigCloseSvg />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="text-2xl">Correct solution:</div>{" "}
-                  <div className="text-sm font-normal">{correctAnswer}</div>
-                </div>
-              </div>
-            )}
-          </>
-          <button
-            onClick={onFinish}
-            className={
-              isAnswerCorrect
-                ? "w-full rounded-2xl border-b-4 border-green-600 bg-green-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
-                : "w-full rounded-2xl border-b-4 border-red-600 bg-red-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
-            }
-          >
-            Continue
-          </button>
-        </div>
-      </div>
-    </>
-  );
-};
-
-const ProblemInfo = ({
-  problem,
-  correctAnswerCount,
-  totalCorrectAnswersNeeded,
-  quitMessageShown,
-  setQuitMessageShown,
-  onFinish,
-  hearts,
-}: {
-  problem: ModuleBLesson;
-  correctAnswerCount: number;
-  totalCorrectAnswersNeeded: number;
-  quitMessageShown: boolean;
-  setQuitMessageShown: React.Dispatch<React.SetStateAction<boolean>>;
-  onFinish: () => void;
-  hearts: number | null;
-}) => {
-  // Type guard para asegurar que es una lección tipo INFO
-  if (problem.type !== "INFO") {
-    return null;
-  }
-
-  const { moduleTitle, introduction, objectives } = problem;
-
-  return (
-    <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
-      <div className="flex grow flex-col items-center gap-5">
-        <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
-          <ProgressBar
-            correctAnswerCount={correctAnswerCount}
-            totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
-            setQuitMessageShown={setQuitMessageShown}
-            hearts={hearts}
-          />
-        </div>
-        <section className="flex max-w-4xl grow flex-col gap-8 self-center sm:items-center sm:justify-center sm:px-5">
-          <div className="text-center">
-            <h1 className="mb-4 text-3xl font-bold text-[#f2a445] sm:text-4xl">
-              {moduleTitle}
-            </h1>
-            <div className="mb-6 text-left text-lg leading-relaxed text-gray-700 sm:text-center">
-              {introduction.split('\n').map((line, i) => (
-                <p key={i} className="mb-3">{line}</p>
-              ))}
-            </div>
-          </div>
-          
-          <div className="w-full max-w-2xl">
-            <h2 className="mb-4 text-xl font-bold text-gray-800">Objetivos del Nivel:</h2>
-            <ul className="space-y-3">
-              {objectives.map((objective, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#f2a445]"></div>
-                  <span className="text-gray-700">{objective}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      </div>
-
-      <section className="border-gray-200 sm:border-t-2 sm:p-10">
-        <div className="mx-auto flex max-w-5xl justify-center">
-          <button
-            onClick={onFinish}
-            className="w-full rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
-          >
-            Comenzar
-          </button>
-        </div>
-      </section>
-
-      <QuitMessage
-        quitMessageShown={quitMessageShown}
-        setQuitMessageShown={setQuitMessageShown}
-      />
-    </div>
-  );
-};
-
-const ProblemSelect1Of3 = ({
+const MultipleChoiceQuestion = ({
   problem,
   correctAnswerCount,
   totalCorrectAnswersNeeded,
@@ -535,7 +298,7 @@ const ProblemSelect1Of3 = ({
   onSkip,
   hearts,
 }: {
-  problem: ModuleBLesson;
+  problem: ModuleLesson;
   correctAnswerCount: number;
   totalCorrectAnswersNeeded: number;
   selectedAnswer: number | null;
@@ -549,8 +312,8 @@ const ProblemSelect1Of3 = ({
   onSkip: () => void;
   hearts: number | null;
 }) => {
-  // Type guard para asegurar que es una lección tipo SELECT_1_OF_3
-  if (problem.type !== "SELECT_1_OF_3") {
+  // Type guard para asegurar que es una lección tipo MULTIPLE_CHOICE
+  if (problem.type !== "MULTIPLE_CHOICE") {
     return null;
   }
 
@@ -616,137 +379,6 @@ const ProblemSelect1Of3 = ({
   );
 };
 
-const ProblemWriteInEnglish = ({
-  problem,
-  correctAnswerCount,
-  totalCorrectAnswersNeeded,
-  selectedAnswers,
-  setSelectedAnswers,
-  quitMessageShown,
-  correctAnswerShown,
-  setQuitMessageShown,
-  isAnswerCorrect,
-  onCheckAnswer,
-  onFinish,
-  onSkip,
-  hearts,
-}: {
-  problem: ModuleBLesson;
-  correctAnswerCount: number;
-  totalCorrectAnswersNeeded: number;
-  selectedAnswers: number[];
-  setSelectedAnswers: React.Dispatch<React.SetStateAction<number[]>>;
-  correctAnswerShown: boolean;
-  quitMessageShown: boolean;
-  setQuitMessageShown: React.Dispatch<React.SetStateAction<boolean>>;
-  isAnswerCorrect: boolean;
-  onCheckAnswer: () => void;
-  onFinish: () => void;
-  onSkip: () => void;
-  hearts: number | null;
-}) => {
-  // Type guard para asegurar que es una lección tipo WRITE_IN_ENGLISH
-  if (problem.type !== "WRITE_IN_ENGLISH") {
-    return null;
-  }
-
-  const { question, correctAnswer, answerTiles } = problem;
-
-  return (
-    <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
-      <div className="flex grow flex-col items-center gap-5">
-        <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
-          <ProgressBar
-            correctAnswerCount={correctAnswerCount}
-            totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
-            setQuitMessageShown={setQuitMessageShown}
-            hearts={hearts}
-          />
-        </div>
-        <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-24">
-          <h1 className="mb-2 text-2xl font-bold sm:text-3xl">
-            Completa la definición
-          </h1>
-
-          <div className="w-full">
-            <div className="flex items-center gap-2 px-2">
-              <Image src="/logo.svg" alt="" width={92} height={115} />
-              <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
-                {question}
-                <div
-                  className="absolute h-4 w-4 rotate-45 border-b-2 border-l-2 border-gray-200 bg-white"
-                  style={{
-                    top: "calc(50% - 8px)",
-                    left: "-10px",
-                  }}
-                ></div>
-              </div>
-            </div>
-
-            <div className="flex min-h-[60px] flex-wrap gap-1 border-b-2 border-t-2 border-gray-200 py-1">
-              {selectedAnswers.map((i) => {
-                return (
-                  <button
-                    key={i}
-                    className="rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
-                    onClick={() => {
-                      setSelectedAnswers((selectedAnswers) => {
-                        return selectedAnswers.filter((x) => x !== i);
-                      });
-                    }}
-                  >
-                    {answerTiles[i]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="flex flex-wrap justify-center gap-1">
-            {answerTiles.map((answerTile, i) => {
-              return (
-                <button
-                  key={i}
-                  className={
-                    selectedAnswers.includes(i)
-                      ? "rounded-2xl border-2 border-b-4 border-gray-200 bg-gray-200 p-2 text-gray-200"
-                      : "rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
-                  }
-                  disabled={selectedAnswers.includes(i)}
-                  onClick={() =>
-                    setSelectedAnswers((selectedAnswers) => {
-                      if (selectedAnswers.includes(i)) {
-                        return selectedAnswers;
-                      }
-                      return [...selectedAnswers, i];
-                    })
-                  }
-                >
-                  {answerTile}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      </div>
-
-      <CheckAnswer
-        correctAnswer={correctAnswer.map((i) => answerTiles[i]).join(" ")}
-        correctAnswerShown={correctAnswerShown}
-        isAnswerCorrect={isAnswerCorrect}
-        isAnswerSelected={selectedAnswers.length > 0}
-        onCheckAnswer={onCheckAnswer}
-        onFinish={onFinish}
-        onSkip={onSkip}
-      />
-
-      <QuitMessage
-        quitMessageShown={quitMessageShown}
-        setQuitMessageShown={setQuitMessageShown}
-      />
-    </div>
-  );
-};
-
 const LessonComplete = ({
   correctAnswerCount,
   incorrectAnswerCount,
@@ -799,7 +431,7 @@ const LessonComplete = ({
               {Math.round(
                 (correctAnswerCount /
                   (correctAnswerCount + incorrectAnswerCount)) *
-                  100,
+                100,
               )}
               %
             </div>
@@ -845,103 +477,6 @@ type QuestionResult = {
   question: string;
   yourResponse: string;
   correctResponse: string;
-};
-
-const ReviewLesson = ({
-  reviewLessonShown,
-  setReviewLessonShown,
-  questionResults,
-}: {
-  reviewLessonShown: boolean;
-  setReviewLessonShown: React.Dispatch<React.SetStateAction<boolean>>;
-  questionResults: QuestionResult[];
-}) => {
-  const [selectedQuestionResult, setSelectedQuestionResult] =
-    useState<null | QuestionResult>(null);
-  return (
-    <div
-      className={[
-        "fixed inset-0 flex items-center justify-center p-5 transition duration-300",
-        reviewLessonShown ? "" : "pointer-events-none opacity-0",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "absolute inset-0 bg-black",
-          reviewLessonShown ? "opacity-75" : "pointer-events-none opacity-0",
-        ].join(" ")}
-        onClick={() => setReviewLessonShown(false)}
-      ></div>
-      <div className="relative flex w-full max-w-4xl flex-col gap-5 rounded-2xl border-2 border-gray-200 bg-white p-8">
-        <button
-          className="absolute -right-5 -top-5 rounded-full border-2 border-gray-200 bg-gray-100 p-1 text-gray-400 hover:brightness-90"
-          onClick={() => setReviewLessonShown(false)}
-        >
-          <BigCloseSvg className="h-8 w-8" />
-          <span className="sr-only">Close</span>
-        </button>
-        <h2 className="text-center text-3xl">Check out your scorecard!</h2>
-        <p className="text-center text-xl text-gray-400">
-          Click the tiles below to reveal the solutions
-        </p>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {questionResults.map((questionResult, i) => {
-            return (
-              <button
-                key={i}
-                className={[
-                  "relative flex flex-col items-stretch gap-3 rounded-xl p-5 text-left",
-                  questionResult.yourResponse === questionResult.correctResponse
-                    ? "bg-yellow-100 text-yellow-600"
-                    : "bg-red-100 text-red-500",
-                ].join(" ")}
-                onClick={() =>
-                  setSelectedQuestionResult((selectedQuestionResult) =>
-                    selectedQuestionResult === questionResult
-                      ? null
-                      : questionResult,
-                  )
-                }
-              >
-                <div className="flex justify-between gap-2">
-                  <h3 className="font-bold">{questionResult.question}</h3>
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white">
-                    {questionResult.yourResponse ===
-                    questionResult.correctResponse ? (
-                      <DoneSvg className="h-5 w-5" />
-                    ) : (
-                      <BigCloseSvg className="h-5 w-5" />
-                    )}
-                  </div>
-                </div>
-                <div>{questionResult.yourResponse}</div>
-                {selectedQuestionResult === questionResult && (
-                  <div className="absolute left-1 right-1 top-20 z-10 rounded-2xl border-2 border-gray-200 bg-white p-3 text-sm tracking-tighter">
-                    <div
-                      className="absolute -top-2 h-3 w-3 rotate-45 border-l-2 border-t-2 border-gray-200 bg-white"
-                      style={{ left: "calc(50% - 6px)" }}
-                    ></div>
-                    <div className="font-bold uppercase text-gray-400">
-                      Your response:
-                    </div>
-                    <div className="mb-3 text-gray-700">
-                      {questionResult.yourResponse}
-                    </div>
-                    <div className="font-bold uppercase text-gray-400">
-                      Correct response:
-                    </div>
-                    <div className="text-gray-700">
-                      {questionResult.correctResponse}
-                    </div>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
 };
 
 const LessonFastForwardStart = ({
