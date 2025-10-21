@@ -1,6 +1,4 @@
 import { type NextPage } from "next";
-import Link from "next/link";
-import { GlobeSvg } from "~/components/Svgs";
 import React from "react";
 import { ModuleHeader } from "~/components/ModuleHeader";
 import { useLoginScreen, LoginScreen } from "~/components/LoginScreen";

@@ -1,0 +1,993 @@
+openapi: 3.0.3
+info:
+  description: |-
+    API (Contrato Primero) para la plataforma gamificada BugHunter Saga.
+    Diseñada para soportar la implementación del frontend en Next.js
+    y el backend en Spring Boot para el proyecto de tesis de Max Carrión.
+  title: BugHunter Saga API
+  version: 1.0.0
+servers:
+- description: Servidor de API (prefijo base)
+  url: /api
+tags:
+- description: "Autenticación, registro y recuperación de cuentas."
+  name: Auth
+- description: "Carga de módulos, unidades, lecciones y problemas."
+  name: Content
+- description: "Gestión del perfil, configuraciones y estadísticas del usuario."
+  name: User
+- description: Registro del progreso de lecciones y recompensas.
+  name: Progress
+- description: Endpoints para la tienda (shop) y la tabla de clasificación (leaderboard).
+  name: Gamification
+paths:
+  /auth/register:
+    post:
+      description: Crea una nueva cuenta de usuario y su perfil inicial.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationDTO'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDTO'
+          description: Usuario registrado exitosamente.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: "Solicitud inválida (e.g., falta un campo, email inválido,\
+            \ username ya existe)."
+      summary: Registrar un nuevo usuario
+      tags:
+      - Auth
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /auth/login:
+    post:
+      description: Autentica al usuario y devuelve un token de acceso e información
+        básica.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDTO'
+          description: Inicio de sesión exitoso.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      summary: Iniciar sesión
+      tags:
+      - Auth
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /auth/forgot-password:
+    post:
+      description: Inicia el flujo de recuperación de contraseña (lógica a implementar).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/_auth_forgot_password_post_request'
+        required: true
+      responses:
+        "200":
+          description: Instrucciones enviadas (si el email existe).
+      summary: Recuperación de contraseña (placeholder)
+      tags:
+      - Auth
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /content/modules:
+    get:
+      description: Devuelve la lista de todos los módulos disponibles para que el
+        usuario elija en `pages/register.tsx`.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ModuleSummaryDTO'
+                type: array
+          description: Lista de módulos.
+      summary: Obtener todos los módulos
+      tags:
+      - Content
+      x-accepts:
+      - application/json
+  /content/modules/{moduleCode}/unit:
+    get:
+      description: |-
+        Devuelve la estructura de la unidad actual para un módulo (basado en `utils/units.ts`, que muestra una unidad por módulo).
+        Incluye la lista de 'tiles' (lecciones) para renderizar en `pages/learn.tsx`.
+      parameters:
+      - explode: false
+        in: path
+        name: moduleCode
+        required: true
+        schema:
+          example: moduleA
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnitDetailDTO'
+          description: Detalles de la unidad y sus 'tiles' (lecciones).
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: Recurso no encontrado.
+      security:
+      - bearerAuth: []
+      summary: Obtener la unidad activa para un módulo
+      tags:
+      - Content
+      x-accepts:
+      - application/json
+  /content/modules/{moduleCode}/problems:
+    get:
+      description: |-
+        Reemplaza la carga de archivos estáticos en `stores/createQuestionsSlice.ts`.
+        Devuelve *toda* la lista de problemas (incluyendo 'INFO', 'MULTIPLE_CHOICE', etc.) para un módulo,
+        que `pages/lesson.tsx` consumirá.
+      parameters:
+      - explode: false
+        in: path
+        name: moduleCode
+        required: true
+        schema:
+          example: moduleB
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ProblemDTO'
+                type: array
+          description: Lista de todos los problemas/preguntas para ese módulo.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: Recurso no encontrado.
+      security:
+      - bearerAuth: []
+      summary: Obtener todos los problemas/preguntas de un módulo
+      tags:
+      - Content
+      x-accepts:
+      - application/json
+  /users/me/profile:
+    get:
+      description: "Devuelve toda la información del usuario autenticado, incluyendo\
+        \ datos personales y configuraciones."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileDTO'
+          description: Perfil completo del usuario.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Obtener el perfil completo del usuario
+      tags:
+      - User
+      x-accepts:
+      - application/json
+  /users/me/account:
+    put:
+      description: Usado por `pages/settings/account.tsx` para guardar cambios.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAccountUpdateDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDTO'
+          description: Cuenta actualizada.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: "Solicitud inválida (e.g., falta un campo, email inválido,\
+            \ username ya existe)."
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Actualizar datos de la cuenta (nombre/username)
+      tags:
+      - User
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/me/settings:
+    put:
+      description: Usado por `pages/settings/coach.tsx` y `pages/settings/sound.tsx`.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSettingsUpdateDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileDTO'
+          description: Configuraciones actualizadas.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: "Solicitud inválida (e.g., falta un campo, email inválido,\
+            \ username ya existe)."
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: "Actualizar configuraciones del usuario (meta, sonido)"
+      tags:
+      - User
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/me/stats:
+    get:
+      description: "Endpoint optimizado para `RightBar.tsx` y `TopBar.tsx`, proporciona\
+        \ todos los datos dinámicos."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsDTO'
+          description: Estadísticas del usuario.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Obtener estadísticas de gamificación del usuario
+      tags:
+      - User
+      x-accepts:
+      - application/json
+  /progress/lesson:
+    post:
+      description: |-
+        Se llama desde `LessonComplete` en `lesson.tsx`.
+        El backend debe:
+        1. Registrar la lección en `user_lesson_progress`.
+        2. Calcular y registrar el XP en `user_xp_history`.
+        3. Calcular y actualizar la racha en `user_streaks`.
+        4. Otorga lingots/Puntos QA (si no es práctica) y actualizar `user_profiles`.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LessonResultDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonCompletionResponseDTO'
+          description: "Progreso guardado, devuelve recompensas."
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: "Solicitud inválida (e.g., falta un campo, email inválido,\
+            \ username ya existe)."
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Registrar finalización de una lección
+      tags:
+      - Progress
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /progress/treasure/{lessonId}:
+    post:
+      description: Se llama desde `pages/learn.tsx` al hacer clic en un cofre activo.
+        El backend otorga lingots/Puntos QA.
+      parameters:
+      - description: ID de la lección (o tile) que representa el tesoro.
+        explode: false
+        in: path
+        name: lessonId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_progress_treasure__lessonId__post_200_response'
+          description: Recompensa reclamada.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: Tesoro ya reclamado o no desbloqueado.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Reclamar un cofre de tesoro
+      tags:
+      - Progress
+      x-accepts:
+      - application/json
+  /leaderboard:
+    get:
+      description: Devuelve la tabla de clasificación de la liga actual del usuario
+        para `pages/leaderboard.tsx`.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardDTO'
+          description: Tabla de clasificación semanal.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: El usuario aún no ha desbloqueado las clasificaciones.
+      security:
+      - bearerAuth: []
+      summary: Obtener la tabla de clasificación
+      tags:
+      - Gamification
+      x-accepts:
+      - application/json
+  /shop/items:
+    get:
+      description: Devuelve los artículos disponibles en `pages/shop.tsx`.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ShopItemDTO'
+                type: array
+          description: Lista de artículos.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Obtener los artículos de la tienda
+      tags:
+      - Gamification
+      x-accepts:
+      - application/json
+  /shop/purchase/{itemId}:
+    post:
+      description: Permite al usuario comprar un artículo (ej. 'streak-freeze') usando
+        'lingots'.
+      parameters:
+      - explode: false
+        in: path
+        name: itemId
+        required: true
+        schema:
+          example: streak-freeze
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsDTO'
+          description: Compra exitosa. Devuelve el estado actualizado del perfil/inventario.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: Fondos (lingots) insuficientes o artículo no válido.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          description: No autenticado (token no provisto o inválido).
+      security:
+      - bearerAuth: []
+      summary: Comprar un artículo de la tienda
+      tags:
+      - Gamification
+      x-accepts:
+      - application/json
+components:
+  responses:
+    ErrorBadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      description: "Solicitud inválida (e.g., falta un campo, email inválido, username\
+        \ ya existe)."
+    ErrorUnauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      description: No autenticado (token no provisto o inválido).
+    ErrorNotFound:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      description: Recurso no encontrado.
+  schemas:
+    UserRegistrationDTO:
+      example:
+        password: password
+        name: Max Carrión
+        email: max.carrion@epn.edu.ec
+        username: max.carrion
+      properties:
+        username:
+          example: max.carrion
+          type: string
+        name:
+          example: Max Carrión
+          type: string
+        email:
+          example: max.carrion@epn.edu.ec
+          format: email
+          type: string
+        password:
+          format: password
+          minLength: 8
+          type: string
+      required:
+      - email
+      - name
+      - password
+      - username
+      type: object
+    UserLoginDTO:
+      example:
+        emailOrUsername: max.carrion
+        password: password
+      properties:
+        emailOrUsername:
+          example: max.carrion
+          type: string
+        password:
+          format: password
+          type: string
+      required:
+      - emailOrUsername
+      - password
+      type: object
+    AuthResponseDTO:
+      example:
+        user:
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          email: email
+          username: username
+        token: token
+      properties:
+        token:
+          description: Token de acceso (JWT)
+          type: string
+        user:
+          $ref: '#/components/schemas/UserInfoDTO'
+      type: object
+    UserInfoDTO:
+      example:
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        email: email
+        username: username
+      properties:
+        id:
+          format: uuid
+          type: string
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          format: email
+          type: string
+      type: object
+    UserProfileDTO:
+      description: Perfil completo del usuario (datos personales y configuraciones)
+      example:
+        lingots: 0
+        joinedAt: 2000-01-23T04:56:07.000+00:00
+        dailyXpGoal: 6
+        name: name
+        soundEffectsEnabled: true
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        email: email
+        username: username
+      properties:
+        userId:
+          format: uuid
+          type: string
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          format: email
+          type: string
+        joinedAt:
+          format: date-time
+          type: string
+        lingots:
+          description: Puntos QA
+          type: integer
+        dailyXpGoal:
+          type: integer
+        soundEffectsEnabled:
+          type: boolean
+      type: object
+    UserAccountUpdateDTO:
+      description: Campos para actualizar en `settings/account.tsx`
+      example:
+        name: name
+        username: username
+      properties:
+        name:
+          maxLength: 100
+          type: string
+        username:
+          maxLength: 50
+          minLength: 3
+          type: string
+      type: object
+    UserSettingsUpdateDTO:
+      description: Campos para actualizar en `settings/coach.tsx` y `settings/sound.tsx`
+      example:
+        dailyXpGoal: 0
+        speakingExercises: true
+        listeningExercises: true
+        soundEffectsEnabled: true
+      properties:
+        dailyXpGoal:
+          enum:
+          - 1
+          - 10
+          - 20
+          - 30
+          - 50
+          type: integer
+        soundEffectsEnabled:
+          type: boolean
+        speakingExercises:
+          type: boolean
+        listeningExercises:
+          type: boolean
+      type: object
+    UserStatsDTO:
+      description: "Datos dinámicos de gamificación para el UI (RightBar, TopBar)"
+      example:
+        totalXp: 0
+        currentStreak: 1
+        activeDays:
+        - 2025-10-20
+        - 2025-10-20
+        totalLingots: 6
+        xpToday: 5
+        leagueRank: 2
+        xpThisWeek: 5
+      properties:
+        totalXp:
+          type: integer
+        totalLingots:
+          type: integer
+        currentStreak:
+          type: integer
+        xpToday:
+          type: integer
+        xpThisWeek:
+          type: integer
+        leagueRank:
+          nullable: true
+          type: integer
+        activeDays:
+          items:
+            example: 2025-10-20
+            format: date
+            type: string
+          type: array
+      type: object
+    ModuleSummaryDTO:
+      description: Información básica del módulo
+      example:
+        code: moduleA
+        name: name
+        description: description
+        uiConfig:
+          backgroundColor: "bg-[#58cc02]"
+          borderColor: "border-[#46a302]"
+        id: 0
+        shortName: shortName
+      properties:
+        id:
+          type: integer
+        code:
+          example: moduleA
+          type: string
+        name:
+          type: string
+        shortName:
+          type: string
+        description:
+          type: string
+        uiConfig:
+          additionalProperties: true
+          example:
+            backgroundColor: "bg-[#58cc02]"
+            borderColor: "border-[#46a302]"
+          type: object
+      type: object
+    UnitDetailDTO:
+      description: "Detalles de una unidad, incluyendo sus 'tiles' (lecciones)"
+      example:
+        tiles:
+        - lessonId: 6
+          description: description
+          type: star
+          status: LOCKED
+        - lessonId: 6
+          description: description
+          type: star
+          status: LOCKED
+        backgroundColor: backgroundColor
+        borderColor: borderColor
+        unitNumber: 0
+        description: description
+        textColor: textColor
+      properties:
+        unitNumber:
+          type: integer
+        description:
+          type: string
+        backgroundColor:
+          type: string
+        textColor:
+          type: string
+        borderColor:
+          type: string
+        tiles:
+          items:
+            $ref: '#/components/schemas/LessonTileDTO'
+          type: array
+      type: object
+    LessonTileDTO:
+      description: Representa un 'tile' (lección) en la UI de `learn.tsx`
+      example:
+        lessonId: 6
+        description: description
+        type: star
+        status: LOCKED
+      properties:
+        lessonId:
+          type: integer
+        type:
+          enum:
+          - star
+          - book
+          - dumbbell
+          - trophy
+          - fast-forward
+          - treasure
+          type: string
+        description:
+          type: string
+        status:
+          description: (Calculado por el backend basado en el progreso del usuario)
+          enum:
+          - LOCKED
+          - ACTIVE
+          - COMPLETE
+          type: string
+      type: object
+    ProblemDTO:
+      description: Una única pregunta o pieza de contenido dentro de una lección
+      example:
+        moduleTitle: moduleTitle
+        question: question
+        answers:
+        - name: name
+        - name: name
+        answerTiles:
+        - answerTiles
+        - answerTiles
+        objectives:
+        - objectives
+        - objectives
+        correctAnswerIndices:
+        - 6
+        - 6
+        type: INFO
+        correctAnswer: 0
+        introduction: introduction
+      properties:
+        type:
+          enum:
+          - INFO
+          - MULTIPLE_CHOICE
+          - FILL_IN_THE_BLANK
+          type: string
+        moduleTitle:
+          nullable: true
+          type: string
+        introduction:
+          nullable: true
+          type: string
+        objectives:
+          items:
+            type: string
+          nullable: true
+          type: array
+        question:
+          nullable: true
+          type: string
+        answers:
+          items:
+            $ref: '#/components/schemas/ProblemDTO_answers_inner'
+          nullable: true
+          type: array
+        correctAnswer:
+          nullable: true
+          type: integer
+        answerTiles:
+          items:
+            type: string
+          nullable: true
+          type: array
+        correctAnswerIndices:
+          items:
+            type: integer
+          nullable: true
+          type: array
+      type: object
+    LessonResultDTO:
+      description: Datos enviados al completar una lección
+      example:
+        isPractice: true
+        correctAnswerCount: 6
+        incorrectAnswerCount: 1
+        lessonId: 0
+        timeTakenMs: 5
+      properties:
+        lessonId:
+          type: integer
+        correctAnswerCount:
+          type: integer
+        incorrectAnswerCount:
+          type: integer
+        timeTakenMs:
+          type: integer
+        isPractice:
+          type: boolean
+      type: object
+    LessonCompletionResponseDTO:
+      description: Respuesta del backend al completar una lección
+      example:
+        newStreak: 5
+        newTotalLingots: 1
+        xpEarned: 0
+        lingotsEarned: 6
+      properties:
+        xpEarned:
+          type: integer
+        lingotsEarned:
+          type: integer
+        newTotalLingots:
+          type: integer
+        newStreak:
+          type: integer
+      type: object
+    LeaderboardDTO:
+      example:
+        leagueName: Liga Bronce
+        timeUntilEnd: 2 días restantes
+        users:
+        - isCurrentUser: true
+          name: name
+          xp: 6
+          rank: 0
+        - isCurrentUser: true
+          name: name
+          xp: 6
+          rank: 0
+      properties:
+        leagueName:
+          example: Liga Bronce
+          type: string
+        timeUntilEnd:
+          example: 2 días restantes
+          type: string
+        users:
+          items:
+            $ref: '#/components/schemas/LeaderboardEntryDTO'
+          type: array
+      type: object
+    LeaderboardEntryDTO:
+      example:
+        isCurrentUser: true
+        name: name
+        xp: 6
+        rank: 0
+      properties:
+        rank:
+          type: integer
+        name:
+          type: string
+        xp:
+          type: integer
+        isCurrentUser:
+          type: boolean
+      type: object
+    ShopItemDTO:
+      example:
+        itemId: streak-freeze
+        cost: 10
+        name: Congelador de Racha
+        description: description
+      properties:
+        itemId:
+          example: streak-freeze
+          type: string
+        name:
+          example: Congelador de Racha
+          type: string
+        description:
+          type: string
+        cost:
+          example: 10
+          type: integer
+      type: object
+    ErrorDTO:
+      example:
+        error: error
+        message: message
+        timestamp: 2000-01-23T04:56:07.000+00:00
+        status: 0
+      properties:
+        timestamp:
+          format: date-time
+          type: string
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+      type: object
+    _auth_forgot_password_post_request:
+      properties:
+        email:
+          format: email
+          type: string
+      type: object
+    _progress_treasure__lessonId__post_200_response:
+      example:
+        totalLingots: 6
+        lingotsEarned: 0
+      properties:
+        lingotsEarned:
+          type: integer
+        totalLingots:
+          type: integer
+      type: object
+    ProblemDTO_answers_inner:
+      example:
+        name: name
+      properties:
+        name:
+          type: string
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+
