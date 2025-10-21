@@ -1,12 +1,11 @@
+package com.bughuntersaga.api.infrastructure.web.controller;
 
-    package com.bughuntersaga.api.infrastructure.web.controller;
-
-    import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import com.bughuntersaga.api.application.port.in.*;
 
 
-    @RestController
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/content")
     public class ContentController {

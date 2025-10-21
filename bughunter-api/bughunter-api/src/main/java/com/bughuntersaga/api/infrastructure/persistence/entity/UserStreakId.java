@@ -1,7 +1,7 @@
 
     package com.bughuntersaga.api.infrastructure.persistence.entity;
 
-    import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import lombok.*;
 import java.io.Serializable;
 import java.util.UUID;
