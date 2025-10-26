@@ -1,7 +1,7 @@
 
-    package com.bughuntersaga.api.infrastructure.security.config;
+package com.bughuntersaga.api.infrastructure.security.config;
 
-    import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,43 +10,60 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import com.bughuntersaga.api.infrastructure.security.filter.JwtAuthenticationFilter;
 
-
-    @Configuration
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-    public class SecurityConfiguration {
+public class SecurityConfiguration {
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder();
-        }
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http
-                    .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para API sin estado
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sesiones sin estado
-                    .authorizeHttpRequests(auth -> auth
-                            // === INICIO: Permitir Rutas de Swagger UI ===
-                            .requestMatchers(
-                                    "/",                  // Permite acceso a la raíz para la redirección
-                                    "/swagger-ui.html",   // La página principal de Swagger UI
-                                    "/swagger-ui/**",     // Recursos estáticos (CSS, JS) para Swagger UI
-                                    "/v3/api-docs/**"     // Los endpoints de la especificación OpenAPI
-                            ).permitAll()
-                            // === FIN: Permitir Rutas de Swagger UI ===
-
-                            // Tus endpoints públicos existentes
-                            .requestMatchers("/api/auth/**").permitAll()
-                            .requestMatchers("/api/content/modules").permitAll()
-
-                            // Todas las demás solicitudes deben estar autenticadas
-                            .anyRequest().authenticated()
-                    );
-
-            // TODO: Añadir la configuración del filtro JWT aquí después
-
-            return http.build();
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**")
+                        .permitAll()
+                        .requestMatchers("/api/content/modules").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(java.util.Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:3002",
+                "http://localhost:8080",
+                "http://localhost:8081"));
+        configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}

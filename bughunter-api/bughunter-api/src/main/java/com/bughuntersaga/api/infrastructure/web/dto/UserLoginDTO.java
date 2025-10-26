@@ -1,16 +1,17 @@
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
-    /**
-     * DTO para UserLoginDTO.
-     * Schema: UserLoginDTO de OpenAPI
-     */
-    public record UserLoginDTO(
-        // TODO: Definir campos basados en el OpenAPI
+/**
+ * DTO para UserLoginDTO.
+ * Schema: UserLoginDTO de OpenAPI
+ */
+public record UserLoginDTO(
         // Schema: UserLoginDTO de OpenAPI
-    ) {
-    }
+        String emailOrUsername,
+        String password) {
+}
