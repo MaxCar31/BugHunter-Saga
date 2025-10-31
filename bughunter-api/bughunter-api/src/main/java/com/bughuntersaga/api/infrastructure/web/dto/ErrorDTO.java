@@ -1,16 +1,23 @@
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    import jakarta.validation.constraints.*;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    /**
-     * DTO para ErrorDTO.
-     * Schema: ErrorDTO de OpenAPI
-     */
-    public record ErrorDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: ErrorDTO de OpenAPI
-    ) {
-    }
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ErrorDTO {
+    private LocalDateTime timestamp;
+    private Integer status;
+    private String error;
+    private String message;
+}

@@ -6,9 +6,7 @@ import java.lang.RuntimeException;
 
 
 public class LessonAlreadyCompletedException extends RuntimeException {
-
-public LessonAlreadyCompletedException(String message) {
-    super(message);
-}
-
+    public LessonAlreadyCompletedException(String message) {
+        super(message);
+    }
 }

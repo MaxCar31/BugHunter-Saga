@@ -39,7 +39,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
                             // Tus endpoints públicos existentes
                             .requestMatchers("/api/auth/**").permitAll()
-                            .requestMatchers("/api/content/modules").permitAll()
+                            .requestMatchers("/api/content/modules/**").permitAll()
 
                             // Todas las demás solicitudes deben estar autenticadas
                             .anyRequest().authenticated()
