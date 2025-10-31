@@ -1,18 +1,27 @@
 
-    package com.bughuntersaga.api.domain.model;
+package com.bughuntersaga.api.domain.model;
 
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.UUID;
 
-    @Getter
+/**
+ * Entidad de dominio UserProfile.
+ *
+ * Representa el perfil de un usuario con su información de progreso.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class UserProfile {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class UserProfile {
+    private UUID userId;
+    private Integer lingots;
+    private Integer dailyXpGoal;
+    private Boolean soundEffectsEnabled;
+}

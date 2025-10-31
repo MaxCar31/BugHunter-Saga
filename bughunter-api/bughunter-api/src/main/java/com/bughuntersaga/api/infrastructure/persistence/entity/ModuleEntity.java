@@ -1,40 +1,46 @@
 
-    package com.bughuntersaga.api.infrastructure.persistence.entity;
+package com.bughuntersaga.api.infrastructure.persistence.entity;
 
-    import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.Map;
 
-    @Entity
+/**
+ * Entidad JPA para la tabla 'modules'.
+ *
+ * Representa un módulo de aprendizaje (ej. Módulo A - Equivalencia).
+ */
+@Entity
 @Table(name = "modules")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-    public class ModuleEntity {
+public class ModuleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(name = "code", unique = true, nullable = false, length = 20)
     private String code;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    /**
+     * Configuración de UI en formato JSON.
+     * Ejemplo: {"backgroundColor": "bg-blue-500", "icon": "🎯"}
+     */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "ui_config", columnDefinition = "jsonb")
-    private String uiConfig; // O Map<String, Object> si tienes Jackson
-
-    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<UnitEntity> units;
-
-    }
+    private Map<String, Object> uiConfig;
+}

@@ -1,15 +1,27 @@
 
-    package com.bughuntersaga.api.application.service;
+package com.bughuntersaga.api.application.service;
 
-    import lombok.RequiredArgsConstructor;
+import com.bughuntersaga.api.application.port.out.ModuleRepositoryPort;
+import com.bughuntersaga.api.domain.model.Module;
+import lombok.RequiredArgsConstructor;
+import com.bughuntersaga.api.domain.model.Module;
 import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetModulesUseCase;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class GetModulesService implements GetModulesUseCase {
+@Transactional(readOnly = true)
+public class GetModulesService implements GetModulesUseCase {
 
-    // Contenido de la clase
+    private final ModuleRepositoryPort moduleRepository;
 
+    @Override
+    public List<Module> getModules() {
+        List<Module> modules = moduleRepository.findAll();
+        return modules;
     }
+}

@@ -1,18 +1,49 @@
 
-    package com.bughuntersaga.api.domain.model;
+package com.bughuntersaga.api.domain.model;
 
-    import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 
-    @Getter
+/**
+ * Entidad de dominio Problem.
+ * Contiene campos específicos según el tipo de problema.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class Problem {
+@AllArgsConstructor
+public class Problem {
 
-    // Contenido de la clase
+    private String type;
 
+    // Campos para tipo INFO
+    private String moduleTitle;
+    private String introduction;
+    private List<String> objectives;
+
+    // Campos para preguntas
+    private String question;
+
+    // Campos para SELECT_1_OF_3
+    private List<AnswerOption> answers;
+    private Integer correctAnswer;
+
+    // Campos para FILL_IN_THE_BLANK
+    private List<String> answerTiles;
+    private List<Integer> correctAnswerIndices;
+
+    /**
+     * Opción de respuesta.
+     */
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AnswerOption {
+        private String name;
     }
+}

@@ -2,9 +2,11 @@
 package com.bughuntersaga.api.application.port.in;
 
 
+import com.bughuntersaga.api.domain.model.Unit;
+
 
 public interface GetModuleUnitUseCase {
 
-    // Contenido de la interfaz
+    Unit getModuleUnit(String moduleCode);
 
 }
