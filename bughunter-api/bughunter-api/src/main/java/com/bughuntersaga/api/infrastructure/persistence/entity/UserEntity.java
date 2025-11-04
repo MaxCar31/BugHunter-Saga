@@ -1,20 +1,19 @@
+package com.bughuntersaga.api.infrastructure.persistence.entity;
 
-    package com.bughuntersaga.api.infrastructure.persistence.entity;
-
-    import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
-import java.time.ZonedDateTime;
+// import java.time.ZonedDateTime; // <- ELIMINADO
+import java.time.LocalDateTime;  // <- AÑADIDO
 
-
-    @Entity
+@Entity
 @Table(name = "users")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-    public class UserEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,10 +31,11 @@ import java.time.ZonedDateTime;
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    // --- INICIO DE LA CORRECCIÓN ---
     @Column(name = "created_at", updatable = false, columnDefinition = "timestamptz DEFAULT (now())")
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt; // <- CAMBIADO de ZonedDateTime
+    // --- FIN DE LA CORRECCIÓN ---
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfileEntity userProfile;
-
-    }
+}

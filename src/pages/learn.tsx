@@ -33,23 +33,8 @@ import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
-import { getUnitForModule } from "~/utils/units";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
-
-const tileStatus = (tile: Tile, lessonsCompleted: number, currentUnit: Unit | null): TileStatus => {
-  const lessonsPerTile = 4;
-  const tilesCompleted = Math.floor(lessonsCompleted / lessonsPerTile);
-  const tileIndex = currentUnit?.tiles.findIndex((t) => t === tile) ?? -1;
-
-  if (tileIndex < tilesCompleted) {
-    return "COMPLETE";
-  }
-  if (tileIndex > tilesCompleted) {
-    return "LOCKED";
-  }
-  return "ACTIVE";
-};
 
 const TileIcon = ({
   tileType,
@@ -165,9 +150,9 @@ const getTileTooltipLeftOffset = ({
     unitNumber % 2 === 1
       ? tileTooltipLeftOffsets
       : [
-        ...tileTooltipLeftOffsets.slice(4),
-        ...tileTooltipLeftOffsets.slice(0, 4),
-      ];
+          ...tileTooltipLeftOffsets.slice(4),
+          ...tileTooltipLeftOffsets.slice(0, 4),
+        ];
 
   return offsets[index % offsets.length] ?? tileTooltipLeftOffsets[0];
 };
@@ -224,7 +209,6 @@ const TileTooltip = ({
   }, [selectedTile, tileTooltipRef, closeTooltip, index]);
 
   const activeBackgroundColor = unit.backgroundColor;
-  const activeTextColor = unit.textColor;
 
   return (
     <div
@@ -280,7 +264,7 @@ const TileTooltip = ({
             href="/lesson"
             className={[
               "flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase",
-              activeTextColor,
+              unit.textColor,
             ].join(" ")}
           >
             Iniciar +10 XP
@@ -305,7 +289,7 @@ const TileTooltip = ({
   );
 };
 
-const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
+const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
   const [selectedTile, setSelectedTile] = useState<null | number>(null);
 
   useEffect(() => {
@@ -323,6 +307,16 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
 
   const lessonsCompleted = getLessonsCompletedForModule(currentModule.code);
 
+  // Mostrar skeleton mientras se carga
+  if (!unit) {
+    return (
+      <div className="flex max-w-2xl flex-col items-center gap-8">
+        <div className="h-32 w-full animate-pulse rounded-xl bg-gray-200"></div>
+        <div className="h-64 w-full animate-pulse rounded-xl bg-gray-200"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <UnitHeader
@@ -333,7 +327,9 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
       />
       <div className="relative mb-8 mt-[67px] flex max-w-2xl flex-col items-center gap-4">
         {unit.tiles.map((tile, i): JSX.Element => {
-          const status = tileStatus(tile, lessonsCompleted, unit);
+          // Ahora usamos el status que viene de la API
+          const status = tile.status;
+          
           return (
             <Fragment key={i}>
               {(() => {
@@ -390,7 +386,6 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
                               tile.type === "fast-forward" &&
                               status === "LOCKED"
                             ) {
-                              // Saltar directamente al tile fast-forward en el módulo actual
                               increaseLessonsCompleted(currentModule.code, i * 4);
                               return;
                             }
@@ -465,17 +460,60 @@ const UnitSection = ({ unit }: { unit: Unit }): JSX.Element => {
 
 const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
-
   const currentModule = useBoundStore((x) => x.module);
-  const currentUnit = getUnitForModule(currentModule?.code || "");
 
-  // Check if module is set and valid; if not, show a message with a link to select one
-  if (!currentModule || !currentModule.code || !currentUnit) {
+  // --- CARGA DINÁMICA DE LA UNIDAD ---
+  const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const apiBase = "http://localhost:8080";
+
+  useEffect(() => {
+    const fetchUnit = async () => {
+      if (!currentModule?.code) {
+        setIsLoading(false);
+        setError("No se ha seleccionado ningún módulo.");
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+      const token = localStorage.getItem("bh_token");
+      
+      try {
+        const response = await fetch(
+          `${apiBase}/api/content/modules/${currentModule.code}/unit`,
+          {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Error ${response.status} cargando la unidad`);
+        }
+
+        const data: Unit = await response.json();
+        setCurrentUnit(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error desconocido");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUnit();
+  }, [currentModule?.code]);
+
+  // Verificar si hay módulo seleccionado
+  if (!currentModule || !currentModule.code) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">No se ha seleccionado un módulo</h1>
-          <p className="text-gray-600 mb-6">Por favor, selecciona un módulo para continuar aprendiendo.</p>
+          <p className="text-gray-600 mb-6">
+            Por favor, selecciona un módulo para continuar aprendiendo.
+          </p>
           <Link
             href="/register"
             className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
@@ -495,7 +533,6 @@ const Learn: NextPage = () => {
     return () => document.removeEventListener("scroll", updateScrollY);
   }, [scrollY]);
 
-  // Los colores del topbar ahora vienen del módulo actual
   const topBarColors = {
     backgroundColor: currentModule.backgroundColor,
     borderColor: currentModule.borderColor,
@@ -511,7 +548,12 @@ const Learn: NextPage = () => {
 
       <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
         <div className="flex max-w-2xl grow flex-col">
-          <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
+          {isLoading && <UnitSection unit={null} />}
+          {error && <p className="text-center text-red-500">{error}</p>}
+          {!isLoading && !error && currentUnit && (
+            <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
+          )}
+          
           <div className="sticky bottom-28 left-0 right-0 flex items-end justify-between">
             <Link
               href="/lesson?practice"
