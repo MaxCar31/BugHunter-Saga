@@ -1,23 +1,39 @@
 
-    package com.bughuntersaga.api.infrastructure.web.controller;
+package com.bughuntersaga.api.infrastructure.web.controller;
 
-    import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import com.bughuntersaga.api.application.port.in.*;
-
+import org.springframework.http.ResponseEntity;
+import com.bughuntersaga.api.application.service.RegisterUserService;
+import com.bughuntersaga.api.application.service.LoginUserService;
+import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
-    public class AuthController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
-    private final com.bughuntersaga.api.application.port.in.RegisterUserUseCase registerUserUseCase;
-    private final com.bughuntersaga.api.application.port.in.LoginUserUseCase loginUserUseCase;
-    private final com.bughuntersaga.api.application.port.in.ForgotPasswordUseCase forgotPasswordUseCase;
+    private final RegisterUserService registerUserService;
+    private final LoginUserService loginUserService;
 
-    // TODO: Implementar endpoints de OpenAPI
-    // @PostMapping("/register") ...
-    // @PostMapping("/login") ...
-    // @PostMapping("/forgot-password") ...
-
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody UserLoginDTO request) {
+        try {
+            AuthResponseDTO response = registerUserService.register(request);
+            return ResponseEntity.status(201).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody UserLoginDTO request) {
+        try {
+            AuthResponseDTO response = loginUserService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).build();
+        }
+    }
+}

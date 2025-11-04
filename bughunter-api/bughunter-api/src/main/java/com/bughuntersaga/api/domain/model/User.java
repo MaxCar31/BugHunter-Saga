@@ -1,46 +1,54 @@
 package com.bughuntersaga.api.domain.model;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Representa el concepto de negocio de un Usuario.
- * (Versión Anémica - Contenedor de datos)
- */
+@Entity
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username"),
+        @UniqueConstraint(columnNames = "email")
+})
 @Getter
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
-
-    /**
-     * Identificador único de negocio.
-     * Asignado por la capa de aplicación.
-     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    /**
-     * Nombre de usuario para login.
-     */
-    private String name;
-
-    /**
-     * Nombre de usuario para login.
-     */
+    @Column(nullable = false, unique = true)
     private String username;
 
-    /**
-     * Email del usuario, usado para login y notificaciones.
-     */
+    @Column(nullable = false, unique = true)
     private String email;
 
-    /**
-     * Contraseña del usuario.
-     */
-    private String password;
+    @Column(nullable = false, name = "password_hash")
+    private String passwordHash;
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = true)
+    private String lastname;
+
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false, name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

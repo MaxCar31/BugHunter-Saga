@@ -33,9 +33,13 @@ export const LoginScreen = ({
   const setUsername = useBoundStore((x) => x.setUsername);
   const setName = useBoundStore((x) => x.setName);
 
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
   const [ageTooltipShown, setAgeTooltipShown] = useState(false);
 
   const nameInputRef = useRef<null | HTMLInputElement>(null);
+  const emailInputRef = useRef<null | HTMLInputElement>(null);
+  const passwordInputRef = useRef<null | HTMLInputElement>(null);
 
   useEffect(() => {
     if (loginScreenState !== "HIDDEN" && loggedIn) {
@@ -43,14 +47,65 @@ export const LoginScreen = ({
     }
   }, [loginScreenState, loggedIn, setLoginScreenState]);
 
-  const logInAndSetUserProperties = () => {
+  const logInAndSetUserProperties = async () => {
+    // Limpiar error previo
+    setErrorMessage("");
+    setIsLoading(true);
+
+    const emailOrUsername = emailInputRef.current?.value.trim() || "";
+    const password = passwordInputRef.current?.value.trim() || "";
     const name =
       nameInputRef.current?.value.trim() || Math.random().toString().slice(2);
-    const username = name.replace(/ +/g, "-");
-    setUsername(username);
-    setName(name);
-    logIn();
-    void router.push("/learn");
+
+    // Validar campos requeridos
+    if (!emailOrUsername || !password) {
+      setErrorMessage("Por favor completa email/usuario y contraseña");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:8081";
+      const endpoint = loginScreenState === "SIGNUP" ? "/api/auth/register" : "/api/auth/login";
+      
+      const res = await fetch(`${apiBase}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailOrUsername, password }),
+      });
+
+      if (res.ok) {
+        const data = (await res.json()) as { token: string; user: { username: string; name: string; email: string } };
+        const user = data.user || {};
+        const username = user.username || emailOrUsername.replace(/ +/g, "-");
+        const displayName = user.name || name;
+        // guardar token en localStorage para llamadas futuras
+        if (data.token) {
+          try {
+            localStorage.setItem("bh_token", data.token);
+          } catch (e) {
+            // ignore storage errors
+          }
+        }
+        setUsername(username);
+        setName(displayName);
+        logIn();
+        setIsLoading(false);
+        void router.push("/learn");
+        return;
+      } else if (res.status === 401) {
+        setErrorMessage("Email/usuario o contraseña incorrectos");
+      } else if (res.status === 400) {
+        setErrorMessage("Email o usuario ya existe");
+      } else {
+        setErrorMessage("Error en el servidor. Intenta de nuevo.");
+      }
+    } catch (e) {
+      setErrorMessage("Error de conexión. Verifica tu conexión de internet.");
+      console.error("Auth error:", e);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -85,6 +140,11 @@ export const LoginScreen = ({
           <h2 className="text-center text-2xl font-bold text-gray-800">
             {loginScreenState === "LOGIN" ? "Log in" : "Create your profile"}
           </h2>
+          {errorMessage && (
+            <div className="rounded-xl border-2 border-red-300 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
           <div className="flex flex-col gap-2 text-black">
             {loginScreenState === "SIGNUP" && (
               <>
@@ -133,12 +193,14 @@ export const LoginScreen = ({
                   ? "Email or username (optional)"
                   : "Email (optional)"
               }
+              ref={emailInputRef}
             />
             <div className="relative flex grow">
               <input
                 className="grow rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
                 placeholder="Password (optional)"
                 type="password"
+                ref={passwordInputRef}
               />
               {loginScreenState === "LOGIN" && (
                 <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center pr-5">
@@ -153,10 +215,17 @@ export const LoginScreen = ({
             </div>
           </div>
           <button
-            className="rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition hover:brightness-110"
-            onClick={logInAndSetUserProperties}
+            className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${
+              isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
+            }`}
+            onClick={() => {
+              logInAndSetUserProperties().catch(() => {
+                // silently handle errors
+              });
+            }}
+            disabled={isLoading}
           >
-            {loginScreenState === "LOGIN" ? "Log in" : "Create account"}
+            {isLoading ? "Cargando..." : loginScreenState === "LOGIN" ? "Log in" : "Create account"}
           </button>
           <p className="text-center text-xs leading-5 text-gray-400">
             By signing in to BugHunter Saga, you agree to our{" "}
