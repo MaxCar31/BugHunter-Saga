@@ -116,13 +116,20 @@ const Lesson: NextPage = () => {
       ? 3 - incorrectAnswerCount
       : null;
 
-  // Solo verificar correctAnswer si no es una pantalla INFO y si problem existe
-  const correctAnswer = problem && problem.type !== "INFO" && "correctAnswer" in problem
-    ? problem.correctAnswer
-    : null;
-  const isAnswerCorrect = problem && problem.type === "INFO" ? false : Array.isArray(correctAnswer)
-    ? numbersEqual(selectedAnswers, correctAnswer)
-    : selectedAnswer === correctAnswer;
+
+
+  const isAnswerCorrect = (() => {
+      if (!problem || problem.type === "INFO") {
+        return false;
+      }
+      if (problem.type === "MULTIPLE_CHOICE") {
+        return selectedAnswer === problem.correctAnswer;
+      }
+      if (problem.type === "FILL_IN_THE_BLANK") {
+        return numbersEqual(selectedAnswers, problem.correctAnswerIndices);
+      }
+      return false;
+    })();
 
   const onCheckAnswer = () => {
     // No hay verificación de respuesta para pantallas INFO
@@ -144,7 +151,7 @@ const Lesson: NextPage = () => {
         {
           question: problem.question,
           yourResponse: problem.answers[selectedAnswer ?? 0]?.name ?? "",
-          correctResponse: problem.answers[problem.correctAnswer].name,
+          correctResponse: problem.answers[problem.correctAnswer]?.name ?? "",
         },
       ]);
     } else if (problem.type === "FILL_IN_THE_BLANK") {
@@ -153,7 +160,7 @@ const Lesson: NextPage = () => {
         {
           question: problem.question,
           yourResponse: selectedAnswers.map((i) => problem.answerTiles[i]).join(" "),
-          correctResponse: problem.correctAnswer.map((i) => problem.answerTiles[i]).join(" "),
+          correctResponse: problem.correctAnswerIndices.map((i) => problem.answerTiles[i]).join(" "),
         },
       ]);
     }
@@ -352,7 +359,7 @@ const MultipleChoiceQuestion = ({
                   tabIndex={0}
                   onClick={() => setSelectedAnswer(i)}
                 >
-                  {answer.icon}
+
                   <h2 className="text-center">{answer.name}</h2>
                 </div>
               );

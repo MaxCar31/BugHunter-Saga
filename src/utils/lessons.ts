@@ -17,7 +17,7 @@ export type LessonFillInTheBlank = {
     type: "FILL_IN_THE_BLANK";
     question: string;
     answerTiles: string[];
-    correctAnswer: number[];
+    correctAnswerIndices: number[];
 };
 
 export type ModuleLesson = LessonInfo | LessonMultipleChoice | LessonFillInTheBlank;

@@ -39,7 +39,7 @@ export const FillInTheBlankQuestion = ({
         return null;
     }
 
-    const { question, correctAnswer, answerTiles } = problem;
+    const { question, correctAnswerIndices, answerTiles } = problem;
 
     return (
         <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
@@ -119,7 +119,7 @@ export const FillInTheBlankQuestion = ({
             </div>
 
             <CheckAnswer
-                correctAnswer={correctAnswer.map((i) => answerTiles[i]).join(" ")}
+                correctAnswer={correctAnswerIndices.map((i) => answerTiles[i]).join(" ")}
                 correctAnswerShown={correctAnswerShown}
                 isAnswerCorrect={isAnswerCorrect}
                 isAnswerSelected={selectedAnswers.length > 0}

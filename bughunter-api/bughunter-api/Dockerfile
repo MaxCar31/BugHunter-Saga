@@ -2,11 +2,18 @@ FROM gradle:jdk17-focal AS builder
 
 WORKDIR /app
 
-COPY . .
+# Copiar solo archivos de configuración de Gradle primero
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle ./gradle
 
-RUN chmod +x ./gradlew
+# Descargar dependencias (esta capa se cachea si no cambian los archivos de configuración)
+RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon || true
 
-RUN ./gradlew build -x test
+# Ahora copiar el resto del código fuente
+COPY src ./src
+
+# Construir la aplicación
+RUN ./gradlew build -x test --no-daemon
 
 FROM eclipse-temurin:17-jre
 
