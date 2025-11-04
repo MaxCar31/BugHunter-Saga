@@ -1,18 +1,24 @@
 
-    package com.bughuntersaga.api.domain.model;
+package com.bughuntersaga.api.domain.model;
 
-    import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Map;
 
 
-    @Getter
+/**
+ * Entidad de dominio Module.
+ * POJO puro sin dependencias de frameworks.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class Module {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class Module {
+    private Integer id;
+    private String code;
+    private String name;
+    private String description;
+    private Map<String, Object> uiConfig;
+}

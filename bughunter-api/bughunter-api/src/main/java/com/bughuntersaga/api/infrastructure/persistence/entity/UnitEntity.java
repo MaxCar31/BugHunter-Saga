@@ -1,35 +1,34 @@
 
-    package com.bughuntersaga.api.infrastructure.persistence.entity;
+package com.bughuntersaga.api.infrastructure.persistence.entity;
 
-    import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
-
-    @Entity
+/**
+ * Entidad JPA para la tabla 'units'.
+ *
+ * Representa una unidad dentro de un módulo.
+ */
+@Entity
 @Table(name = "units")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-    public class UnitEntity {
+public class UnitEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "module_id", nullable = false)
-    private ModuleEntity module;
+    @Column(name = "module_id", nullable = false)
+    private Integer moduleId;
 
     @Column(name = "unit_number", nullable = false)
     private Integer unitNumber;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-    @OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LessonEntity> lessons;
-
-    }
+}

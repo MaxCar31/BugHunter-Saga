@@ -6,9 +6,12 @@ import lombok.Getter;
 
 
     @Getter
-@Builder
+    @Builder
     public class CompleteLessonCommand {
-
-    // TODO: Definir campos para el comando/query
+        private final Integer lessonId;
+        private final Integer correctAnswerCount;
+        private final Integer incorrectAnswerCount;
+        private final Long timeTakenMs;
+        private final Boolean isPractice;
 
     }

@@ -1,18 +1,21 @@
 
-    package com.bughuntersaga.api.domain.model;
+package com.bughuntersaga.api.domain.model;
 
-    import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.time.LocalDate;
+import java.util.UUID;
 
-
-    @Getter
+/**
+ * Entidad de dominio UserStreak.
+ *
+ * Representa la racha de días consecutivos de un usuario.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class UserStreak {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class UserStreak {
+    private UUID userId;
+    private LocalDate activityDate;
+}
