@@ -1,8 +1,7 @@
-
 package com.bughuntersaga.api.infrastructure.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
@@ -27,7 +26,10 @@ public record ProblemDTO(
 
         // Campos para FILL_IN_THE_BLANK
         List<String> answerTiles,
+
+        @JsonProperty("correctAnswer")
         List<Integer> correctAnswerIndices
+        // --- FIN DE LA CORRECCIÓN ---
 ) {
     public record AnswerOption(String name) {}
 }

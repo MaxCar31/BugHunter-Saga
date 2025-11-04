@@ -3,11 +3,13 @@ package com.bughuntersaga.api.infrastructure.persistence.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
-// import java.time.ZonedDateTime; // <- ELIMINADO
-import java.time.LocalDateTime;  // <- AÑADIDO
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username"),
+        @UniqueConstraint(columnNames = "email")
+})
 @Getter
 @Setter
 @Builder
@@ -20,10 +22,7 @@ public class UserEntity {
     private UUID id;
 
     @Column(unique = true, nullable = false, length = 50)
-    private String lastname;
-
-    @Column(length = 100)
-    private String name;
+    private String username; // <--- CAMPO AÑADIDO
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -31,11 +30,29 @@ public class UserEntity {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    // --- INICIO DE LA CORRECCIÓN ---
-    @Column(name = "created_at", updatable = false, columnDefinition = "timestamptz DEFAULT (now())")
-    private LocalDateTime createdAt; // <- CAMBIADO de ZonedDateTime
-    // --- FIN DE LA CORRECCIÓN ---
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(length = 100)
+    private String lastname;
+
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfileEntity userProfile;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

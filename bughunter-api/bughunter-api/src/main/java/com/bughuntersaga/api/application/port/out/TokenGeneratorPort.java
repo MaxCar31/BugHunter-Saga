@@ -1,10 +1,8 @@
-
 package com.bughuntersaga.api.application.port.out;
 
-
-
 public interface TokenGeneratorPort {
-
-    // Contenido de la interfaz
-
+    /**
+     * Genera un token (JWT) para un username específico.
+     */
+    String generateToken(String username);
 }

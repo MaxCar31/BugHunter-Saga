@@ -1,4 +1,3 @@
-
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
 import com.bughuntersaga.api.domain.model.Lesson;
@@ -19,8 +18,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContentApiMapper {
 
-
+    @Mapping(source = "name", target = "shortName")
     ModuleResponseDTO toModuleResponseDTO(Module module);
+
+
     UnitDetailDTO toUnitDetailDTO(Unit unit);
 
     @Mapping(target = "answers", expression = "java(mapAnswers(problem))")
@@ -33,8 +34,7 @@ public interface ContentApiMapper {
                 .collect(Collectors.toList());
     }
     /**
-     * Convierte Unit → UnitDTO.
-     *
+     * Convierte Unit → UnitDTO
      * NOTA: Los colores (backgroundColor, textColor, borderColor)
      * no están en el dominio Unit. Deben ser configurados
      * manualmente o venir del módulo.

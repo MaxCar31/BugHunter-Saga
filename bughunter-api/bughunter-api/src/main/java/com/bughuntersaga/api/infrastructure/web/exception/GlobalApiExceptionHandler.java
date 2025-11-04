@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Manejador global de excepciones para la API.
@@ -21,8 +22,12 @@ import java.util.stream.Collectors;
  * - Retornar ErrorDTO según el contrato de la API
  * - Proporcionar mensajes de error consistentes
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalApiExceptionHandler {
+
+
+
 
     /**
      * Maneja UserAlreadyExistsException (400 Bad Request).
@@ -106,10 +111,6 @@ public class GlobalApiExceptionHandler {
     }
 
 
-    // ========================================================================
-    // HANDLERS GENÉRICOS (YA EXISTENTES)
-    // ========================================================================
-
     /**
      * Maneja errores de validación de Spring (400 Bad Request).
      */
@@ -130,10 +131,14 @@ public class GlobalApiExceptionHandler {
     }
 
     /**
-     * Maneja cualquier otra excepción no capturada (500 Internal Server Error).
+     * Maneja CUALQUIER otra excepción no capturada (500 Internal Server Error).
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleGenericException(Exception ex) {
+
+
+        log.error("Error 500 no controlado: {}", ex.getMessage(), ex);
+
         ErrorDTO error = ErrorDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

@@ -1,15 +1,19 @@
+package com.bughuntersaga.api.infrastructure.security.adapter;
 
-    package com.bughuntersaga.api.infrastructure.security.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import com.bughuntersaga.api.application.port.out.TokenGeneratorPort;
+import com.bughuntersaga.api.infrastructure.security.jwt.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-
-    @Component
+@Component
 @RequiredArgsConstructor
-    public class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
+public class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
 
-    // Contenido de la clase
 
+    private final JwtUtil jwtUtil;
+
+    @Override
+    public String generateToken(String username) {
+        return jwtUtil.generateToken(username);
     }
+}

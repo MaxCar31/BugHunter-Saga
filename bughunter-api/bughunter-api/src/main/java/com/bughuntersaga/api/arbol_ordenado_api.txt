@@ -137,7 +137,6 @@
 │   │   │   │   ├── 📄 UserJpaRepository.java
 │   │   │   │   ├── 📄 UserLessonProgressJpaRepository.java
 │   │   │   │   ├── 📄 UserProfileJpaRepository.java
-│   │   │   │   ├── 📄 UserRepository.java
 │   │   │   │   ├── 📄 UserStreakJpaRepository.java
 │   │   │   │   ├── 📄 UserXpHistoryJpaRepository.java
 │   │   ├── 📁 security/
@@ -312,21 +311,17 @@ import lombok.Getter;
 ================================================================================
 📄 CONTENIDO DE: application/dto/LoginUserCommand.java
 ================================================================================
+package com.bughuntersaga.api.application.dto;
 
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
-
-    @Getter
+@Getter
 @Builder
-    public class LoginUserCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
+public class LoginUserCommand {
+    private final String emailOrUsername;
+    private final String password;
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/dto/PurchaseItemCommand.java
@@ -562,17 +557,19 @@ public interface GetUserStatsUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/port/in/LoginUserUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
-
+import com.bughuntersaga.api.application.dto.LoginUserCommand;
+import com.bughuntersaga.api.domain.model.AuthToken;
 
 public interface LoginUserUseCase {
 
-    // Contenido de la interfaz
-
+    /**
+     * Autentica a un usuario y devuelve un token.
+     * @throws com.bughuntersaga.api.domain.exception.InvalidCredentialsException si las credenciales son incorrectas.
+     */
+    AuthToken login(LoginUserCommand command);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/PurchaseItemUseCase.java
@@ -688,17 +685,19 @@ public interface ModuleRepositoryPort {
 ================================================================================
 📄 CONTENIDO DE: application/port/out/PasswordEncoderPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
-
-
 public interface PasswordEncoderPort {
+    /**
+     * Codifica una contraseña en texto plano.
+     */
+    String encode(String rawPassword);
 
-    // Contenido de la interfaz
-
+    /**
+     * Compara una contraseña en texto plano con una ya codificada.
+     */
+    boolean matches(String rawPassword, String encodedPassword);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/ProblemRepositoryPort.java
@@ -737,17 +736,14 @@ public interface ShopItemRepositoryPort {
 ================================================================================
 📄 CONTENIDO DE: application/port/out/TokenGeneratorPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
-
-
 public interface TokenGeneratorPort {
-
-    // Contenido de la interfaz
-
+    /**
+     * Genera un token (JWT) para un username específico.
+     */
+    String generateToken(String username);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/TransactionPort.java
@@ -838,17 +834,33 @@ public interface UserProfileRepositoryPort {
 ================================================================================
 📄 CONTENIDO DE: application/port/out/UserRepositoryPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
-
+import com.bughuntersaga.api.domain.model.User;
+import java.util.Optional;
 
 public interface UserRepositoryPort {
 
-    // Contenido de la interfaz
+    /**
+     * Guarda o actualiza un usuario.
+     */
+    User save(User user);
 
+    /**
+     * Busca un usuario por su username.
+     */
+    Optional<User> findByUsername(String username);
+
+    /**
+     * Busca un usuario por su email.
+     */
+    Optional<User> findByEmail(String email);
+
+    /**
+     * Busca un usuario por username O email (para el login).
+     */
+    Optional<User> findByUsernameOrEmail(String username, String email);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/UserStreakRepositoryPort.java
@@ -1123,51 +1135,61 @@ import com.bughuntersaga.api.application.port.in.GetUserStatsUseCase;
 ================================================================================
 📄 CONTENIDO DE: application/service/LoginUserService.java
 ================================================================================
-
 package com.bughuntersaga.api.application.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.dto.LoginUserCommand;
+import com.bughuntersaga.api.application.port.in.LoginUserUseCase;
+import com.bughuntersaga.api.application.port.out.PasswordEncoderPort;
+import com.bughuntersaga.api.application.port.out.TokenGeneratorPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.InvalidCredentialsException;
+import com.bughuntersaga.api.domain.model.AuthToken;
 import com.bughuntersaga.api.domain.model.User;
-import com.bughuntersaga.api.infrastructure.persistence.repository.UserRepository;
-import com.bughuntersaga.api.infrastructure.security.jwt.JwtUtil;
-import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class LoginUserService {
+public class LoginUserService implements LoginUserUseCase {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
 
-    public AuthResponseDTO login(UserLoginDTO request) {
-        // Buscar usuario por username o email
-        User user = userRepository.findByUsernameOrEmail(request.emailOrUsername(), request.emailOrUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    private final UserRepositoryPort userRepositoryPort;
+    private final PasswordEncoderPort passwordEncoderPort;
+    private final TokenGeneratorPort tokenGeneratorPort;
 
-        // Validar contraseña
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid password");
+    @Override
+    @Transactional(readOnly = true) // Login es de solo lectura
+    public AuthToken login(LoginUserCommand command) {
+        log.info("Intento de login para: {}", command.getEmailOrUsername());
+
+        // 1. Buscar usuario (usando el puerto)
+        User user = userRepositoryPort.findByUsernameOrEmail(command.getEmailOrUsername(), command.getEmailOrUsername())
+                .orElseThrow(() -> {
+                    log.warn("Login fallido: Usuario no encontrado - {}", command.getEmailOrUsername());
+                    // Lanza una excepción de dominio, no de infraestructura
+                    return new InvalidCredentialsException("Credenciales inválidas");
+                });
+
+        // 2. Validar contraseña (usando el puerto)
+        if (!passwordEncoderPort.matches(command.getPassword(), user.getPasswordHash())) {
+            log.warn("Login fallido: Contraseña inválida para - {}", command.getEmailOrUsername());
+            throw new InvalidCredentialsException("Credenciales inválidas");
         }
 
-        // Generar token JWT
-        String token = jwtUtil.generateToken(user.getUsername());
+        // 3. Generar token (usando el puerto)
+        log.info("Contraseña válida. Generando token para: {}", user.getUsername());
+        String token = tokenGeneratorPort.generateToken(user.getUsername());
 
-        // Devolver respuesta
-        UserInfoDTO userInfo = new UserInfoDTO(
-                user.getId().toString(),
-                user.getUsername(),
-                user.getName(),
-                user.getEmail());
-
-        return new AuthResponseDTO(token, userInfo);
+        log.info("Login exitoso para: {}", user.getUsername());
+        return AuthToken.builder()
+                .token(token)
+                .user(user)
+                .build();
     }
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/service/PurchaseItemService.java
@@ -1196,55 +1218,62 @@ package com.bughuntersaga.api.application.service;
 
 import com.bughuntersaga.api.application.dto.RegisterUserCommand;
 import com.bughuntersaga.api.application.port.in.RegisterUserUseCase;
+import com.bughuntersaga.api.application.port.out.PasswordEncoderPort;
+import com.bughuntersaga.api.application.port.out.TokenGeneratorPort;
 import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
 import com.bughuntersaga.api.domain.exception.EmailAlreadyExistsException;
 import com.bughuntersaga.api.domain.exception.UsernameAlreadyExistsException;
 import com.bughuntersaga.api.domain.model.AuthToken;
 import com.bughuntersaga.api.domain.model.User;
 import com.bughuntersaga.api.domain.model.UserProfile;
-import com.bughuntersaga.api.infrastructure.persistence.repository.UserRepository;
-import com.bughuntersaga.api.infrastructure.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegisterUserService implements RegisterUserUseCase {
 
-    private final UserRepository userRepository;
+    // --- ¡ARQUITECTURA CORRECTA! ---
+    // Solo depende de interfaces (Puertos)
+    private final UserRepositoryPort userRepositoryPort;
     private final UserProfileRepositoryPort userProfileRepositoryPort;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final PasswordEncoderPort passwordEncoderPort;
+    private final TokenGeneratorPort tokenGeneratorPort;
 
     @Override
     @Transactional
     public AuthToken register(RegisterUserCommand command) {
-        // Validar duplicados
-        if (userRepository.findByUsername(command.getUsername()).isPresent()) {
+        log.info("Iniciando registro para el usuario: {}", command.getUsername());
+
+        // 1. Validar duplicados (usando el puerto)
+        if (userRepositoryPort.findByUsername(command.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException("El username ya existe: " + command.getUsername());
         }
-        if (userRepository.findByEmail(command.getEmail()).isPresent()) {
+        if (userRepositoryPort.findByEmail(command.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("El email ya existe: " + command.getEmail());
         }
 
-        // Hashear contraseña
-        String passwordHash = passwordEncoder.encode(command.getRawPassword());
+        // 2. Codificar password (usando el puerto)
+        String passwordHash = passwordEncoderPort.encode(command.getRawPassword());
 
-        // Crear usuario
-        User newUser = User.builder()
+        // 3. Crear usuario (Modelo de Dominio)
+        User newUserDomain = User.builder()
                 .username(command.getUsername())
                 .email(command.getEmail())
                 .passwordHash(passwordHash)
                 .name(command.getName())
                 .build();
 
-        User savedUser = userRepository.save(newUser);
+        // 4. Guardar (usando el puerto)
+        User savedUserDomain = userRepositoryPort.save(newUserDomain);
 
-        // Crear perfil por defecto
+        // 5. Crear perfil
         UserProfile newProfile = UserProfile.builder()
-                .userId(savedUser.getId())
+                .userId(savedUserDomain.getId())
                 .lingots(0)
                 .dailyXpGoal(10)
                 .soundEffectsEnabled(true)
@@ -1252,17 +1281,15 @@ public class RegisterUserService implements RegisterUserUseCase {
 
         userProfileRepositoryPort.save(newProfile);
 
-        // Generar token JWT
-        String token = jwtUtil.generateToken(savedUser.getUsername());
+        // 6. Generar token (usando el puerto)
+        String token = tokenGeneratorPort.generateToken(savedUserDomain.getUsername());
 
-        // Retornar token + usuario
         return AuthToken.builder()
                 .token(token)
-                .user(savedUser)
+                .user(savedUserDomain)
                 .build();
     }
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/service/UpdateUserAccountService.java
@@ -1716,59 +1743,26 @@ public class Unit {
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
-import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "email")
-})
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @Column(nullable = false, unique = true)
     private String username;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false, name = "password_hash")
     private String passwordHash;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = true)
     private String lastname;
-
-    @Column(nullable = false, updatable = false, name = "created_at")
     private LocalDateTime createdAt;
-
-    @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/UserLessonProgress.java
@@ -2231,6 +2225,8 @@ package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
 import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
 import com.bughuntersaga.api.domain.model.UserProfile;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserProfileEntity;
 import com.bughuntersaga.api.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.bughuntersaga.api.infrastructure.persistence.repository.UserProfileJpaRepository;
@@ -2247,9 +2243,19 @@ public class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
     private final UserProfileJpaRepository userProfileJpaRepository;
     private final UserPersistenceMapper userPersistenceMapper;
 
+
+    private final UserJpaRepository userJpaRepository;
+
     @Override
     public UserProfile save(UserProfile userProfile) {
+
         UserProfileEntity entity = userPersistenceMapper.toUserProfileEntity(userProfile);
+
+        UserEntity userEntity = userJpaRepository.findById(userProfile.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado al crear perfil: " + userProfile.getUserId()));
+
+        entity.setUser(userEntity);
+
         UserProfileEntity savedEntity = userProfileJpaRepository.save(entity);
         return userPersistenceMapper.toUserProfileDomain(savedEntity);
     }
@@ -2261,26 +2267,57 @@ public class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
     }
 }
 
-
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/UserRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.UserPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class UserRepositoryAdapter implements UserRepositoryPort {
+public class UserRepositoryAdapter implements UserRepositoryPort {
 
-    // Contenido de la clase
+    // Depende de implementaciones de persistencia
+    private final UserJpaRepository userJpaRepository;
+    private final UserPersistenceMapper userPersistenceMapper;
 
+    @Override
+    public User save(User user) {
+        // Mapea de Dominio a Entidad
+        UserEntity userEntity = userPersistenceMapper.toUserEntity(user);
+        // Guarda la Entidad
+        UserEntity savedEntity = userJpaRepository.save(userEntity);
+        // Mapea de Entidad a Dominio
+        return userPersistenceMapper.toUserDomain(savedEntity);
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userJpaRepository.findByUsername(username)
+                .map(userPersistenceMapper::toUserDomain);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userJpaRepository.findByEmail(email)
+                .map(userPersistenceMapper::toUserDomain);
+    }
+
+    @Override
+    public Optional<User> findByUsernameOrEmail(String username, String email) {
+        return userJpaRepository.findByUsernameOrEmail(username, email)
+                .map(userPersistenceMapper::toUserDomain);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/UserStreakRepositoryAdapter.java
@@ -2565,33 +2602,31 @@ public class UnitEntity {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/entity/UserEntity.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.entity;
 
-    package com.bughuntersaga.api.infrastructure.persistence.entity;
-
-    import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
-
-    @Entity
-@Table(name = "users")
+@Entity
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username"),
+        @UniqueConstraint(columnNames = "email")
+})
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-    public class UserEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(unique = true, nullable = false, length = 50)
-    private String lastname;
-
-    @Column(length = 100)
-    private String name;
+    private String username; // <--- CAMPO AÑADIDO
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -2599,14 +2634,32 @@ import java.time.ZonedDateTime;
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "created_at", updatable = false, columnDefinition = "timestamptz DEFAULT (now())")
-    private ZonedDateTime createdAt;
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(length = 100)
+    private String lastname;
+
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfileEntity userProfile;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/entity/UserLessonProgressEntity.java
@@ -3068,16 +3121,18 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserPersistenceMapper {
 
+
     UserEntity toUserEntity(User user);
     User toUserDomain(UserEntity userEntity);
 
-    @Mapping(target = "user", ignore = true)
+    @Mapping(source = "userId", target = "userId")
     UserProfile toUserProfileDomain(UserProfileEntity entity);
 
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "user", ignore = true)
     UserProfileEntity toUserProfileEntity(UserProfile domain);
-}
 
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/LeagueJpaRepository.java
@@ -3276,22 +3331,24 @@ public interface UnitJpaRepository extends JpaRepository<UnitEntity, Integer> {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserJpaRepository.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository;
 
-    package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-    import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 import java.util.UUID;
 
-
-    @Repository
+@Repository
 public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
 
-        // Contenido de la interfaz
+    Optional<UserEntity> findByUsername(String username);
 
-    }
+    Optional<UserEntity> findByEmail(String email);
 
+    Optional<UserEntity> findByUsernameOrEmail(String username, String email);
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserLessonProgressJpaRepository.java
@@ -3331,27 +3388,6 @@ public interface UserProfileJpaRepository extends JpaRepository<UserProfileEntit
         // Contenido de la interfaz
 
     }
-
-
-================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserRepository.java
-================================================================================
-package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-import com.bughuntersaga.api.domain.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import java.util.Optional;
-import java.util.UUID;
-
-@Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findByUsername(String username);
-
-    Optional<User> findByEmail(String email);
-
-    Optional<User> findByUsernameOrEmail(String username, String email);
-}
 
 
 ================================================================================
@@ -3397,42 +3433,53 @@ public interface UserXpHistoryJpaRepository extends JpaRepository<UserXpHistoryE
 ================================================================================
 📄 CONTENIDO DE: infrastructure/security/adapter/JwtTokenGeneratorAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.security.adapter;
 
-    package com.bughuntersaga.api.infrastructure.security.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import com.bughuntersaga.api.application.port.out.TokenGeneratorPort;
+import com.bughuntersaga.api.infrastructure.security.jwt.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-
-    @Component
+@Component
 @RequiredArgsConstructor
-    public class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
+public class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
 
-    // Contenido de la clase
 
+    private final JwtUtil jwtUtil;
+
+    @Override
+    public String generateToken(String username) {
+        return jwtUtil.generateToken(username);
     }
-
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/security/adapter/SpringPasswordEncoderAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.security.adapter;
 
-    package com.bughuntersaga.api.infrastructure.security.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import com.bughuntersaga.api.application.port.out.PasswordEncoderPort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-
-    @Component
+@Component
 @RequiredArgsConstructor
-    public class SpringPasswordEncoderAdapter implements PasswordEncoderPort {
+public class SpringPasswordEncoderAdapter implements PasswordEncoderPort {
 
-    // Contenido de la clase
+    // Depende de la implementación de Spring
+    private final PasswordEncoder passwordEncoder;
 
+    @Override
+    public String encode(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 
+    @Override
+    public boolean matches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/security/config/SecurityConfiguration.java
@@ -3492,10 +3539,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(java.util.Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:3002",
-                "http://localhost:8080",
-                "http://localhost:8081"));
+                "*"));
         configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
         configuration.setAllowCredentials(false);
@@ -3631,9 +3675,12 @@ public class JwtUtil {
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
+import com.bughuntersaga.api.application.dto.LoginUserCommand;
 import com.bughuntersaga.api.application.dto.RegisterUserCommand;
+import com.bughuntersaga.api.application.port.in.LoginUserUseCase;
 import com.bughuntersaga.api.application.port.in.RegisterUserUseCase;
 import com.bughuntersaga.api.domain.exception.EmailAlreadyExistsException;
+import com.bughuntersaga.api.domain.exception.InvalidCredentialsException;
 import com.bughuntersaga.api.domain.exception.UsernameAlreadyExistsException;
 import com.bughuntersaga.api.domain.model.AuthToken;
 import com.bughuntersaga.api.infrastructure.web.dto.UserRegistrationDTO;
@@ -3643,7 +3690,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.bughuntersaga.api.application.service.LoginUserService;
 import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
 
@@ -3653,32 +3699,29 @@ import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
 public class AuthController {
 
     private final RegisterUserUseCase registerUserUseCase;
-    private final LoginUserService loginUserService;
+    private final LoginUserUseCase loginUserUseCase;
     private final AuthApiMapper authApiMapper;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody UserRegistrationDTO request) {
-        try {
-            RegisterUserCommand command = authApiMapper.toRegisterCommand(request);
-            AuthToken authToken = registerUserUseCase.register(command);
-            AuthResponseDTO response = authApiMapper.toAuthResponseDTO(authToken);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+
+
+        RegisterUserCommand command = authApiMapper.toRegisterCommand(request);
+        AuthToken authToken = registerUserUseCase.register(command);
+        AuthResponseDTO response = authApiMapper.toAuthResponseDTO(authToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody UserLoginDTO request) {
-        try {
-            AuthResponseDTO response = loginUserService.login(request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody UserLoginDTO request) {
+
+
+        LoginUserCommand command = authApiMapper.toLoginCommand(request);
+        AuthToken authToken = loginUserUseCase.login(command);
+        AuthResponseDTO response = authApiMapper.toAuthResponseDTO(authToken);
+        return ResponseEntity.ok(response);
     }
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/controller/ContentController.java
@@ -4042,38 +4085,28 @@ public record LessonTileDTO(
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/ModuleResponseDTO.java
 ================================================================================
-
 package com.bughuntersaga.api.infrastructure.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-/**
- * DTO para ModuleSummaryDTO.
- * Schema: ModuleSummaryDTO de OpenAPI
- */
 public record ModuleResponseDTO(
         Integer id,
         String code,
         String name,
+        String shortName,
         String description,
         Map<String, Object> uiConfig
-
-) {
-}
-
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/ProblemDTO.java
 ================================================================================
-
 package com.bughuntersaga.api.infrastructure.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
@@ -4098,7 +4131,10 @@ public record ProblemDTO(
 
         // Campos para FILL_IN_THE_BLANK
         List<String> answerTiles,
+
+        @JsonProperty("correctAnswer")
         List<Integer> correctAnswerIndices
+        // --- FIN DE LA CORRECCIÓN ---
 ) {
     public record AnswerOption(String name) {}
 }
@@ -4266,7 +4302,6 @@ public record UserRegistrationDTO(
         String password
 ) {}
 
-
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserSettingsUpdateDTO.java
 ================================================================================
@@ -4325,6 +4360,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Manejador global de excepciones para la API.
@@ -4335,8 +4371,12 @@ import java.util.stream.Collectors;
  * - Retornar ErrorDTO según el contrato de la API
  * - Proporcionar mensajes de error consistentes
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalApiExceptionHandler {
+
+
+
 
     /**
      * Maneja UserAlreadyExistsException (400 Bad Request).
@@ -4420,10 +4460,6 @@ public class GlobalApiExceptionHandler {
     }
 
 
-    // ========================================================================
-    // HANDLERS GENÉRICOS (YA EXISTENTES)
-    // ========================================================================
-
     /**
      * Maneja errores de validación de Spring (400 Bad Request).
      */
@@ -4444,10 +4480,14 @@ public class GlobalApiExceptionHandler {
     }
 
     /**
-     * Maneja cualquier otra excepción no capturada (500 Internal Server Error).
+     * Maneja CUALQUIER otra excepción no capturada (500 Internal Server Error).
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleGenericException(Exception ex) {
+
+
+        log.error("Error 500 no controlado: {}", ex.getMessage(), ex);
+
         ErrorDTO error = ErrorDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -4464,11 +4504,13 @@ public class GlobalApiExceptionHandler {
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
+import com.bughuntersaga.api.application.dto.LoginUserCommand;
 import com.bughuntersaga.api.application.dto.RegisterUserCommand;
 import com.bughuntersaga.api.domain.model.AuthToken;
 import com.bughuntersaga.api.domain.model.User;
 import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UserRegistrationDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -4481,6 +4523,9 @@ public interface AuthApiMapper {
     @Mapping(source = "password", target = "rawPassword")
     RegisterUserCommand toRegisterCommand(UserRegistrationDTO dto);
 
+    // Mapeo de DTO de Login a Comando de Login
+    LoginUserCommand toLoginCommand(UserLoginDTO dto);
+
     // Mapeo de AuthToken a DTO de respuesta
     AuthResponseDTO toAuthResponseDTO(AuthToken authToken);
 
@@ -4489,11 +4534,9 @@ public interface AuthApiMapper {
     UserInfoDTO toUserInfoDTO(User user);
 }
 
-
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/mapper/ContentApiMapper.java
 ================================================================================
-
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
 import com.bughuntersaga.api.domain.model.Lesson;
@@ -4514,8 +4557,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContentApiMapper {
 
-
+    @Mapping(source = "name", target = "shortName")
     ModuleResponseDTO toModuleResponseDTO(Module module);
+
+
     UnitDetailDTO toUnitDetailDTO(Unit unit);
 
     @Mapping(target = "answers", expression = "java(mapAnswers(problem))")
@@ -4528,8 +4573,7 @@ public interface ContentApiMapper {
                 .collect(Collectors.toList());
     }
     /**
-     * Convierte Unit → UnitDTO.
-     *
+     * Convierte Unit → UnitDTO
      * NOTA: Los colores (backgroundColor, textColor, borderColor)
      * no están en el dominio Unit. Deben ser configurados
      * manualmente o venir del módulo.
@@ -4546,7 +4590,6 @@ public interface ContentApiMapper {
     @Mapping(target = "lessonId", source = "id")
     LessonTileDTO toLessonTileDTO(Lesson lesson);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/mapper/GamificationApiMapper.java
