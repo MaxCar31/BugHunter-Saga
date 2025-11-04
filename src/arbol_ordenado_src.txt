@@ -71,7 +71,7 @@
 ================================================================================
 
 ================================================================================
-📄 CONTENIDO DE: components\BottomBar.tsx
+📄 CONTENIDO DE: components/BottomBar.tsx
 ================================================================================
 import Link from "next/link";
 import { useBoundStore } from "~/hooks/useBoundStore";
@@ -255,7 +255,7 @@ export const BottomBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\Calendar.tsx
+📄 CONTENIDO DE: components/Calendar.tsx
 ================================================================================
 import dayjs from "dayjs";
 import { useBoundStore } from "~/hooks/useBoundStore";
@@ -363,7 +363,7 @@ export const Calendar = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components\Flag.tsx
+📄 CONTENIDO DE: components/Flag.tsx
 ================================================================================
 import type { StaticImageData } from "next/image";
 import _flagsSvg from "../../public/flags.svg";
@@ -392,42 +392,23 @@ export const Flag = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components\LeftBar.tsx
+📄 CONTENIDO DE: components/LeftBar.tsx
 ================================================================================
 import Link from "next/link";
-import type { ComponentProps } from "react";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import type { Tab } from "./BottomBar";
 import { useBottomBarItems } from "./BottomBar";
 import type { LoginScreenState } from "./LoginScreen";
 import { LoginScreen } from "./LoginScreen";
-import { GlobeIconSvg, PodcastIconSvg } from "./Svgs";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import Image from "next/image";
 
-const LeftBarMoreMenuSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" {...props}>
-      <circle
-        cx="23"
-        cy="23"
-        r="19"
-        fill="#CE82FF"
-        stroke="#CE82FF"
-        strokeWidth="2"
-      />
-      <circle cx="15" cy="23" r="2" fill="white" />
-      <circle cx="23" cy="23" r="2" fill="white" />
-      <circle cx="31" cy="23" r="2" fill="white" />
-    </svg>
-  );
-};
-
 export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
+  const router = useRouter();
   const loggedIn = useBoundStore((x) => x.loggedIn);
   const logOut = useBoundStore((x) => x.logOut);
 
-  const [moreMenuShown, setMoreMenuShown] = useState(false);
   const [loginScreenState, setLoginScreenState] =
     useState<LoginScreenState>("HIDDEN");
 
@@ -472,82 +453,19 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
               </li>
             );
           })}
-          {/* <div
-            className="relative flex grow cursor-default items-center gap-3 rounded-xl px-2 py-1 font-bold uppercase text-gray-400 hover:bg-gray-100"
-            onClick={() => setMoreMenuShown((x) => !x)}
-            onMouseEnter={() => setMoreMenuShown(true)}
-            onMouseLeave={() => setMoreMenuShown(false)}
-            role="button"
-            tabIndex={0}
-          >
-            <LeftBarMoreMenuSvg />{" "}
-            <span className="hidden text-sm lg:inline">Más</span>
-            <div
-              className={[
-                "absolute left-full top-[-10px] min-w-[300px] rounded-2xl border-2 border-gray-300 bg-white text-left text-gray-400",
-                moreMenuShown ? "" : "hidden",
-              ].join(" ")}
+          {loggedIn && (
+            <button
+              className="flex items-center gap-3 rounded-xl px-2 py-1 font-bold uppercase text-red-600 hover:bg-red-50"
+              onClick={() => {
+                logOut();
+                localStorage.removeItem("bh_token");
+                void router.push("/?login");
+              }}
             >
-              <div className="flex flex-col py-2">
-                <Link
-                  className="flex items-center gap-4 px-5 py-2 text-left uppercase hover:bg-gray-100"
-                  href="https://schools.duolingo.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <GlobeIconSvg className="h-10 w-10" />
-                  Escuelas QA
-                </Link>
-                <Link
-                  className="flex items-center gap-4 px-5 py-2 text-left uppercase hover:bg-gray-100"
-                  href="https://podcast.bughuntersaga.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <PodcastIconSvg className="h-10 w-10" />
-                  Podcast QA
-                </Link>
-              </div>
-              <div className="flex flex-col border-t-2 border-gray-300 py-2">
-                {!loggedIn && (
-                  <button
-                    className="px-5 py-2 text-left uppercase hover:bg-gray-100"
-                    onClick={() => setLoginScreenState("SIGNUP")}
-                  >
-                    Crear perfil
-                  </button>
-                )}
-                <Link
-                  className="px-5 py-2 text-left uppercase hover:bg-gray-100"
-                  href={loggedIn ? "/settings/account" : "/settings/sound"}
-                >
-                  Configuración
-                </Link>
-                <Link
-                  className="px-5 py-2 text-left uppercase hover:bg-gray-100"
-                  href="https://support.bughuntersaga.com/hc/en-us"
-                >
-                  Help
-                </Link>
-                {!loggedIn && (
-                  <button
-                    className="px-5 py-2 text-left uppercase hover:bg-gray-100"
-                    onClick={() => setLoginScreenState("LOGIN")}
-                  >
-                    Sign in
-                  </button>
-                )}
-                {loggedIn && (
-                  <button
-                    className="px-5 py-2 text-left uppercase hover:bg-gray-100"
-                    onClick={logOut}
-                  >
-                    Sign out
-                  </button>
-                )}
-              </div>
-            </div>
-          </div> */}
+              <span className="hidden lg:inline">Cerrar sesión</span>
+              <span className="lg:hidden">🚪</span>
+            </button>
+          )}
         </ul>
       </nav>
       <LoginScreen
@@ -560,7 +478,7 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\LoginScreen.tsx
+📄 CONTENIDO DE: components/LoginScreen.tsx
 ================================================================================
 import Link from "next/link";
 import { CloseSvg } from "./Svgs";
@@ -597,9 +515,13 @@ export const LoginScreen = ({
   const setUsername = useBoundStore((x) => x.setUsername);
   const setName = useBoundStore((x) => x.setName);
 
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
   const [ageTooltipShown, setAgeTooltipShown] = useState(false);
 
   const nameInputRef = useRef<null | HTMLInputElement>(null);
+  const emailInputRef = useRef<null | HTMLInputElement>(null);
+  const passwordInputRef = useRef<null | HTMLInputElement>(null);
 
   useEffect(() => {
     if (loginScreenState !== "HIDDEN" && loggedIn) {
@@ -607,14 +529,65 @@ export const LoginScreen = ({
     }
   }, [loginScreenState, loggedIn, setLoginScreenState]);
 
-  const logInAndSetUserProperties = () => {
+  const logInAndSetUserProperties = async () => {
+    // Limpiar error previo
+    setErrorMessage("");
+    setIsLoading(true);
+
+    const emailOrUsername = emailInputRef.current?.value.trim() || "";
+    const password = passwordInputRef.current?.value.trim() || "";
     const name =
       nameInputRef.current?.value.trim() || Math.random().toString().slice(2);
-    const username = name.replace(/ +/g, "-");
-    setUsername(username);
-    setName(name);
-    logIn();
-    void router.push("/learn");
+
+    // Validar campos requeridos
+    if (!emailOrUsername || !password) {
+      setErrorMessage("Por favor completa email/usuario y contraseña");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:8081";
+      const endpoint = loginScreenState === "SIGNUP" ? "/api/auth/register" : "/api/auth/login";
+      
+      const res = await fetch(`${apiBase}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailOrUsername, password }),
+      });
+
+      if (res.ok) {
+        const data = (await res.json()) as { token: string; user: { username: string; name: string; email: string } };
+        const user = data.user || {};
+        const username = user.username || emailOrUsername.replace(/ +/g, "-");
+        const displayName = user.name || name;
+        // guardar token en localStorage para llamadas futuras
+        if (data.token) {
+          try {
+            localStorage.setItem("bh_token", data.token);
+          } catch (e) {
+            // ignore storage errors
+          }
+        }
+        setUsername(username);
+        setName(displayName);
+        logIn();
+        setIsLoading(false);
+        void router.push("/learn");
+        return;
+      } else if (res.status === 401) {
+        setErrorMessage("Email/usuario o contraseña incorrectos");
+      } else if (res.status === 400) {
+        setErrorMessage("Email o usuario ya existe");
+      } else {
+        setErrorMessage("Error en el servidor. Intenta de nuevo.");
+      }
+    } catch (e) {
+      setErrorMessage("Error de conexión. Verifica tu conexión de internet.");
+      console.error("Auth error:", e);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -649,6 +622,11 @@ export const LoginScreen = ({
           <h2 className="text-center text-2xl font-bold text-gray-800">
             {loginScreenState === "LOGIN" ? "Log in" : "Create your profile"}
           </h2>
+          {errorMessage && (
+            <div className="rounded-xl border-2 border-red-300 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
           <div className="flex flex-col gap-2 text-black">
             {loginScreenState === "SIGNUP" && (
               <>
@@ -697,12 +675,14 @@ export const LoginScreen = ({
                   ? "Email or username (optional)"
                   : "Email (optional)"
               }
+              ref={emailInputRef}
             />
             <div className="relative flex grow">
               <input
                 className="grow rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
                 placeholder="Password (optional)"
                 type="password"
+                ref={passwordInputRef}
               />
               {loginScreenState === "LOGIN" && (
                 <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center pr-5">
@@ -717,10 +697,17 @@ export const LoginScreen = ({
             </div>
           </div>
           <button
-            className="rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition hover:brightness-110"
-            onClick={logInAndSetUserProperties}
+            className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${
+              isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
+            }`}
+            onClick={() => {
+              logInAndSetUserProperties().catch(() => {
+                // silently handle errors
+              });
+            }}
+            disabled={isLoading}
           >
-            {loginScreenState === "LOGIN" ? "Log in" : "Create account"}
+            {isLoading ? "Cargando..." : loginScreenState === "LOGIN" ? "Log in" : "Create account"}
           </button>
           <p className="text-center text-xs leading-5 text-gray-400">
             By signing in to BugHunter Saga, you agree to our{" "}
@@ -779,7 +766,7 @@ export const LoginScreen = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components\ModuleCarousel.tsx
+📄 CONTENIDO DE: components/ModuleCarousel.tsx
 ================================================================================
 import Link from "next/link";
 import { ChevronLeftSvg, ChevronRightSvg } from "./Svgs";
@@ -924,7 +911,7 @@ export const ModuleCarousel = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\ModuleDropDown.tsx
+📄 CONTENIDO DE: components/ModuleDropDown.tsx
 ================================================================================
 import Link from "next/link";
 import { useState } from "react";
@@ -973,7 +960,7 @@ export const ModuleDropDown = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\ModuleHeader.tsx
+📄 CONTENIDO DE: components/ModuleHeader.tsx
 ================================================================================
 import Link from "next/link";
 import { ModuleDropDown } from "./ModuleDropDown";
@@ -998,7 +985,7 @@ export const ModuleHeader = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\ModuleIcon.tsx
+📄 CONTENIDO DE: components/ModuleIcon.tsx
 ================================================================================
 import type { Module } from "~/utils/modules";
 
@@ -1069,7 +1056,7 @@ export const ModuleIcon = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\RightBar.tsx
+📄 CONTENIDO DE: components/RightBar.tsx
 ================================================================================
 import Link from "next/link";
 import type { ComponentProps } from "react";
@@ -1372,7 +1359,7 @@ const XpProgressSection = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\SettingsRightNav.tsx
+📄 CONTENIDO DE: components/SettingsRightNav.tsx
 ================================================================================
 import Link from "next/link";
 import React from "react";
@@ -1421,7 +1408,7 @@ export const SettingsRightNav = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components\Svgs.tsx
+📄 CONTENIDO DE: components/Svgs.tsx
 ================================================================================
 import type { ComponentProps } from "react";
 import React from "react";
@@ -5280,7 +5267,236 @@ export const WomanSvg = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components\TopBar.tsx
+📄 CONTENIDO DE: components/TopBar.tsx
+================================================================================
+import dayjs from "dayjs";
+import Link from "next/link";
+import type { ComponentProps } from "react";
+import React, { useState } from "react";
+import { useBoundStore } from "~/hooks/useBoundStore";
+import { Calendar } from "./Calendar";
+import { ModuleIcon } from "./ModuleIcon";
+import {
+  FireSvg,
+  GemSvg,
+  GlobeIconSvg,
+  LingotsTreasureChestSvg,
+  MoreOptionsSvg,
+  PodcastIconSvg,
+} from "./Svgs";
+
+const EmptyFireTopBarSvg = (props: ComponentProps<"svg">) => {
+  return (
+    <svg width="25" height="30" viewBox="0 0 25 30" fill="none" {...props}>
+      <g opacity="0.2">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M13.9697 2.91035C13.2187 1.96348 11.7813 1.96348 11.0303 2.91035L7.26148 7.66176L4.83362 6.36218C4.61346 6.24433 4.1221 6.09629 3.88966 6.05712C2.72329 5.86056 2.04098 6.78497 2.04447 8.03807L2.06814 16.5554C2.02313 16.9355 2 17.322 2 17.7137C2 23.2979 6.70101 27.8248 12.5 27.8248C18.299 27.8248 23 23.2979 23 17.7137C23 15.3518 22.1591 13.1791 20.7498 11.458L13.9697 2.91035Z"
+          fill="black"
+        />
+      </g>
+    </svg>
+  );
+};
+
+const EmptyGemTopBarSvg = (props: ComponentProps<"svg">) => {
+  return (
+    <svg width="24" height="30" viewBox="0 0 24 30" fill="none" {...props}>
+      <g opacity="0.2">
+        <path
+          d="M3.63705 7.31556C2.62104 7.92872 2 9.02888 2 10.2156V19.8818C2 21.0685 2.62104 22.1687 3.63705 22.7819L10.1117 26.6893C11.1881 27.3389 12.5356 27.3389 13.612 26.6894L20.087 22.7818C21.1031 22.1687 21.7241 21.0685 21.7241 19.8818V10.2156C21.7241 9.0289 21.1031 7.92872 20.087 7.31557L13.612 3.40806C12.5356 2.7585 11.1881 2.75851 10.1117 3.40809L3.63705 7.31556Z"
+          fill="black"
+        />
+      </g>
+    </svg>
+  );
+};
+
+const AddModuleSvg = (props: ComponentProps<"svg">) => {
+  return (
+    <svg width="36" height="29" viewBox="0 0 36 29" {...props}>
+      <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+        <g stroke="#AFAFAF">
+          <path
+            d="M7.743 3c-1.67 0-2.315.125-2.98.48A3.071 3.071 0 0 0 3.48 4.763c-.355.665-.48 1.31-.48 2.98v13.514c0 1.67.125 2.315.48 2.98.297.555.728.986 1.283 1.283.665.355 1.31.48 2.98.48h20.514c1.67 0 2.315-.125 2.98-.48a3.071 3.071 0 0 0 1.283-1.283c.355-.665.48-1.31.48-2.98V7.743c0-1.67-.125-2.315-.48-2.98a3.071 3.071 0 0 0-1.283-1.283c-.665-.355-1.31-.48-2.98-.48H7.743Z"
+            strokeWidth="2"
+          />
+          <g strokeLinecap="round" strokeWidth="3">
+            <path d="M18 10v9M13.5 14.5h9" />
+          </g>
+        </g>
+      </g>
+    </svg>
+  );
+};
+
+type MenuState = "HIDDEN" | "MODULES" | "STREAK" | "GEMS" | "MORE";
+
+export const TopBar = ({
+  backgroundColor = "bg-[#58cc02]",
+  borderColor = "border-[#46a302]",
+}: {
+  backgroundColor?: `bg-${string}`;
+  borderColor?: `border-${string}`;
+}) => {
+  const [menu, setMenu] = useState<MenuState>("HIDDEN");
+  const [now, setNow] = useState(dayjs());
+  const streak = useBoundStore((x) => x.streak);
+  const lingots = useBoundStore((x) => x.lingots);
+  const currentModule = useBoundStore((x) => x.module);
+  return (
+    <header className="fixed z-20 h-[58px] w-full">
+      <div
+        className={`relative flex h-full w-full items-center justify-between border-b-2 px-[10px] transition duration-500 sm:hidden ${borderColor} ${backgroundColor}`}
+      >
+        <button
+          onClick={() =>
+            setMenu((x) => (x === "MODULES" ? "HIDDEN" : "MODULES"))
+          }
+        >
+          <ModuleIcon module={currentModule} width={45} />
+          <span className="sr-only">Ver módulos</span>
+        </button>
+
+        <button
+          className="flex items-center gap-2 font-bold text-white"
+          onClick={() => setMenu((x) => (x === "STREAK" ? "HIDDEN" : "STREAK"))}
+          aria-label="Toggle streak menu"
+        >
+          {streak > 0 ? <FireSvg /> : <EmptyFireTopBarSvg />}{" "}
+          <span className={streak > 0 ? "text-white" : "text-black opacity-20"}>
+            {streak}
+          </span>
+        </button>
+        <button
+          className="flex items-center gap-2 font-bold"
+          onClick={() => setMenu((x) => (x === "GEMS" ? "HIDDEN" : "GEMS"))}
+          aria-label="Toggle puntos QA menu"
+        >
+          {lingots > 0 ? <GemSvg /> : <EmptyGemTopBarSvg />}{" "}
+          <span
+            className={lingots > 0 ? "text-white" : "text-black opacity-20"}
+          >
+            {lingots}
+          </span>
+        </button>
+        <MoreOptionsSvg
+          onClick={() => setMenu((x) => (x === "MORE" ? "HIDDEN" : "MORE"))}
+          role="button"
+          tabIndex={0}
+          aria-label="Toggle more menu"
+        />
+
+        <div
+          className={[
+            "absolute left-0 right-0 top-full bg-white transition duration-300",
+            menu === "HIDDEN" ? "opacity-0" : "opacity-100",
+          ].join(" ")}
+          aria-hidden={menu === "HIDDEN"}
+        >
+          {((): null | JSX.Element => {
+            switch (menu) {
+              case "MODULES":
+                return (
+                  <div className="flex gap-5 p-5">
+                    <div className="flex flex-col items-center justify-between gap-2">
+                      <div className="rounded-2xl border-4 border-blue-400">
+                        <ModuleIcon module={currentModule} width={80} />
+                      </div>
+                      <span className="font-bold">{currentModule.code}</span>
+                    </div>
+                    <Link
+                      className="flex flex-col items-center justify-between gap-2"
+                      href="/register"
+                    >
+                      <div className="rounded-2xl border-4 border-white">
+                        <AddModuleSvg className="h-16 w-20" />
+                      </div>
+                      <span className="font-bold text-gray-400">Módulos</span>
+                    </Link>
+                  </div>
+                );
+
+              case "STREAK":
+                return (
+                  <div className="flex grow flex-col items-center gap-3 p-5">
+                    <h2 className="text-xl font-bold">Racha</h2>
+                    <p className="text-sm text-gray-400">
+                      ¡Practica cada día para que tu racha no se reinicie!
+                    </p>
+                    <div className="self-stretch">
+                      <Calendar now={now} setNow={setNow} />
+                    </div>
+                  </div>
+                );
+
+              case "GEMS":
+                return (
+                  <div className="flex grow items-center gap-3 p-5">
+                    <LingotsTreasureChestSvg className="h-24 w-24" />
+                    <div className="flex flex-col gap-3">
+                      <h2 className="text-xl font-bold text-black">Puntos QA</h2>
+                      <p className="text-sm font-normal text-gray-400">
+                        Tienes {lingots}{" "}
+                        {lingots === 1 ? "punto" : "puntos"}.
+                      </p>
+                      <Link
+                        className="font-bold uppercase text-blue-400 transition hover:brightness-110"
+                        href="/shop"
+                      >
+                        Ir a tienda
+                      </Link>
+                    </div>
+                  </div>
+                );
+
+              case "MORE":
+                return (
+                  <div className="flex grow flex-col">
+                    <Link
+                      className="flex items-center gap-2 p-2 font-bold text-gray-700"
+                      href="https://podcast.bughuntersaga.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <PodcastIconSvg className="h-10 w-10" />
+                      Podcast QA
+                    </Link>
+                    <Link
+                      className="flex items-center gap-2 border-t-2 border-gray-300 p-2 font-bold text-gray-700"
+                      href="https://schools.bughuntersaga.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <GlobeIconSvg className="h-10 w-10" />
+                      Testing Schools
+                    </Link>
+                  </div>
+                );
+
+              case "HIDDEN":
+                return null;
+            }
+          })()}
+          <div
+            className={[
+              "absolute left-0 top-full h-screen w-screen bg-black opacity-30",
+              menu === "HIDDEN" ? "pointer-events-none" : "",
+            ].join(" ")}
+            onClick={() => setMenu("HIDDEN")}
+            aria-label="Hide menu"
+            role="button"
+          ></div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+
+================================================================================
+📄 CONTENIDO DE: components/TopBarNew.tsx
 ================================================================================
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -5509,236 +5725,7 @@ export const TopBar = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components\TopBarNew.tsx
-================================================================================
-import dayjs from "dayjs";
-import Link from "next/link";
-import type { ComponentProps } from "react";
-import React, { useState } from "react";
-import { useBoundStore } from "~/hooks/useBoundStore";
-import { Calendar } from "./Calendar";
-import { ModuleIcon } from "./ModuleIcon";
-import {
-  FireSvg,
-  GemSvg,
-  GlobeIconSvg,
-  LingotsTreasureChestSvg,
-  MoreOptionsSvg,
-  PodcastIconSvg,
-} from "./Svgs";
-
-const EmptyFireTopBarSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="25" height="30" viewBox="0 0 25 30" fill="none" {...props}>
-      <g opacity="0.2">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M13.9697 2.91035C13.2187 1.96348 11.7813 1.96348 11.0303 2.91035L7.26148 7.66176L4.83362 6.36218C4.61346 6.24433 4.1221 6.09629 3.88966 6.05712C2.72329 5.86056 2.04098 6.78497 2.04447 8.03807L2.06814 16.5554C2.02313 16.9355 2 17.322 2 17.7137C2 23.2979 6.70101 27.8248 12.5 27.8248C18.299 27.8248 23 23.2979 23 17.7137C23 15.3518 22.1591 13.1791 20.7498 11.458L13.9697 2.91035Z"
-          fill="black"
-        />
-      </g>
-    </svg>
-  );
-};
-
-const EmptyGemTopBarSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="24" height="30" viewBox="0 0 24 30" fill="none" {...props}>
-      <g opacity="0.2">
-        <path
-          d="M3.63705 7.31556C2.62104 7.92872 2 9.02888 2 10.2156V19.8818C2 21.0685 2.62104 22.1687 3.63705 22.7819L10.1117 26.6893C11.1881 27.3389 12.5356 27.3389 13.612 26.6894L20.087 22.7818C21.1031 22.1687 21.7241 21.0685 21.7241 19.8818V10.2156C21.7241 9.0289 21.1031 7.92872 20.087 7.31557L13.612 3.40806C12.5356 2.7585 11.1881 2.75851 10.1117 3.40809L3.63705 7.31556Z"
-          fill="black"
-        />
-      </g>
-    </svg>
-  );
-};
-
-const AddModuleSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="36" height="29" viewBox="0 0 36 29" {...props}>
-      <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-        <g stroke="#AFAFAF">
-          <path
-            d="M7.743 3c-1.67 0-2.315.125-2.98.48A3.071 3.071 0 0 0 3.48 4.763c-.355.665-.48 1.31-.48 2.98v13.514c0 1.67.125 2.315.48 2.98.297.555.728.986 1.283 1.283.665.355 1.31.48 2.98.48h20.514c1.67 0 2.315-.125 2.98-.48a3.071 3.071 0 0 0 1.283-1.283c.355-.665.48-1.31.48-2.98V7.743c0-1.67-.125-2.315-.48-2.98a3.071 3.071 0 0 0-1.283-1.283c-.665-.355-1.31-.48-2.98-.48H7.743Z"
-            strokeWidth="2"
-          />
-          <g strokeLinecap="round" strokeWidth="3">
-            <path d="M18 10v9M13.5 14.5h9" />
-          </g>
-        </g>
-      </g>
-    </svg>
-  );
-};
-
-type MenuState = "HIDDEN" | "MODULES" | "STREAK" | "GEMS" | "MORE";
-
-export const TopBar = ({
-  backgroundColor = "bg-[#58cc02]",
-  borderColor = "border-[#46a302]",
-}: {
-  backgroundColor?: `bg-${string}`;
-  borderColor?: `border-${string}`;
-}) => {
-  const [menu, setMenu] = useState<MenuState>("HIDDEN");
-  const [now, setNow] = useState(dayjs());
-  const streak = useBoundStore((x) => x.streak);
-  const lingots = useBoundStore((x) => x.lingots);
-  const module = useBoundStore((x) => x.module);
-  return (
-    <header className="fixed z-20 h-[58px] w-full">
-      <div
-        className={`relative flex h-full w-full items-center justify-between border-b-2 px-[10px] transition duration-500 sm:hidden ${borderColor} ${backgroundColor}`}
-      >
-        <button
-          onClick={() =>
-            setMenu((x) => (x === "MODULES" ? "HIDDEN" : "MODULES"))
-          }
-        >
-          <ModuleIcon module={module} width={45} />
-          <span className="sr-only">Ver módulos</span>
-        </button>
-
-        <button
-          className="flex items-center gap-2 font-bold text-white"
-          onClick={() => setMenu((x) => (x === "STREAK" ? "HIDDEN" : "STREAK"))}
-          aria-label="Toggle streak menu"
-        >
-          {streak > 0 ? <FireSvg /> : <EmptyFireTopBarSvg />}{" "}
-          <span className={streak > 0 ? "text-white" : "text-black opacity-20"}>
-            {streak}
-          </span>
-        </button>
-        <button
-          className="flex items-center gap-2 font-bold"
-          onClick={() => setMenu((x) => (x === "GEMS" ? "HIDDEN" : "GEMS"))}
-          aria-label="Toggle puntos QA menu"
-        >
-          {lingots > 0 ? <GemSvg /> : <EmptyGemTopBarSvg />}{" "}
-          <span
-            className={lingots > 0 ? "text-white" : "text-black opacity-20"}
-          >
-            {lingots}
-          </span>
-        </button>
-        <MoreOptionsSvg
-          onClick={() => setMenu((x) => (x === "MORE" ? "HIDDEN" : "MORE"))}
-          role="button"
-          tabIndex={0}
-          aria-label="Toggle more menu"
-        />
-
-        <div
-          className={[
-            "absolute left-0 right-0 top-full bg-white transition duration-300",
-            menu === "HIDDEN" ? "opacity-0" : "opacity-100",
-          ].join(" ")}
-          aria-hidden={menu === "HIDDEN"}
-        >
-          {((): null | JSX.Element => {
-            switch (menu) {
-              case "MODULES":
-                return (
-                  <div className="flex gap-5 p-5">
-                    <div className="flex flex-col items-center justify-between gap-2">
-                      <div className="rounded-2xl border-4 border-blue-400">
-                        <ModuleIcon module={module} width={80} />
-                      </div>
-                      <span className="font-bold">{module.name}</span>
-                    </div>
-                    <Link
-                      className="flex flex-col items-center justify-between gap-2"
-                      href="/register"
-                    >
-                      <div className="rounded-2xl border-4 border-white">
-                        <AddModuleSvg className="h-16 w-20" />
-                      </div>
-                      <span className="font-bold text-gray-400">Módulos</span>
-                    </Link>
-                  </div>
-                );
-
-              case "STREAK":
-                return (
-                  <div className="flex grow flex-col items-center gap-3 p-5">
-                    <h2 className="text-xl font-bold">Racha</h2>
-                    <p className="text-sm text-gray-400">
-                      ¡Practica cada día para que tu racha no se reinicie!
-                    </p>
-                    <div className="self-stretch">
-                      <Calendar now={now} setNow={setNow} />
-                    </div>
-                  </div>
-                );
-
-              case "GEMS":
-                return (
-                  <div className="flex grow items-center gap-3 p-5">
-                    <LingotsTreasureChestSvg className="h-24 w-24" />
-                    <div className="flex flex-col gap-3">
-                      <h2 className="text-xl font-bold text-black">Puntos QA</h2>
-                      <p className="text-sm font-normal text-gray-400">
-                        Tienes {lingots}{" "}
-                        {lingots === 1 ? "punto" : "puntos"}.
-                      </p>
-                      <Link
-                        className="font-bold uppercase text-blue-400 transition hover:brightness-110"
-                        href="/shop"
-                      >
-                        Ir a tienda
-                      </Link>
-                    </div>
-                  </div>
-                );
-
-              case "MORE":
-                return (
-                  <div className="flex grow flex-col">
-                    <Link
-                      className="flex items-center gap-2 p-2 font-bold text-gray-700"
-                      href="https://podcast.bughuntersaga.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <PodcastIconSvg className="h-10 w-10" />
-                      Podcast QA
-                    </Link>
-                    <Link
-                      className="flex items-center gap-2 border-t-2 border-gray-300 p-2 font-bold text-gray-700"
-                      href="https://schools.bughuntersaga.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <GlobeIconSvg className="h-10 w-10" />
-                      Testing Schools
-                    </Link>
-                  </div>
-                );
-
-              case "HIDDEN":
-                return null;
-            }
-          })()}
-          <div
-            className={[
-              "absolute left-0 top-full h-screen w-screen bg-black opacity-30",
-              menu === "HIDDEN" ? "pointer-events-none" : "",
-            ].join(" ")}
-            onClick={() => setMenu("HIDDEN")}
-            aria-label="Hide menu"
-            role="button"
-          ></div>
-        </div>
-      </div>
-    </header>
-  );
-};
-
-
-================================================================================
-📄 CONTENIDO DE: components\lessons\CheckAnswer.tsx
+📄 CONTENIDO DE: components/lessons/CheckAnswer.tsx
 ================================================================================
 import React from "react";
 import { BigCloseSvg, DoneSvg } from "~/components/Svgs";
@@ -5835,7 +5822,7 @@ export const CheckAnswer = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\lessons\FillInTheBlankQuestion.tsx
+📄 CONTENIDO DE: components/lessons/FillInTheBlankQuestion.tsx
 ================================================================================
 import React from "react";
 import Image from "next/image";
@@ -5976,7 +5963,7 @@ export const FillInTheBlankQuestion = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\lessons\MultipleChoiceQuestion.tsx
+📄 CONTENIDO DE: components/lessons/MultipleChoiceQuestion.tsx
 ================================================================================
 import React from "react";
 import { ProgressBar } from "./ProgressBar";
@@ -6081,7 +6068,7 @@ export const MultipleChoiceQuestion = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\lessons\ProblemInfo.tsx
+📄 CONTENIDO DE: components/lessons/ProblemInfo.tsx
 ================================================================================
 import React from "react";
 import { ProgressBar } from "./ProgressBar";
@@ -6169,7 +6156,7 @@ export const ProblemInfo = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\lessons\ProgressBar.tsx
+📄 CONTENIDO DE: components/lessons/ProgressBar.tsx
 ================================================================================
 import React from "react";
 import Link from "next/link";
@@ -6233,7 +6220,7 @@ export const ProgressBar = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\lessons\QuitMessage.tsx
+📄 CONTENIDO DE: components/lessons/QuitMessage.tsx
 ================================================================================
 import React from "react";
 import Link from "next/link";
@@ -6294,7 +6281,7 @@ export const QuitMessage = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components\lessons\ReviewLesson.tsx
+📄 CONTENIDO DE: components/lessons/ReviewLesson.tsx
 ================================================================================
 import React, { useState } from "react";
 import { BigCloseSvg, DoneSvg } from "~/components/Svgs";
@@ -6403,7 +6390,7 @@ export const ReviewLesson = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: hooks\useBoundStore.ts
+📄 CONTENIDO DE: hooks/useBoundStore.ts
 ================================================================================
 import type { StateCreator } from "zustand";
 import { create } from "zustand";
@@ -6463,7 +6450,7 @@ if (typeof window !== 'undefined') {
 }
 
 ================================================================================
-📄 CONTENIDO DE: hooks\useLeaderboard.ts
+📄 CONTENIDO DE: hooks/useLeaderboard.ts
 ================================================================================
 import { fakeUsers } from "~/utils/fakeUsers";
 import { useBoundStore } from "~/hooks/useBoundStore";
@@ -6487,7 +6474,7 @@ export const useLeaderboardRank = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\_app.tsx
+📄 CONTENIDO DE: pages/_app.tsx
 ================================================================================
 import { type AppType } from "next/dist/shared/lib/utils";
 import Head from "next/head";
@@ -6518,7 +6505,7 @@ export default MyApp;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\forgot-password.tsx
+📄 CONTENIDO DE: pages/forgot-password.tsx
 ================================================================================
 import type { NextPage } from "next";
 import Link from "next/link";
@@ -6627,7 +6614,7 @@ export default ForgotPassword;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\index.tsx
+📄 CONTENIDO DE: pages/index.tsx
 ================================================================================
 import { type NextPage } from "next";
 import React from "react";
@@ -6681,7 +6668,7 @@ export default Home;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\leaderboard.tsx
+📄 CONTENIDO DE: pages/leaderboard.tsx
 ================================================================================
 import type { NextPage } from "next";
 import React, { useEffect } from "react";
@@ -6898,7 +6885,7 @@ export default Leaderboard;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\learn.tsx
+📄 CONTENIDO DE: pages/learn.tsx
 ================================================================================
 import { type NextPage } from "next";
 import Link from "next/link";
@@ -7548,7 +7535,7 @@ const UnitHeader = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: pages\lesson.tsx
+📄 CONTENIDO DE: pages/lesson.tsx
 ================================================================================
 import type { NextPage } from "next";
 import Image from "next/image";
@@ -8163,7 +8150,7 @@ const LessonFastForwardEndPass = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: pages\profile.tsx
+📄 CONTENIDO DE: pages/profile.tsx
 ================================================================================
 import type { NextPage } from "next";
 import { BottomBar } from "~/components/BottomBar";
@@ -8297,7 +8284,7 @@ const ProfileStatsSection = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\register.tsx
+📄 CONTENIDO DE: pages/register.tsx
 ================================================================================
 import type { NextPage } from "next";
 import Link from "next/link";
@@ -8349,7 +8336,7 @@ export default Register;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\shop.tsx
+📄 CONTENIDO DE: pages/shop.tsx
 ================================================================================
 import type { NextPage } from "next";
 import type { ComponentProps } from "react";
@@ -8763,7 +8750,7 @@ export default Shop;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\settings\account.tsx
+📄 CONTENIDO DE: pages/settings/account.tsx
 ================================================================================
 import type { NextPage } from "next";
 import React, { useState } from "react";
@@ -8837,7 +8824,7 @@ export default Account;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\settings\coach.tsx
+📄 CONTENIDO DE: pages/settings/coach.tsx
 ================================================================================
 import type { NextPage } from "next";
 import type { ComponentProps } from "react";
@@ -9043,7 +9030,7 @@ export default Coach;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages\settings\sound.tsx
+📄 CONTENIDO DE: pages/settings/sound.tsx
 ================================================================================
 import type { NextPage } from "next";
 import React, { useState } from "react";
@@ -9159,7 +9146,7 @@ export default Sound;
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createGoalXpStore.ts
+📄 CONTENIDO DE: stores/createGoalXpStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9177,7 +9164,7 @@ export const createGoalXpSlice: BoundStateCreator<GoalXpSlice> = (set) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createLessonStore.ts
+📄 CONTENIDO DE: stores/createLessonStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9202,7 +9189,7 @@ export const createLessonSlice: BoundStateCreator<LessonSlice> = (set, get) => (
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createLingotStore.ts
+📄 CONTENIDO DE: stores/createLingotStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9219,7 +9206,7 @@ export const createLingotSlice: BoundStateCreator<LingotSlice> = (set) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createModuleStore.ts
+📄 CONTENIDO DE: stores/createModuleStore.ts
 ================================================================================
 import modules, { type Module } from "~/utils/modules";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9249,7 +9236,7 @@ export const createModuleSlice: BoundStateCreator<ModuleSlice> = (set, get) => {
 };
 
 ================================================================================
-📄 CONTENIDO DE: stores\createQuestionsSlice.ts
+📄 CONTENIDO DE: stores/createQuestionsSlice.ts
 ================================================================================
 import type { StateCreator } from "zustand";
 import type { ModuleLesson } from "~/utils/lessons"; // Importa los tipos de lecciones
@@ -9283,7 +9270,7 @@ export const createQuestionsSlice: StateCreator<
 });
 
 ================================================================================
-📄 CONTENIDO DE: stores\createSoundSettingsStore.ts
+📄 CONTENIDO DE: stores/createSoundSettingsStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9311,7 +9298,7 @@ export const createSoundSettingsSlice: BoundStateCreator<SoundSettingsSlice> = (
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createStreakStore.ts
+📄 CONTENIDO DE: stores/createStreakStore.ts
 ================================================================================
 import dayjs from "dayjs";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9360,7 +9347,7 @@ export const createStreakSlice: BoundStateCreator<StreakSlice> = (
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createUserStore.ts
+📄 CONTENIDO DE: stores/createUserStore.ts
 ================================================================================
 import dayjs from "dayjs";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9389,7 +9376,7 @@ export const createUserSlice: BoundStateCreator<UserSlice> = (set) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: stores\createXpStore.ts
+📄 CONTENIDO DE: stores/createXpStore.ts
 ================================================================================
 import dayjs from "dayjs";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9436,7 +9423,7 @@ export const createXpSlice: BoundStateCreator<XpSlice> = (set, get) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\array-utils.ts
+📄 CONTENIDO DE: utils/array-utils.ts
 ================================================================================
 export const range = (lo: number, hi: number): number[] => {
   const result = Array<number>(hi - lo);
@@ -9456,7 +9443,7 @@ export const sum = (numbers: number[]): number => {
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\dateString.ts
+📄 CONTENIDO DE: utils/dateString.ts
 ================================================================================
 import type dayjs from "dayjs";
 
@@ -9471,7 +9458,7 @@ export const toDateString = (day: dayjs.Dayjs): DateString => {
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\fakeUsers.ts
+📄 CONTENIDO DE: utils/fakeUsers.ts
 ================================================================================
 export const fakeUsers = [
   { name: "Aaron", xp: 424, isCurrentUser: false },
@@ -9507,7 +9494,7 @@ export const fakeUsers = [
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\lessons.ts
+📄 CONTENIDO DE: utils/lessons.ts
 ================================================================================
 // Definición de tipos para las lecciones del Módulo B
 export type LessonInfo = {
@@ -9535,7 +9522,7 @@ export type ModuleLesson = LessonInfo | LessonMultipleChoice | LessonFillInTheBl
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\moduleA-lessons.ts
+📄 CONTENIDO DE: utils/moduleA-lessons.ts
 ================================================================================
 import { ModuleLesson } from "./lessons";
 
@@ -9684,7 +9671,7 @@ export const getModuleALessons = (level: number): readonly ModuleLesson[] => {
 };
 
 ================================================================================
-📄 CONTENIDO DE: utils\moduleB-lessons.ts
+📄 CONTENIDO DE: utils/moduleB-lessons.ts
 ================================================================================
 import { ModuleLesson } from "./lessons";
 
@@ -9741,7 +9728,7 @@ export const getModuleBLessons = (level: number): readonly ModuleLesson[] => {
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\moduleC-lessons.ts
+📄 CONTENIDO DE: utils/moduleC-lessons.ts
 ================================================================================
 import type { ModuleLesson } from "./lessons";
 
@@ -9796,7 +9783,7 @@ export const getModuleCLessons = (level: number): readonly ModuleLesson[] => {
 };
 
 ================================================================================
-📄 CONTENIDO DE: utils\modules.ts
+📄 CONTENIDO DE: utils/modules.ts
 ================================================================================
 export type Module = (typeof modules)[number];
 
@@ -9840,7 +9827,7 @@ export default modules;
 
 
 ================================================================================
-📄 CONTENIDO DE: utils\units.ts
+📄 CONTENIDO DE: utils/units.ts
 ================================================================================
 export type Unit = {
   unitNumber: number;

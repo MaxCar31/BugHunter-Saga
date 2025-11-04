@@ -1,18 +1,13 @@
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-
-    @Getter
+@Getter
 @Setter
 @Builder
-@NoArgsConstructor
-    public class AuthToken {
-
-    // Contenido de la clase
-
-    }
+public class AuthToken {
+    private String token;
+    private User user;
+}

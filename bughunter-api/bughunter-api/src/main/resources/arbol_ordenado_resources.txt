@@ -1,0 +1,300 @@
+Árbol de archivos del directorio: resources
+================================================================================
+
+## 🌳 ESTRUCTURA DE ARCHIVOS
+
+│   ├── 📁 db/
+│   │   ├── 📁 migration/
+│   │   │   ├── 📄 V1__Create_Users_table.sql
+│   │   │   ├── 📄 V1__create_users_table.sql
+│   │   │   ├── 📄 V2__Create_UserProfile_table.sql
+│   │   │   ├── 📄 V3__Create_Content_Tables.sql
+│   │   │   ├── 📄 V4__Seed_Module_A_EP_BVA.sql
+│   │   │   ├── 📄 V5__Seed_Module_B_Decision_Table.sql
+│   │   │   ├── 📄 V6__Seed_Module_C_Statement_Testing.sql
+│   ├── 📁 static/
+
+
+================================================================================
+## 📄 CONTENIDO DETALLADO DE ARCHIVOS
+================================================================================
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V1__Create_Users_table.sql
+================================================================================
+-- ============================================================================
+-- Migration: V1__Create_Users_Table.sql
+-- Description: Crea la tabla de usuarios (users) del sistema
+-- Author: BugHunter Saga Team
+-- Date: 2025-10-26
+-- ============================================================================
+
+-- Tabla principal de usuarios
+CREATE TABLE IF NOT EXISTS users (
+                                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_username_length CHECK (char_length(username) >= 3),
+    CONSTRAINT chk_email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$')
+    );
+
+-- Índices para optimizar búsquedas
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
+
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V1__create_users_table.sql
+================================================================================
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_users_username ON users(username);
+
+CREATE INDEX idx_users_email ON users(email);
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V2__Create_UserProfile_table.sql
+================================================================================
+-- ============================================================================
+-- Migration: V2__Create_User_Profiles_Table.sql
+-- Description: Crea la tabla de perfiles de usuario (user_profiles)
+-- Author: BugHunter Saga Team
+-- Date: 2025-10-26
+-- ============================================================================
+
+-- Tabla de perfiles de usuario (gamificación)
+CREATE TABLE IF NOT EXISTS user_profiles (
+                                             user_id UUID PRIMARY KEY,
+                                             lingots INTEGER NOT NULL DEFAULT 0,
+                                             daily_xp_goal INTEGER NOT NULL DEFAULT 10,
+                                             sound_effects_enabled BOOLEAN NOT NULL DEFAULT true,
+
+                                             CONSTRAINT fk_user_profiles_user
+                                             FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+    CONSTRAINT chk_lingots_positive CHECK (lingots >= 0),
+    CONSTRAINT chk_daily_xp_goal_range CHECK (daily_xp_goal >= 1 AND daily_xp_goal <= 100)
+    );
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V3__Create_Content_Tables.sql
+================================================================================
+-- ============================================================================
+-- Migration: V3__Create_Content_Tables.sql
+-- Description: Crea las tablas para módulos, unidades, lecciones y problemas
+-- Author: BugHunter Saga Team
+-- Date: 2025-10-26
+-- ============================================================================
+
+-- Tabla para los módulos de aprendizaje (ej. Módulo A - Equivalencia)
+CREATE TABLE modules (
+                         id SERIAL PRIMARY KEY,
+                         code VARCHAR(20) UNIQUE NOT NULL,
+                         name VARCHAR(100) NOT NULL,
+                         description TEXT,
+                         ui_config JSONB,
+
+                         CONSTRAINT chk_code_format CHECK (code ~ '^mod-[a-z]$')
+    );
+
+COMMENT ON TABLE modules IS 'Módulos de aprendizaje (ej. Módulo A - Equivalencia)';
+
+-- Tabla para las unidades dentro de cada módulo
+CREATE TABLE units (
+                       id SERIAL PRIMARY KEY,
+                       module_id INTEGER NOT NULL,
+                       unit_number INTEGER NOT NULL,
+                       description TEXT,
+
+                       CONSTRAINT fk_units_module
+                           FOREIGN KEY (module_id)
+                               REFERENCES modules(id)
+                               ON DELETE CASCADE,
+
+                       CONSTRAINT uq_unit_per_module UNIQUE (module_id, unit_number)
+);
+
+COMMENT ON TABLE units IS 'Unidades dentro de cada módulo';
+
+CREATE INDEX idx_units_module_id ON units(module_id);
+
+-- Tabla para las lecciones individuales (los "tiles" en tu UI)
+CREATE TABLE lessons (
+                         id SERIAL PRIMARY KEY,
+                         unit_id INTEGER NOT NULL,
+                         type VARCHAR(50) NOT NULL,
+                         description TEXT,
+                         position INTEGER NOT NULL,
+
+                         CONSTRAINT fk_lessons_unit
+                             FOREIGN KEY (unit_id)
+                                 REFERENCES units(id)
+                                 ON DELETE CASCADE,
+
+                         CONSTRAINT chk_lesson_type
+                             CHECK (type IN ('star', 'book', 'trophy', 'treasure', 'fast-forward'))
+);
+
+COMMENT ON TABLE lessons IS 'Lecciones individuales (tiles) en el camino de aprendizaje';
+
+CREATE INDEX idx_lessons_unit_id ON lessons(unit_id);
+CREATE INDEX idx_lessons_position ON lessons(unit_id, position);
+
+-- Tabla para el contenido específico de cada lección (los problemas/pantallas)
+CREATE TABLE problems (
+                          id SERIAL PRIMARY KEY,
+                          lesson_id INTEGER NOT NULL,
+                          type VARCHAR(50) NOT NULL,
+                          content JSONB NOT NULL,
+                          position INTEGER NOT NULL,
+
+                          CONSTRAINT fk_problems_lesson
+                              FOREIGN KEY (lesson_id)
+                                  REFERENCES lessons(id)
+                                  ON DELETE CASCADE,
+
+                          CONSTRAINT chk_problem_type
+                              CHECK (type IN ('INFO', 'SELECT_1_OF_3', 'FILL_IN_THE_BLANK', 'MATCH_PAIRS', 'CODE_CHALLENGE'))
+);
+
+COMMENT ON TABLE problems IS 'Contenido específico de cada lección (problemas/pantallas)';
+
+CREATE INDEX idx_problems_lesson_id ON problems(lesson_id);
+CREATE INDEX idx_problems_position ON problems(lesson_id, position);
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V4__Seed_Module_A_EP_BVA.sql
+================================================================================
+-- ============================================================================
+-- Migration: V6__Seed_Module_A_EP_BVA.sql
+-- Description: Inserta el contenido del Módulo A (Equivalencia y Valores Límite)
+-- Author: BugHunter Saga Team
+-- ============================================================================
+
+-- 1. CREAR MÓDULO A
+INSERT INTO modules (code, name, description, ui_config) VALUES
+    ('mod-a', 'Particion de Equivalencia y Valores Limite',
+     'Aprende a dividir el dominio y probar los bordes donde ocurren los errores.',
+     '{"backgroundColor": "bg-blue-500", "icon": "🎯", "color": "blue"}');
+
+-- 2. CREAR UNIDADES
+INSERT INTO units (module_id, unit_number, description) VALUES
+                                                            (1, 1, 'Introducción a la Equivalencia'),
+                                                            (1, 2, 'Particiones Válidas e Inválidas'),
+                                                            (1, 3, 'Fundamentos de Valores Límite'),
+                                                            (1, 4, 'Límites Robustos');
+
+-- 3. CREAR LECCIONES
+-- Lecciones EP (Unidades 1, 2)
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+                                                               (1, 'book', '¿Qué es la Equivalencia de Particiones?', 1),
+                                                               (1, 'star', 'Identifica Clases de Equivalencia', 2),
+                                                               (1, 'trophy', 'Revisión de Unidad 1', 3),
+                                                               (2, 'book', 'Particiones Válidas vs Inválidas', 1),
+                                                               (2, 'star', 'Ejercicio: Validación de Email', 2);
+-- Lecciones BVA (Unidades 3, 4)
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+                                                               (3, 'book', 'Introducción a Valores Límite', 1),
+                                                               (3, 'star', 'Identifica los Límites', 2),
+                                                               (4, 'treasure', 'Cofre de Bonus: Límites Robustos', 1);
+
+-- 4. CREAR PROBLEMAS
+-- Problemas de Equivalencia (Lecciones 1, 2, 5)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              (1, 'INFO', '{"title": "Bienvenido a Equivalencia de Particiones", "content": "La Equivalencia de Particiones es una técnica de caja negra...", "image": "/assets/ep-intro.png"}', 1),
+                                                              (1, 'INFO', '{"title": "¿Por qué es importante?", "content": "En lugar de probar TODOS los valores posibles (imposible)...", "example": "Para un campo que acepta edades 0-120..."}', 2),
+                                                              (2, 'SELECT_1_OF_3', '{"question": "Un sistema acepta códigos promocionales de 5-10 caracteres. ¿Cuántas clases de equivalencia hay?", "options": [{"id": "a", "text": "2 clases..."}, {"id": "b", "text": "3 clases: menor a 5, 5-10, mayor a 10"}, {"id": "c", "text": "6 clases..."}], "correctAnswer": "b", "explanation": "Correcto! Tenemos 3 clases: < 5 chars (inválida), 5-10 chars (válida), > 10 chars (inválida)"}', 1),
+                                                              (2, 'SELECT_1_OF_3', '{"question": "¿Cuál NO es un beneficio de la Equivalencia de Particiones?", "options": [{"id": "a", "text": "Reduce el número de casos de prueba"}, {"id": "b", "text": "Garantiza encontrar todos los bugs"}, {"id": "c", "text": "Cubre rangos completos de valores"}], "correctAnswer": "b", "explanation": "Correcto! La EP reduce casos de prueba y cubre rangos, pero NO garantiza encontrar todos los bugs."}', 2),
+                                                              (5, 'FILL_IN_THE_BLANK', '{"question": "Para validar un email, identifica las clases de equivalencia. Un email tiene formato: ___@___.___", "blanks": ["usuario", "dominio", "extension"], "correctAnswers": ["texto", "dominio", "com"], "hint": "Piensa en las partes que componen un email válido"}', 1);
+
+-- Problemas de Valores Límite (Lecciones 6, 7, 8)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              (6, 'INFO', '{"title": "¿Qué son los Valores Límite?", "content": "Los errores suelen ocurrir en los BORDES de las clases de equivalencia...", "image": "/assets/bva-intro.png"}', 1),
+                                                              (6, 'INFO', '{"title": "Ejemplo Práctico", "content": "Para un campo de edad válido entre 18-65 años, prueba: 17, 18, 19, 64, 65, 66", "tip": "Regla de oro: min-1, min, min+1, max-1, max, max+1"}', 2),
+                                                              (7, 'SELECT_1_OF_3', '{"question": "Un campo acepta enteros válidos de 10 a 50. ¿Cuál set de pruebas usa BVA de 3 puntos?", "options": [{"id": "a", "text": "10, 30, 50"}, {"id": "b", "text": "9, 10, 11, 49, 50, 51"}, {"id": "c", "text": "9, 51"}], "correctAnswer": "b", "explanation": "BVA de 3 puntos prueba min-1, min, min+1, max-1, max, y max+1."}', 1),
+                                                              (7, 'FILL_IN_THE_BLANK', '{"question": "BVA se enfoca en los ___ de las particiones de equivalencia, donde es más probable encontrar errores.", "blanks": ["respuesta"], "correctAnswers": ["bordes"], "hint": "También se les llama ''límites'' o ''fronteras''."}', 2),
+                                                              (8, 'INFO', '{"title": "¿Qué es BVA Robusto?", "content": "El BVA ''robusto'' es una expansión del BVA normal... considera valores ''muy'' inválidos.", "example": "Para el rango [10, 50], un BVA robusto podría incluir 9, 10, 11... y también -100 y 1000."}', 1),
+                                                              (8, 'MATCH_PAIRS', '{"title": "Empareja el Valor con el Término BVA", "prompt": "Para un descuento válido en compras de $25 a $100:", "pairs": [{"id": "p1", "prompt": "Valor: $24"}, {"id": "p2", "prompt": "Valor: $25"}, {"id": "p3", "prompt": "Valor: $99"}, {"id": "p4", "prompt": "Valor: $101"}], "answers": [{"id": "a1", "text": "Límite Mínimo (min)"}, {"id": "a2", "text": "Justo Debajo del Mínimo (min-1)"}, {"id": "a3", "text": "Justo Encima del Máximo (max+1)"}, {"id": "a4", "text": "Justo Debajo del Máximo (max-1)"}], "correctMapping": {"p1": "a2", "p2": "a1", "p3": "a4", "p4": "a3"}}', 2),
+                                                              (8, 'SELECT_1_OF_3', '{"question": "Un campo de texto debe tener una longitud de 5 a 10 caracteres. ¿Cuál NO es un valor límite a probar?", "options": [{"id": "a", "text": "Una cadena de 4 caracteres"}, {"id": "b", "text": "Una cadena de 11 caracteres"}, {"id": "c", "text": "Una cadena de 7 caracteres"}], "correctAnswer": "c", "explanation": "7 caracteres es un valor ''en medio'' de la partición válida. No es un límite."}', 3);
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V5__Seed_Module_B_Decision_Table.sql
+================================================================================
+-- ============================================================================
+-- Migration: V5__Seed_Module_B_Decision_Tables.sql
+-- Description: Inserta el contenido del Módulo B (Tablas de Decisión)
+-- Author: BugHunter Saga Team
+-- ============================================================================
+
+-- 1. CREAR MÓDULO B
+INSERT INTO modules (code, name, description, ui_config) VALUES
+    ('mod-b', 'Tablas de Decisión',
+     'Técnica de caja negra para reglas de negocio complejas.',
+     '{"backgroundColor": "bg-green-500", "icon": "🔲", "color": "green"}');
+
+-- 2. CREAR UNIDADES
+INSERT INTO units (module_id, unit_number, description) VALUES
+    (2, 1, 'Modelando Lógica Compleja');
+
+-- 3. CREAR LECCIONES (IDs 9, 10, 11)
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+                                                               (5, 'book', 'Introducción a Tablas de Decisión', 1),
+                                                               (5, 'star', 'Crea tu Primera Tabla', 2),
+                                                               (5, 'fast-forward', 'Desafío Rápido: Reglas Complejas', 3);
+
+-- 4. CREAR PROBLEMAS
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              (9, 'INFO', '{"title": "Tablas de Decisión", "content": "Las tablas de decisión modelan lógica compleja con múltiples condiciones...", "example": "Sistema de descuentos: Cliente VIP + Compra > $100 + Cupón = 30% descuento"}', 1),
+                                                              (10, 'SELECT_1_OF_3', '{"question": "Si tienes 3 condiciones de entrada (ej. V/F, V/F, V/F), ¿cuántas reglas (columnas) necesitas?", "options": [{"id": "a", "text": "3 reglas"}, {"id": "b", "text": "6 reglas"}, {"id": "c", "text": "8 reglas (2^3)"}], "correctAnswer": "c", "explanation": "El número de reglas es 2 elevado al número de condiciones binarias (2^3 = 8)."}', 1),
+                                                              (10, 'FILL_IN_THE_BLANK', '{"question": "Una tabla de decisión se divide en 4 cuadrantes: Condiciones, Acciones, Reglas de Condición y Reglas de ___.", "blanks": ["respuesta"], "correctAnswers": ["Acción"], "hint": "Las condiciones de entrada guían a las... de salida."}', 2),
+                                                              (11, 'MATCH_PAIRS', '{"title": "Empareja la Regla con la Acción", "prompt": "Para un descuento de aerolínea:", "pairs": [{"id": "p1", "prompt": "Regla 1: (VIP = SI, Vuelo Lleno = SI)"}, {"id": "p2", "prompt": "Regla 2: (VIP = SI, Vuelo Lleno = NO)"}, {"id": "p3", "prompt": "Regla 3: (VIP = NO, Vuelo Lleno = SI)"}, {"id": "p4", "prompt": "Regla 4: (VIP = NO, Vuelo Lleno = NO)"}], "answers": [{"id": "a1", "text": "Acción: Dar Upgrade a 1ra Clase"}, {"id": "a2", "text": "Acción: Ofrecer 10% descuento"}, {"id": "a3", "text": "Acción: Poner en lista de espera"}, {"id": "a4", "text": "Acción: No hacer nada"}], "correctMapping": {"p1": "a1", "p2": "a2", "p3": "a3", "p4": "a4"}}', 1),
+                                                              (11, 'SELECT_1_OF_3', '{"question": "¿Cuál es el principal beneficio de las Tablas de Decisión?", "options": [{"id": "a", "text": "Probar el rendimiento."}, {"id": "b", "text": "Garantizar que no se olvide ninguna combinación de reglas de negocio."}, {"id": "c", "text": "Probar cada línea de código."}], "correctAnswer": "b", "explanation": "Son ideales para sistemas con lógica de negocio compleja (muchos IF-ELSE)."}', 2),
+                                                              (11, 'INFO', '{"title": "Simplificación de Reglas", "content": "A veces, el valor de una condición no importa (se marca con ''-'')...", "example": "Regla: (Condición: VIP = NO, Condición: Compra > 100 = ''-''), Acción: (Acceso Denegado = SÍ)"}', 3);
+
+================================================================================
+📄 CONTENIDO DE: db/migration/V6__Seed_Module_C_Statement_Testing.sql
+================================================================================
+-- ============================================================================
+-- Migration: V6__Seed_Module_C_Statement_Testing.sql
+-- Description: Inserta el contenido del Módulo C (Pruebas de Sentencia)
+-- Author: BugHunter Saga Team
+-- ============================================================================
+
+-- 1. CREAR MÓDULO C
+INSERT INTO modules (code, name, description, ui_config) VALUES
+    ('mod-c', 'Pruebas de Sentencia',
+     'Técnica de caja blanca para cobertura de código.',
+     '{"backgroundColor": "bg-purple-500", "icon": "📄", "color": "purple"}');
+
+-- 2. CREAR UNIDADES
+INSERT INTO units (module_id, unit_number, description) VALUES
+    (3, 1, 'Introducción a Cobertura de Sentencia');
+
+-- 3. CREAR LECCIONES (IDs 12, 13, 14)
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+                                                               (6, 'book', '¿Qué es la Cobertura de Sentencia?', 1),
+                                                               (6, 'star', 'Calculando Cobertura', 2),
+                                                               (6, 'star', 'Desafío de Código', 3);
+
+-- 4. CREAR PROBLEMAS
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              (12, 'INFO', '{"title": "Pruebas de Sentencia", "content": "Es una técnica de prueba de CAJA BLANCA que mide el porcentaje de líneas de código...", "image": "/assets/white-box.png"}', 1),
+                                                              (13, 'SELECT_1_OF_3', '{"question": "Un programa tiene 100 líneas ejecutables. Un set de pruebas ejecuta 75. ¿Cuál es la cobertura de sentencia?", "options": [{"id": "a", "text": "75%"}, {"id": "b", "text": "100%"}, {"id": "c", "text": "No se puede saber"}], "correctAnswer": "a", "explanation": "(75 / 100) * 100 = 75%."}', 1),
+                                                              (13, 'FILL_IN_THE_BLANK', '{"question": "Lograr 100% de cobertura de sentencia ___ (garantiza/no garantiza) que el software esté libre de bugs.", "blanks": ["respuesta"], "correctAnswers": ["no garantiza"], "hint": "Puedes ejecutar todas las líneas, pero ¿qué pasa si la lógica es incorrecta?"}', 2),
+                                                              (14, 'CODE_CHALLENGE', '{"title": "Desafío de Cobertura", "code": "public int calcular(int x, int y) {\n  int r = x;  // S1\n  if (x > 5) {  // S2\n    r = x + y;  // S3\n  }\n  return r;   // S4\n}", "question": "¿Qué caso de prueba (x, y) logra 100% de cobertura de sentencia?", "options": [{"id": "a", "text": "x = 4, y = 10"}, {"id": "b", "text": "x = 6, y = 10"}, {"id": "c", "text": "x = 5, y = 10"}], "correctAnswer": "b", "explanation": "El caso (6, 10) hace que ''x > 5'' sea verdadero, ejecutando la línea S3. Los otros casos se saltan la S3."}', 1),
+                                                              (14, 'SELECT_1_OF_3', '{"question": "Usando el mismo código, ¿qué caso de prueba logra la MENOR cobertura de sentencia?", "options": [{"id": "a", "text": "x = 10, y = 2"}, {"id": "b", "text": "x = 2, y = 2"}], "correctAnswer": "b", "explanation": "El caso (2, 2) ejecuta S1, S2 y S4 (3 de 4 sentencias). El caso (10, 2) ejecuta las 4 sentencias."}', 2);

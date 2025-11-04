@@ -16,8 +16,8 @@ import type { UserSlice } from "~/stores/createUserStore";
 import { createUserSlice } from "~/stores/createUserStore";
 import type { XpSlice } from "~/stores/createXpStore";
 import { createXpSlice } from "~/stores/createXpStore";
-import type { QuestionsSlice } from "~/stores/createQuestionsSlice"; // Importa el tipo para QuestionsSlice
-import { createQuestionsSlice } from "~/stores/createQuestionsSlice"; // Importa el slice de preguntas
+import type { QuestionsSlice } from "~/stores/createQuestionsSlice";
+import { createQuestionsSlice } from "~/stores/createQuestionsSlice";
 
 type BoundState = GoalXpSlice &
   ModuleSlice &
@@ -27,7 +27,7 @@ type BoundState = GoalXpSlice &
   StreakSlice &
   UserSlice &
   XpSlice &
-  QuestionsSlice; // Agrega QuestionsSlice al tipo BoundState
+  QuestionsSlice;
 
 export type BoundStateCreator<SliceState> = StateCreator<
   BoundState,
@@ -45,12 +45,13 @@ export const useBoundStore = create<BoundState>((...args) => ({
   ...createStreakSlice(...args),
   ...createUserSlice(...args),
   ...createXpSlice(...args),
-  ...createQuestionsSlice(...args), // Agrega el slice de preguntas al store
+  ...createQuestionsSlice(...args),
 }));
 
-// Inicializar las preguntas del módulo por defecto DESPUÉS de crear el store
-// Esto se ejecuta una sola vez cuando se importa el módulo
-if (typeof window !== 'undefined') {
+// Inicializar las preguntas del módulo actual (solo si hay window)
+if (typeof window !== "undefined") {
   const currentModule = useBoundStore.getState().module;
-  useBoundStore.getState().loadQuestions(currentModule.code);
+  if (currentModule?.code) {
+    useBoundStore.getState().loadQuestions(currentModule.code);
+  }
 }

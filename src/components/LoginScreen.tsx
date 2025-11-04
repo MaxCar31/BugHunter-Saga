@@ -9,14 +9,17 @@ export type LoginScreenState = "HIDDEN" | "LOGIN" | "SIGNUP";
 export const useLoginScreen = () => {
   const router = useRouter();
   const loggedIn = useBoundStore((x) => x.loggedIn);
+
   const queryState: LoginScreenState = (() => {
     if (loggedIn) return "HIDDEN";
     if ("login" in router.query) return "LOGIN";
     if ("sign-up" in router.query) return "SIGNUP";
     return "HIDDEN";
   })();
+
   const [loginScreenState, setLoginScreenState] = useState(queryState);
   useEffect(() => setLoginScreenState(queryState), [queryState]);
+
   return { loginScreenState, setLoginScreenState };
 };
 
@@ -35,74 +38,82 @@ export const LoginScreen = ({
 
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [ageTooltipShown, setAgeTooltipShown] = useState(false);
 
-  const nameInputRef = useRef<null | HTMLInputElement>(null);
-  const emailInputRef = useRef<null | HTMLInputElement>(null);
-  const passwordInputRef = useRef<null | HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
+  const usernameInputRef = useRef<HTMLInputElement | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
+  const emailOrUsernameInputRef = useRef<HTMLInputElement | null>(null);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (loginScreenState !== "HIDDEN" && loggedIn) {
       setLoginScreenState("HIDDEN");
     }
+    setErrorMessage("");
   }, [loginScreenState, loggedIn, setLoginScreenState]);
 
-  const logInAndSetUserProperties = async () => {
-    // Limpiar error previo
+  const handleSubmit = async () => {
     setErrorMessage("");
     setIsLoading(true);
 
-    const emailOrUsername = emailInputRef.current?.value.trim() || "";
-    const password = passwordInputRef.current?.value.trim() || "";
-    const name =
-      nameInputRef.current?.value.trim() || Math.random().toString().slice(2);
-
-    // Validar campos requeridos
-    if (!emailOrUsername || !password) {
-      setErrorMessage("Por favor completa email/usuario y contraseña");
-      setIsLoading(false);
-      return;
-    }
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    let endpoint = "";
+    let body: any = {};
 
     try {
-      const apiBase = (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:8081";
-      const endpoint = loginScreenState === "SIGNUP" ? "/api/auth/register" : "/api/auth/login";
-      
+      if (loginScreenState === "LOGIN") {
+        endpoint = "/api/auth/login";
+        const emailOrUsername = emailOrUsernameInputRef.current?.value.trim() || "";
+        const password = passwordInputRef.current?.value.trim() || "";
+        if (!emailOrUsername || !password) {
+          setErrorMessage("Por favor ingresa email/usuario y contraseña.");
+          setIsLoading(false);
+          return;
+        }
+        body = { emailOrUsername, password };
+      } else {
+        endpoint = "/api/auth/register";
+        const name = nameInputRef.current?.value.trim() || "";
+        const username = usernameInputRef.current?.value.trim() || "";
+        const email = emailInputRef.current?.value.trim() || "";
+        const password = passwordInputRef.current?.value.trim() || "";
+        if (!username || !name || !email || !password) {
+          setErrorMessage("Por favor completa todos los campos.");
+          setIsLoading(false);
+          return;
+        }
+        body = { username, name, email, password };
+      }
+
       const res = await fetch(`${apiBase}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailOrUsername, password }),
+        body: JSON.stringify(body),
       });
 
       if (res.ok) {
-        const data = (await res.json()) as { token: string; user: { username: string; name: string; email: string } };
-        const user = data.user || {};
-        const username = user.username || emailOrUsername.replace(/ +/g, "-");
-        const displayName = user.name || name;
-        // guardar token en localStorage para llamadas futuras
-        if (data.token) {
-          try {
-            localStorage.setItem("bh_token", data.token);
-          } catch (e) {
-            // ignore storage errors
-          }
-        }
-        setUsername(username);
-        setName(displayName);
+        const data = (await res.json()) as {
+          token: string;
+          user: { username: string; name: string; email: string };
+        };
+
+        localStorage.setItem("bh_token", data.token);
+        setUsername(data.user.username);
+        setName(data.user.name);
         logIn();
         setIsLoading(false);
         void router.push("/learn");
         return;
       } else if (res.status === 401) {
-        setErrorMessage("Email/usuario o contraseña incorrectos");
+        setErrorMessage("Email/usuario o contraseña incorrectos.");
       } else if (res.status === 400) {
-        setErrorMessage("Email o usuario ya existe");
+        setErrorMessage("Email o usuario ya existe, o los datos son inválidos.");
       } else {
         setErrorMessage("Error en el servidor. Intenta de nuevo.");
       }
     } catch (e) {
-      setErrorMessage("Error de conexión. Verifica tu conexión de internet.");
       console.error("Auth error:", e);
+      setErrorMessage("Error de conexión. ¿El backend está corriendo en el puerto 8080?");
     }
 
     setIsLoading(false);
@@ -112,19 +123,14 @@ export const LoginScreen = ({
     <article
       className={[
         "fixed inset-0 z-30 flex flex-col bg-white p-7 transition duration-300",
-        loginScreenState === "HIDDEN"
-          ? "pointer-events-none opacity-0"
-          : "opacity-100",
+        loginScreenState === "HIDDEN" ? "pointer-events-none opacity-0" : "opacity-100",
       ].join(" ")}
       aria-hidden={!loginScreenState}
     >
       <header className="flex flex-row-reverse justify-between sm:flex-row">
-        <button
-          className="flex text-gray-400"
-          onClick={() => setLoginScreenState("HIDDEN")}
-        >
+        <button className="flex text-gray-400" onClick={() => setLoginScreenState("HIDDEN")}>
           <CloseSvg />
-          <span className="sr-only">Close</span>
+          <span className="sr-only">Cerrar</span>
         </button>
         <button
           className="hidden rounded-2xl border-2 border-b-4 border-gray-200 px-4 py-3 text-sm font-bold uppercase text-[#f2a445] transition hover:bg-gray-50 hover:brightness-90 sm:block"
@@ -135,137 +141,124 @@ export const LoginScreen = ({
           {loginScreenState === "LOGIN" ? "Sign up" : "Login"}
         </button>
       </header>
+
       <div className="flex grow items-center justify-center">
         <div className="flex w-full flex-col gap-5 sm:w-96">
           <h2 className="text-center text-2xl font-bold text-gray-800">
-            {loginScreenState === "LOGIN" ? "Log in" : "Create your profile"}
+            {loginScreenState === "LOGIN" ? "Iniciar sesión" : "Crear cuenta"}
           </h2>
+
           {errorMessage && (
             <div className="rounded-xl border-2 border-red-300 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
               {errorMessage}
             </div>
           )}
+
           <div className="flex flex-col gap-2 text-black">
-            {loginScreenState === "SIGNUP" && (
+            {loginScreenState === "SIGNUP" ? (
               <>
+                <input
+                  className="rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
+                  placeholder="Nombre"
+                  ref={nameInputRef}
+                />
+                <input
+                  className="rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
+                  placeholder="Username"
+                  ref={usernameInputRef}
+                />
+                <input
+                  className="rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
+                  placeholder="Email"
+                  type="email"
+                  ref={emailInputRef}
+                />
+                <input
+                  className="rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
+                  placeholder="Contraseña"
+                  type="password"
+                  ref={passwordInputRef}
+                />
+              </>
+            ) : (
+              <>
+                <input
+                  className="rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
+                  placeholder="Email o username"
+                  ref={emailOrUsernameInputRef}
+                />
                 <div className="relative flex grow">
                   <input
                     className="grow rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
-                    placeholder="Age (optional)"
+                    placeholder="Contraseña"
+                    type="password"
+                    ref={passwordInputRef}
                   />
-                  <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center pr-4">
-                    <div
-                      className="relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-gray-200 text-gray-400"
-                      onMouseEnter={() => setAgeTooltipShown(true)}
-                      onMouseLeave={() => setAgeTooltipShown(false)}
-                      onClick={() => setAgeTooltipShown((x) => !x)}
-                      role="button"
-                      tabIndex={0}
-                      aria-label="Why do you need an age?"
+                  <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center pr-5">
+                    <Link
+                      className="font-bold uppercase text-gray-400 hover:brightness-75"
+                      href="/forgot-password"
                     >
-                      ?
-                      {ageTooltipShown && (
-                        <div className="absolute -right-5 top-full z-10 w-72 rounded-2xl border-2 border-gray-200 bg-white p-4 text-center text-xs leading-5 text-gray-800">
-                          Providing your age ensures you get the right BugHunter Saga
-                          experience. For more details, please visit our{" "}
-                          <Link
-                            href="https://www.duolingo.com/privacy"
-                            className="text-blue-700"
-                          >
-                            Privacy Policy
-                          </Link>
-                        </div>
-                      )}
-                    </div>
+                      ¿Olvidaste?
+                    </Link>
                   </div>
                 </div>
-                <input
-                  className="grow rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
-                  placeholder="Name (optional)"
-                  ref={nameInputRef}
-                />
               </>
             )}
-            <input
-              className="grow rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
-              placeholder={
-                loginScreenState === "LOGIN"
-                  ? "Email or username (optional)"
-                  : "Email (optional)"
-              }
-              ref={emailInputRef}
-            />
-            <div className="relative flex grow">
-              <input
-                className="grow rounded-2xl border-2 border-gray-200 bg-gray-50 px-4 py-3"
-                placeholder="Password (optional)"
-                type="password"
-                ref={passwordInputRef}
-              />
-              {loginScreenState === "LOGIN" && (
-                <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center pr-5">
-                  <Link
-                    className="font-bold uppercase text-gray-400 hover:brightness-75"
-                    href="/forgot-password"
-                  >
-                    Forgot?
-                  </Link>
-                </div>
-              )}
-            </div>
           </div>
+
           <button
             className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${
               isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
             }`}
-            onClick={() => {
-              logInAndSetUserProperties().catch(() => {
-                // silently handle errors
-              });
-            }}
+            onClick={() => handleSubmit().catch(() => {})}
             disabled={isLoading}
           >
-            {isLoading ? "Cargando..." : loginScreenState === "LOGIN" ? "Log in" : "Create account"}
+            {isLoading
+              ? "Cargando..."
+              : loginScreenState === "LOGIN"
+              ? "Iniciar sesión"
+              : "Crear cuenta"}
           </button>
           <p className="text-center text-xs leading-5 text-gray-400">
-            By signing in to BugHunter Saga, you agree to our{" "}
+            Al iniciar sesión en BugHunter Saga, aceptas nuestros{" "}
             <Link
               className="font-bold"
               href="https://www.duolingo.com/terms?wantsPlainInfo=1"
             >
-              Terms
+              Términos
             </Link>{" "}
-            and{" "}
+            y{" "}
             <Link
               className="font-bold"
               href="https://www.duolingo.com/privacy?wantsPlainInfo=1"
             >
-              Privacy Policy
+              Política de Privacidad
             </Link>
             .
           </p>
           <p className="text-center text-xs leading-5 text-gray-400">
-            This site is protected by reCAPTCHA Enterprise and the Google{" "}
+            Este sitio está protegido por reCAPTCHA Enterprise y la{" "}
             <Link
               className="font-bold"
               href="https://policies.google.com/privacy"
             >
-              Privacy Policy
+              Política de Privacidad de Google
             </Link>{" "}
-            and{" "}
+            y{" "}
             <Link
               className="font-bold"
               href="https://policies.google.com/terms"
             >
-              Terms of Service
+              Términos de Servicio
             </Link>{" "}
-            apply.
+            aplican.
           </p>
           <p className="block text-center sm:hidden">
             <span className="text-sm font-bold text-gray-700">
               {loginScreenState === "LOGIN"
-                ? "Don't have an account?"
-                : "Have an account?"}
+                ? "¿No tienes cuenta?"
+                : "¿Ya tienes cuenta?"}
             </span>{" "}
             <button
               className="text-sm font-bold uppercase text-[#f2a445]"
@@ -273,7 +266,7 @@ export const LoginScreen = ({
                 setLoginScreenState((x) => (x === "LOGIN" ? "SIGNUP" : "LOGIN"))
               }
             >
-              {loginScreenState === "LOGIN" ? "sign up" : "log in"}
+              {loginScreenState === "LOGIN" ? "Regístrate" : "Inicia sesión"}
             </button>
           </p>
         </div>

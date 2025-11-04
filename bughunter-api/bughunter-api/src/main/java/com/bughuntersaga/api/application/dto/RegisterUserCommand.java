@@ -1,14 +1,13 @@
+package com.bughuntersaga.api.application.dto;
 
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
-
-    @Getter
+@Getter
 @Builder
-    public class RegisterUserCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
+public class RegisterUserCommand {
+    private final String username;
+    private final String name;
+    private final String email;
+    private final String rawPassword;
+}

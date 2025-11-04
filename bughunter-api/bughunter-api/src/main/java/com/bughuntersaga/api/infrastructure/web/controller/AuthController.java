@@ -1,10 +1,17 @@
-
 package com.bughuntersaga.api.infrastructure.web.controller;
 
+import com.bughuntersaga.api.application.dto.RegisterUserCommand;
+import com.bughuntersaga.api.application.port.in.RegisterUserUseCase;
+import com.bughuntersaga.api.domain.exception.EmailAlreadyExistsException;
+import com.bughuntersaga.api.domain.exception.UsernameAlreadyExistsException;
+import com.bughuntersaga.api.domain.model.AuthToken;
+import com.bughuntersaga.api.infrastructure.web.dto.UserRegistrationDTO;
+import com.bughuntersaga.api.infrastructure.web.mapper.AuthApiMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.bughuntersaga.api.application.service.RegisterUserService;
+import org.springframework.web.bind.annotation.*;
 import com.bughuntersaga.api.application.service.LoginUserService;
 import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
@@ -14,16 +21,19 @@ import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final RegisterUserService registerUserService;
+    private final RegisterUserUseCase registerUserUseCase;
     private final LoginUserService loginUserService;
+    private final AuthApiMapper authApiMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody UserLoginDTO request) {
+    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody UserRegistrationDTO request) {
         try {
-            AuthResponseDTO response = registerUserService.register(request);
-            return ResponseEntity.status(201).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            RegisterUserCommand command = authApiMapper.toRegisterCommand(request);
+            AuthToken authToken = registerUserUseCase.register(command);
+            AuthResponseDTO response = authApiMapper.toAuthResponseDTO(authToken);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -33,7 +43,7 @@ public class AuthController {
             AuthResponseDTO response = loginUserService.login(request);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }

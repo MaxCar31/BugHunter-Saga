@@ -1,16 +1,22 @@
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    import jakarta.validation.constraints.*;
-import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+public record UserRegistrationDTO(
+        @NotBlank(message = "El username es obligatorio")
+        @Size(min = 3, message = "El username debe tener al menos 3 caracteres")
+        String username,
 
-    /**
-     * DTO para UserRegistrationDTO.
-     * Schema: UserRegistrationDTO de OpenAPI
-     */
-    public record UserRegistrationDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserRegistrationDTO de OpenAPI
-    ) {
-    }
+        @NotBlank(message = "El nombre es obligatorio")
+        String name,
+
+        @NotBlank(message = "El email es obligatorio")
+        @Email(message = "El email debe ser válido")
+        String email,
+
+        @NotBlank(message = "La contraseña es obligatoria")
+        @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+        String password
+) {}
