@@ -17,7 +17,7 @@ export const createQuestionsSlice: StateCreator<
   questions: {},
   
   loadQuestions: async (moduleCode: string) => {
-    // Si ya tenemos las preguntas cargadas, no las volvemos a cargar
+
   if ((get().questions[moduleCode]?.length ?? 0) > 0) {
     return;
   }
