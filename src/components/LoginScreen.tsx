@@ -3,6 +3,7 @@ import { CloseSvg } from "./Svgs";
 import React, { useEffect, useRef, useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
+import { apiBase } from "~/utils/config";
 
 export type LoginScreenState = "HIDDEN" | "LOGIN" | "SIGNUP";
 
@@ -56,7 +57,6 @@ export const LoginScreen = ({
     setErrorMessage("");
     setIsLoading(true);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     let endpoint = "";
     let body: any = {};
 
