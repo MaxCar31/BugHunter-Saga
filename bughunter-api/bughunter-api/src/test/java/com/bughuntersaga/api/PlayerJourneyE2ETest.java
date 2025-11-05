@@ -81,7 +81,7 @@ class PlayerJourneyE2ETest extends BaseIntegrationTest {
     void playerCanCompleteLesson() throws Exception {
         String lessonCompletionJson = """
         {
-            "lessonId": 1, 
+            "lessonId": 1,
             "correctAnswerCount": 10,
             "incorrectAnswerCount": 0,
             "timeTakenMs": 15000,

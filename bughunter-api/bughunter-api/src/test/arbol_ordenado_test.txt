@@ -7,6 +7,7 @@
 │   │   ├── 📁 com/
 │   │   │   ├── 📁 bughuntersaga/
 │   │   │   │   ├── 📁 api/
+│   │   │   │   │   ├── 📄 BaseDataJpaTest.java
 │   │   │   │   │   ├── 📄 BaseIntegrationTest.java
 │   │   │   │   │   ├── 📄 BugHunterSagaApiApplicationTests.java
 │   │   │   │   │   ├── 📄 PlayerJourneyE2ETest.java
@@ -18,6 +19,46 @@
 ================================================================================
 ## 📄 CONTENIDO DETALLADO DE ARCHIVOS
 ================================================================================
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/BaseDataJpaTest.java
+================================================================================
+package com.bughuntersaga.api;
+
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+@DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({
+
+        com.bughuntersaga.api.infrastructure.config.BeanConfiguration.class
+})
+@Testcontainers
+public abstract class BaseDataJpaTest {
+
+    @Container
+    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine")
+            .withDatabaseName("bughunter-test-db")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        registry.add("spring.flyway.enabled", () -> true);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: java/com/bughuntersaga/api/BaseIntegrationTest.java
@@ -37,7 +78,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
 
-
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("bughunter-test-db")
@@ -46,7 +86,6 @@ public abstract class BaseIntegrationTest {
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
@@ -158,7 +197,7 @@ class PlayerJourneyE2ETest extends BaseIntegrationTest {
     void playerCanCompleteLesson() throws Exception {
         String lessonCompletionJson = """
         {
-            "lessonId": 1, 
+            "lessonId": 1,
             "correctAnswerCount": 10,
             "incorrectAnswerCount": 0,
             "timeTakenMs": 15000,
@@ -200,17 +239,21 @@ import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
 import com.bughuntersaga.api.domain.exception.LessonAlreadyCompletedException;
 import com.bughuntersaga.api.domain.exception.LessonNotFoundException;
 import com.bughuntersaga.api.domain.exception.TreasureAlreadyClaimedException;
+import com.bughuntersaga.api.infrastructure.security.filter.JwtAuthenticationFilter;
 import com.bughuntersaga.api.infrastructure.web.controller.ProgressController;
+import com.bughuntersaga.api.infrastructure.web.dto.LessonCompletionResponseDTO;
 import com.bughuntersaga.api.infrastructure.web.mapper.ProgressApiMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.bughuntersaga.api.infrastructure.security.config.SecurityConfiguration;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -219,7 +262,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(
         controllers = ProgressController.class,
-        excludeAutoConfiguration = {SecurityConfiguration.class}
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = {
+                        com.bughuntersaga.api.infrastructure.security.config.SecurityConfiguration.class,
+                        JwtAuthenticationFilter.class
+                }
+        )
 )
 class ProgressControllerTest {
 
@@ -228,7 +277,6 @@ class ProgressControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
 
     @MockitoBean
     private CompleteLessonUseCase completeLessonUseCase;
@@ -240,7 +288,7 @@ class ProgressControllerTest {
     private ProgressApiMapper progressApiMapper;
 
     @Test
-    @WithMockUser
+    @WithMockUser  // ✅ Esto simula un usuario autenticado
     void completeLesson_shouldReturnBadRequest_whenDtoIsInvalid() throws Exception {
         String invalidJson = """
         {
@@ -273,9 +321,11 @@ class ProgressControllerTest {
         """;
 
         CompleteLessonResult result = new CompleteLessonResult(20, 5, 105, 3);
-        when(completeLessonUseCase.handle(any())).thenReturn(result);
+        LessonCompletionResponseDTO responseDTO = new LessonCompletionResponseDTO(20, 5, 105, 3);
+
         when(progressApiMapper.toCommand(any())).thenReturn(null);
-        when(progressApiMapper.toDTO(result)).thenCallRealMethod();
+        when(completeLessonUseCase.handle(any())).thenReturn(result);
+        when(progressApiMapper.toDTO(result)).thenReturn(responseDTO);
 
         mockMvc.perform(post("/api/progress/lesson")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -284,24 +334,28 @@ class ProgressControllerTest {
                 .andExpect(jsonPath("$.xpEarned").value(20))
                 .andExpect(jsonPath("$.newStreak").value(3));
     }
+
     @Test
     @WithMockUser
     void completeLesson_shouldReturnConflict_whenLessonAlreadyCompleted() throws Exception {
-        // Arrange
         String validJson = """
-        { "lessonId": 2, "correctAnswerCount": 5, "incorrectAnswerCount": 0, "timeTakenMs": 10000, "isPractice": false }
-    """;
+        { 
+            "lessonId": 2, 
+            "correctAnswerCount": 5, 
+            "incorrectAnswerCount": 0, 
+            "timeTakenMs": 10000, 
+            "isPractice": false 
+        }
+        """;
 
-        // 1. Simular que el Caso de Uso lanza la excepción de Dominio
         when(progressApiMapper.toCommand(any())).thenReturn(null);
         when(completeLessonUseCase.handle(any()))
                 .thenThrow(new LessonAlreadyCompletedException("Lección ya completada: 2"));
 
-        // Act & Assert
         mockMvc.perform(post("/api/progress/lesson")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(validJson))
-                .andExpect(status().isConflict()) // Esperar HTTP 409
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Conflict"))
                 .andExpect(jsonPath("$.message").value("Lección ya completada: 2"));
     }
@@ -309,21 +363,24 @@ class ProgressControllerTest {
     @Test
     @WithMockUser
     void completeLesson_shouldReturnNotFound_whenLessonDoesNotExist() throws Exception {
-        // Arrange
         String validJson = """
-        { "lessonId": 999, "correctAnswerCount": 5, "incorrectAnswerCount": 0, "timeTakenMs": 10000, "isPractice": false }
-    """;
+        { 
+            "lessonId": 999, 
+            "correctAnswerCount": 5, 
+            "incorrectAnswerCount": 0, 
+            "timeTakenMs": 10000, 
+            "isPractice": false 
+        }
+        """;
 
-        // 2. Simular que el Caso de Uso lanza la excepción de Dominio
         when(progressApiMapper.toCommand(any())).thenReturn(null);
         when(completeLessonUseCase.handle(any()))
                 .thenThrow(new LessonNotFoundException(999));
 
-        // Act & Assert
         mockMvc.perform(post("/api/progress/lesson")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(validJson))
-                .andExpect(status().isNotFound()) // Esperar HTTP 404
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("Lesson not found with id: 999"));
     }
@@ -331,18 +388,13 @@ class ProgressControllerTest {
     @Test
     @WithMockUser
     void claimTreasure_shouldReturnOkAndLingots() throws Exception {
-        // Arrange
-        Integer lessonId = 4; // ID de un tesoro
+        Integer lessonId = 4;
 
-        // Simular el resultado del Caso de Uso de Tesoro
         ClaimTreasureResult result = new ClaimTreasureResult(20, 125);
         when(claimTreasureUseCase.claimTreasure(lessonId)).thenReturn(result);
 
-        // Act & Assert
-        mockMvc.perform(post("/api/progress/treasure/{lessonId}", lessonId)
-                        .header("Authorization", "Bearer mock-token")) // Simulación del token
+        mockMvc.perform(post("/api/progress/treasure/{lessonId}", lessonId))
                 .andExpect(status().isOk())
-                // El controlador devuelve un Map<String, Integer>
                 .andExpect(jsonPath("$.lingotsEarned").value(20))
                 .andExpect(jsonPath("$.totalLingots").value(125));
     }
@@ -350,17 +402,13 @@ class ProgressControllerTest {
     @Test
     @WithMockUser
     void claimTreasure_shouldReturnBadRequest_whenAlreadyClaimed() throws Exception {
-        // Arrange
         Integer lessonId = 4;
 
-        // Simular que el Caso de Uso lanza la excepción de Dominio
         when(claimTreasureUseCase.claimTreasure(lessonId))
                 .thenThrow(new TreasureAlreadyClaimedException("Tesoro ya reclamado."));
 
-        // Act & Assert
-        mockMvc.perform(post("/api/progress/treasure/{lessonId}", lessonId)
-                        .header("Authorization", "Bearer mock-token"))
-                .andExpect(status().isBadRequest()) // Esperar HTTP 400 según tu GlobalExceptionHandler
+        mockMvc.perform(post("/api/progress/treasure/{lessonId}", lessonId))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value("Tesoro ya reclamado."));
     }
@@ -497,28 +545,20 @@ class RegisterUserServiceTest {
 ================================================================================
 package com.bughuntersaga.api;
 
-
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
-import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
-import com.bughuntersaga.api.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
 import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 import java.time.ZonedDateTime;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@Import({GamificationPersistenceMapper.class, UserPersistenceMapper.class})
-class UserXpHistoryJpaRepositoryTest {
+class UserXpHistoryJpaRepositoryTest extends BaseDataJpaTest {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -533,7 +573,6 @@ class UserXpHistoryJpaRepositoryTest {
         ZonedDateTime end = ZonedDateTime.now().plusDays(1);
         ZonedDateTime outsideRange = ZonedDateTime.now().minusDays(2);
 
-        // Crear usuarios (necesarios por la FK)
         UserEntity user1 = UserEntity.builder()
                 .username("player1")
                 .email("player1@test.com")
@@ -551,7 +590,6 @@ class UserXpHistoryJpaRepositoryTest {
         entityManager.persist(user1);
         entityManager.persist(user2);
 
-        // Crear historial de XP
         // Player 1: 10 + 20 = 30 XP
         entityManager.persist(new UserXpHistoryEntity(null, user1, 10, "LESSON", 1, start.plusHours(1)));
         entityManager.persist(new UserXpHistoryEntity(null, user1, 20, "LESSON", 2, start.plusHours(2)));
@@ -571,7 +609,6 @@ class UserXpHistoryJpaRepositoryTest {
         assertThat(leaderboard).isNotNull();
         assertThat(leaderboard).hasSize(2);
 
-        // Verifica el ranking (DESC)
         assertThat(leaderboard.get(0).getName()).isEqualTo("Player One");
         assertThat(leaderboard.get(0).getTotalXp()).isEqualTo(30);
 

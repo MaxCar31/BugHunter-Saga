@@ -1,33 +1,19 @@
 package com.bughuntersaga.api;
 
-
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
-import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
-import com.bughuntersaga.api.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
 import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 import java.time.ZonedDateTime;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import com.bughuntersaga.api.infrastructure.persistence.mapper.ContentPersistenceMapper;
-import com.bughuntersaga.api.infrastructure.persistence.mapper.ProgressPersistenceMapper;
-@DataJpaTest
-@Import({
-        GamificationPersistenceMapper.class,
-        UserPersistenceMapper.class,
-        ContentPersistenceMapper.class,
-        ProgressPersistenceMapper.class
-})
-class UserXpHistoryJpaRepositoryTest {
+
+class UserXpHistoryJpaRepositoryTest extends BaseDataJpaTest {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -42,7 +28,6 @@ class UserXpHistoryJpaRepositoryTest {
         ZonedDateTime end = ZonedDateTime.now().plusDays(1);
         ZonedDateTime outsideRange = ZonedDateTime.now().minusDays(2);
 
-        // Crear usuarios (necesarios por la FK)
         UserEntity user1 = UserEntity.builder()
                 .username("player1")
                 .email("player1@test.com")
@@ -60,7 +45,6 @@ class UserXpHistoryJpaRepositoryTest {
         entityManager.persist(user1);
         entityManager.persist(user2);
 
-        // Crear historial de XP
         // Player 1: 10 + 20 = 30 XP
         entityManager.persist(new UserXpHistoryEntity(null, user1, 10, "LESSON", 1, start.plusHours(1)));
         entityManager.persist(new UserXpHistoryEntity(null, user1, 20, "LESSON", 2, start.plusHours(2)));
@@ -80,7 +64,6 @@ class UserXpHistoryJpaRepositoryTest {
         assertThat(leaderboard).isNotNull();
         assertThat(leaderboard).hasSize(2);
 
-        // Verifica el ranking (DESC)
         assertThat(leaderboard.get(0).getName()).isEqualTo("Player One");
         assertThat(leaderboard.get(0).getTotalXp()).isEqualTo(30);
 
