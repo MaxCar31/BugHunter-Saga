@@ -1,16 +1,16 @@
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import java.time.LocalDate;
+import java.util.Set;
 
-    /**
-     * DTO para UserStatsDTO.
-     * Schema: UserStatsDTO de OpenAPI
-     */
-    public record UserStatsDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserStatsDTO de OpenAPI
-    ) {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record UserStatsDTO(
+        Integer totalXp,
+        Integer totalLingots,
+        Integer currentStreak,
+        Integer xpToday,
+        Integer xpThisWeek,
+        Integer leagueRank, // Puede ser nulo
+        Set<LocalDate> activeDays
+) {}

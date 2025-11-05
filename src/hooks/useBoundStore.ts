@@ -48,7 +48,7 @@ export const useBoundStore = create<BoundState>((...args) => ({
   ...createQuestionsSlice(...args),
 }));
 
-// Inicializar las preguntas del módulo actual (solo si hay window)
+
 if (typeof window !== "undefined") {
   const currentModule = useBoundStore.getState().module;
   if (currentModule?.code) {

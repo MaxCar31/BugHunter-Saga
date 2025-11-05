@@ -22,4 +22,6 @@ public interface UserPersistenceMapper {
     @Mapping(target = "user", ignore = true)
     UserProfileEntity toUserProfileEntity(UserProfile domain);
 
+
+
 }

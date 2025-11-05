@@ -1,14 +1,10 @@
-
 package com.bughuntersaga.api.infrastructure.web.dto;
 
-import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO para LessonResultDTO.
- * Schema: LessonResultDTO de OpenAPI
- */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record LessonResultDTO(
         @NotNull(message = "Lesson ID is required")
         @Min(value = 1, message = "Lesson ID must be positive")

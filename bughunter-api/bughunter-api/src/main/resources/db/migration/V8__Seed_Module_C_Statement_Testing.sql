@@ -1,12 +1,12 @@
 -- ============================================================================
--- Migration: V6__Seed_Module_C_Statement_Testing.sql
+-- Migration: V8__Seed_Module_C_Statement_Testing.sql
 -- Description: Inserta el contenido del Módulo C (Pruebas de Sentencia)
 -- Author: BugHunter Saga Team
 -- ============================================================================
 
 -- 1. CREAR MÓDULO C
 INSERT INTO modules (code, name, description, ui_config) VALUES
-    ('mod-c', 'Pruebas de Sentencia',
+    ('moduleC', 'Pruebas de Sentencia',
      'Técnica de caja blanca para cobertura de código.',
      '{"backgroundColor": "bg-purple-500", "icon": "📄", "color": "purple"}');
 

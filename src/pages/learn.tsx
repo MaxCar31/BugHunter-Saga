@@ -33,6 +33,8 @@ import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
+import { apiBase } from "~/utils/config";
+import { useRouter } from "next/router";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
 
@@ -461,14 +463,28 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
 const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
-
+  const router = useRouter();
+  console.log(currentModule);
   // --- CARGA DINÁMICA DE LA UNIDAD ---
   const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const apiBase = "http://localhost:8080";
+  if (!currentModule) {
+    // Si no hay módulo, mostramos un loader o redirigimos
+    useEffect(() => {
+      // Si después de cargar sigue sin haber módulo, redirige a la selección
+      if (!isLoading && !currentModule) {
+        router.push('/register');
+      }
+    }, [isLoading, currentModule, router]);
 
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-xl">Cargando módulo...</p>
+      </div>
+    );
+  }
   useEffect(() => {
     const fetchUnit = async () => {
       if (!currentModule?.code) {
@@ -533,10 +549,13 @@ const Learn: NextPage = () => {
     return () => document.removeEventListener("scroll", updateScrollY);
   }, [scrollY]);
 
+  console.log("Current Unit:", currentUnit);
+  console.log("Current Module:", currentModule);
+
   const topBarColors = {
-    backgroundColor: currentModule.backgroundColor,
-    borderColor: currentModule.borderColor,
-  };
+      backgroundColor: currentModule.uiConfig?.backgroundColor,
+      borderColor: currentModule.uiConfig?.borderColor,
+    };
 
   return (
     <>

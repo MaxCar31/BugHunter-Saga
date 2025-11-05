@@ -1,13 +1,11 @@
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
+import com.bughuntersaga.api.application.dto.ForgotPasswordCommand;
 import com.bughuntersaga.api.application.dto.LoginUserCommand;
 import com.bughuntersaga.api.application.dto.RegisterUserCommand;
 import com.bughuntersaga.api.domain.model.AuthToken;
 import com.bughuntersaga.api.domain.model.User;
-import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserRegistrationDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -28,4 +26,5 @@ public interface AuthApiMapper {
     // Info básica del usuario
     @Mapping(source = "id", target = "id")
     UserInfoDTO toUserInfoDTO(User user);
+    ForgotPasswordCommand toCommand(ForgotPasswordDTO dto);
 }

@@ -1,16 +1,11 @@
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import java.util.List;
 
-    /**
-     * DTO para LeaderboardDTO.
-     * Schema: LeaderboardDTO de OpenAPI
-     */
-    public record LeaderboardDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: LeaderboardDTO de OpenAPI
-    ) {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record LeaderboardDTO(
+        String leagueName,
+        String timeUntilEnd,
+        List<LeaderboardEntryDTO> users
+) {}

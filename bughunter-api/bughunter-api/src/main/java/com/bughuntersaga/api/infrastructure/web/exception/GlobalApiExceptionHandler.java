@@ -129,7 +129,17 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDTO> handleIllegalArgument(IllegalArgumentException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
     /**
      * Maneja CUALQUIER otra excepción no capturada (500 Internal Server Error).
      */
@@ -147,5 +157,39 @@ public class GlobalApiExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    // --- NUEVO HANDLER (Contrato: POST /shop/purchase) ---
+    /**
+     * Maneja InsufficientFundsException (400 Bad Request).
+     * Definido en el contrato como un error 400.
+     */
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ErrorDTO> handleInsufficientFunds(InsufficientFundsException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    // --- NUEVO HANDLER (Contrato: POST /progress/treasure) ---
+    /**
+     * Maneja TreasureAlreadyClaimedException (400 Bad Request).
+     * Definido en el contrato como un error 400.
+     */
+    @ExceptionHandler(TreasureAlreadyClaimedException.class)
+    public ResponseEntity<ErrorDTO> handleTreasureAlreadyClaimed(TreasureAlreadyClaimedException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }

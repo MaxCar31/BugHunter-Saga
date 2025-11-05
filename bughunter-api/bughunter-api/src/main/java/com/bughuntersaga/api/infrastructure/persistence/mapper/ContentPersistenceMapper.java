@@ -82,7 +82,7 @@ public interface ContentPersistenceMapper {
 
 
     // ========================================
-    // Mapeo de Problem (Corregido)
+    // Mapeo de Problem
     // ========================================
 
     default Problem problemToDomain(ProblemEntity entity) {

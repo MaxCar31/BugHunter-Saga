@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -44,5 +45,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public Optional<User> findByUsernameOrEmail(String username, String email) {
         return userJpaRepository.findByUsernameOrEmail(username, email)
                 .map(userPersistenceMapper::toUserDomain);
+    }
+    @Override
+    public boolean existsByUsernameAndIdNot(String username, UUID userId) {
+        return userJpaRepository.existsByUsernameAndIdNot(username, userId);
     }
 }

@@ -1,15 +1,23 @@
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetShopItemsUseCase;
+import com.bughuntersaga.api.application.port.out.ShopItemRepositoryPort;
+import com.bughuntersaga.api.domain.model.ShopItem;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class GetShopItemsService implements GetShopItemsUseCase {
+@Transactional(readOnly = true)
+public class GetShopItemsService implements GetShopItemsUseCase {
 
-    // Contenido de la clase
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
 
+    @Override
+    public List<ShopItem> getShopItems() {
+        return shopItemRepositoryPort.findAll();
     }
+}

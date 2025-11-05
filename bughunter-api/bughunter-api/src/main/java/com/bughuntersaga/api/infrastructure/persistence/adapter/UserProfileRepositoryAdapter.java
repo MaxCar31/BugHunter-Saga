@@ -26,12 +26,21 @@ public class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
     @Override
     public UserProfile save(UserProfile userProfile) {
 
-        UserProfileEntity entity = userPersistenceMapper.toUserProfileEntity(userProfile);
+        UserProfileEntity entity = userProfileJpaRepository.findById(userProfile.getUserId())
+                .orElse(userPersistenceMapper.toUserProfileEntity(userProfile));
 
-        UserEntity userEntity = userJpaRepository.findById(userProfile.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado al crear perfil: " + userProfile.getUserId()));
+        // Mapear campos simples
+        entity.setLingots(userProfile.getLingots());
+        entity.setDailyXpGoal(userProfile.getDailyXpGoal());
+        entity.setSoundEffectsEnabled(userProfile.getSoundEffectsEnabled());
 
-        entity.setUser(userEntity);
+        // Manejar relaciones
+        if (entity.getUser() == null) {
+            UserEntity userEntity = userJpaRepository.findById(userProfile.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado al crear perfil: " + userProfile.getUserId()));
+            entity.setUser(userEntity);
+        }
+
 
         UserProfileEntity savedEntity = userProfileJpaRepository.save(entity);
         return userPersistenceMapper.toUserProfileDomain(savedEntity);

@@ -1,16 +1,17 @@
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-    /**
-     * DTO para UserProfileDTO.
-     * Schema: UserProfileDTO de OpenAPI
-     */
-    public record UserProfileDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserProfileDTO de OpenAPI
-    ) {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record UserProfileDTO(
+        UUID userId,
+        String name,
+        String username,
+        String email,
+        LocalDateTime joinedAt,
+        Integer lingots,
+        Integer dailyXpGoal,
+        Boolean soundEffectsEnabled
+) {}

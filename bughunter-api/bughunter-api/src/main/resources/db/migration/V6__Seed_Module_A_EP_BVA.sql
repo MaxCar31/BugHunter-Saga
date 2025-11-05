@@ -6,7 +6,7 @@
 
 -- 1. CREAR MÓDULO A
 INSERT INTO modules (code, name, description, ui_config) VALUES
-    ('mod-a', 'Particion de Equivalencia y Valores Limite',
+    ('moduleA', 'Particion de Equivalencia y Valores Limite',
      'Aprende a dividir el dominio y probar los bordes donde ocurren los errores.',
      '{"backgroundColor": "bg-blue-500", "icon": "🎯", "color": "blue"}');
 

@@ -1,15 +1,35 @@
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import com.bughuntersaga.api.application.port.out.LeaderboardData;
 import com.bughuntersaga.api.application.port.out.LeaderboardRepositoryPort;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class LeaderboardRepositoryAdapter implements LeaderboardRepositoryPort {
+public class LeaderboardRepositoryAdapter implements LeaderboardRepositoryPort {
 
-    // Contenido de la clase
+    private final UserXpHistoryJpaRepository userXpHistoryRepository;
 
+    @Override
+    public List<LeaderboardData> findLeaderboardData(ZonedDateTime start, ZonedDateTime end) {
+
+        List<LeaderboardProjection> projections = userXpHistoryRepository
+                .findLeaderboardForWeek(start, end);
+
+
+        return projections.stream()
+                .map(p -> new LeaderboardData(
+                        p.getUserId(),
+                        p.getName(),
+                        p.getTotalXp()
+                ))
+                .collect(Collectors.toList());
     }
+}

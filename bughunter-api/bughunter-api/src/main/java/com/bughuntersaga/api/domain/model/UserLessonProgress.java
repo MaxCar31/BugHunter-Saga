@@ -1,18 +1,24 @@
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
-    @Getter
+/**
+ * Entidad de dominio que representa el progreso de un usuario en una lección.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class UserLessonProgress {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class UserLessonProgress {
+    private UUID userId;
+    private Integer lessonId;
+    private ZonedDateTime completedAt;
+}

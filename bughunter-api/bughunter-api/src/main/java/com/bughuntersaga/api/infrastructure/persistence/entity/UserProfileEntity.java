@@ -33,4 +33,5 @@ import java.util.UUID;
     @Column(name = "sound_effects_enabled", nullable = false)
     private Boolean soundEffectsEnabled;
 
+
     }

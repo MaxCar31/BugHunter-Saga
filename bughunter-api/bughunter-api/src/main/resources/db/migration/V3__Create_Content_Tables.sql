@@ -11,9 +11,7 @@ CREATE TABLE modules (
                          code VARCHAR(20) UNIQUE NOT NULL,
                          name VARCHAR(100) NOT NULL,
                          description TEXT,
-                         ui_config JSONB,
-
-                         CONSTRAINT chk_code_format CHECK (code ~ '^mod-[a-z]$')
+                         ui_config JSONB
     );
 
 COMMENT ON TABLE modules IS 'Módulos de aprendizaje (ej. Módulo A - Equivalencia)';

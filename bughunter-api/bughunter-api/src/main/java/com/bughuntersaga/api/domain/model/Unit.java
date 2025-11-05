@@ -15,9 +15,5 @@ public class Unit {
     private Integer id;
     private Integer unitNumber;
     private String description;
-    /**
-     * Lecciones que componen esta unidad.
-     * Se carga bajo demanda según la necesidad.
-     */
     private List<Lesson> lessons;
 }

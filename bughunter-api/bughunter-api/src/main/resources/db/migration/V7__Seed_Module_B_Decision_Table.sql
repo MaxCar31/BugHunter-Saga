@@ -6,7 +6,7 @@
 
 -- 1. CREAR MÓDULO B
 INSERT INTO modules (code, name, description, ui_config) VALUES
-    ('mod-b', 'Tablas de Decisión',
+    ('moduleB', 'Tablas de Decisión',
      'Técnica de caja negra para reglas de negocio complejas.',
      '{"backgroundColor": "bg-green-500", "icon": "🔲", "color": "green"}');
 

@@ -48,12 +48,22 @@ const Lesson: NextPage = () => {
   const getQuestionsForModule = useBoundStore((x) => x.getQuestionsForModule);
   const loadQuestions = useBoundStore((x) => x.loadQuestions);
 
-  // Carga preguntas dinámicamente al montar o cambiar módulo
-  useEffect(() => {
-    if (currentModule.code) {
-      loadQuestions(currentModule.code);
+    // Carga preguntas dinámicamente al montar o cambiar módulo
+  if (!currentModule) {
+      // Usamos useEffect para redirigir de forma segura solo en el cliente
+      useEffect(() => {
+        if (typeof window !== "undefined") {
+          router.push('/register'); // Envía al usuario a seleccionar un módulo
+        }
+      }, [router]);
+
+      // Muestra un loader mientras redirige
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="text-xl">Cargando módulo...</p>
+        </div>
+      );
     }
-  }, [currentModule.code, loadQuestions]);
 
   // Obtiene preguntas del módulo actual desde el store
   const lessonProblems = getQuestionsForModule(currentModule.code);

@@ -6,19 +6,17 @@
 │   ├── 📄 BugHunterSagaApiApplication.java
 │   ├── 📁 application/
 │   │   ├── 📁 dto/
-│   │   │   ├── 📄 ClaimTreasureCommand.java
 │   │   │   ├── 📄 CompleteLessonCommand.java
 │   │   │   ├── 📄 ForgotPasswordCommand.java
-│   │   │   ├── 📄 GetModuleProblemsQuery.java
-│   │   │   ├── 📄 GetModuleUnitQuery.java
 │   │   │   ├── 📄 LoginUserCommand.java
-│   │   │   ├── 📄 PurchaseItemCommand.java
 │   │   │   ├── 📄 RegisterUserCommand.java
 │   │   │   ├── 📄 UpdateUserAccountCommand.java
 │   │   │   ├── 📄 UpdateUserSettingsCommand.java
 │   │   ├── 📁 port/
 │   │   │   ├── 📁 in/
+│   │   │   │   ├── 📄 ClaimTreasureResult.java
 │   │   │   │   ├── 📄 ClaimTreasureUseCase.java
+│   │   │   │   ├── 📄 CompleteLessonResult.java
 │   │   │   │   ├── 📄 CompleteLessonUseCase.java
 │   │   │   │   ├── 📄 ForgotPasswordUseCase.java
 │   │   │   │   ├── 📄 GetLeaderboardUseCase.java
@@ -33,7 +31,10 @@
 │   │   │   │   ├── 📄 RegisterUserUseCase.java
 │   │   │   │   ├── 📄 UpdateUserAccountUseCase.java
 │   │   │   │   ├── 📄 UpdateUserSettingsUseCase.java
+│   │   │   │   ├── 📄 UserStatsResult.java
 │   │   │   ├── 📁 out/
+│   │   │   │   ├── 📄 EmailSenderPort.java
+│   │   │   │   ├── 📄 LeaderboardData.java
 │   │   │   │   ├── 📄 LeaderboardRepositoryPort.java
 │   │   │   │   ├── 📄 LessonRepositoryPort.java
 │   │   │   │   ├── 📄 ModuleRepositoryPort.java
@@ -41,8 +42,8 @@
 │   │   │   │   ├── 📄 ProblemRepositoryPort.java
 │   │   │   │   ├── 📄 ShopItemRepositoryPort.java
 │   │   │   │   ├── 📄 TokenGeneratorPort.java
-│   │   │   │   ├── 📄 TransactionPort.java
 │   │   │   │   ├── 📄 UnitRepositoryPort.java
+│   │   │   │   ├── 📄 UserInventoryRepositoryPort.java
 │   │   │   │   ├── 📄 UserLessonProgressRepositoryPort.java
 │   │   │   │   ├── 📄 UserProfileRepositoryPort.java
 │   │   │   │   ├── 📄 UserRepositoryPort.java
@@ -78,6 +79,7 @@
 │   │   │   ├── 📄 UsernameAlreadyExistsException.java
 │   │   ├── 📁 model/
 │   │   │   ├── 📄 AuthToken.java
+│   │   │   ├── 📄 FullUserProfile.java
 │   │   │   ├── 📄 Leaderboard.java
 │   │   │   ├── 📄 LeaderboardEntry.java
 │   │   │   ├── 📄 Lesson.java
@@ -86,11 +88,15 @@
 │   │   │   ├── 📄 ShopItem.java
 │   │   │   ├── 📄 Unit.java
 │   │   │   ├── 📄 User.java
+│   │   │   ├── 📄 UserInventory.java
 │   │   │   ├── 📄 UserLessonProgress.java
 │   │   │   ├── 📄 UserProfile.java
 │   │   │   ├── 📄 UserStreak.java
 │   │   │   ├── 📄 UserXpHistory.java
 │   ├── 📁 infrastructure/
+│   │   ├── 📁 adapters/
+│   │   │   ├── 📁 email/
+│   │   │   │   ├── 📄 ConsoleEmailSenderAdapter.java
 │   │   ├── 📁 config/
 │   │   │   ├── 📄 BeanConfiguration.java
 │   │   │   ├── 📄 OpenAPIConfig.java
@@ -101,8 +107,8 @@
 │   │   │   │   ├── 📄 ModuleRepositoryAdapter.java
 │   │   │   │   ├── 📄 ProblemRepositoryAdapter.java
 │   │   │   │   ├── 📄 ShopItemRepositoryAdapter.java
-│   │   │   │   ├── 📄 TransactionAdapter.java
 │   │   │   │   ├── 📄 UnitRepositoryAdapter.java
+│   │   │   │   ├── 📄 UserInventoryRepositoryAdapter.java
 │   │   │   │   ├── 📄 UserLessonProgressRepositoryAdapter.java
 │   │   │   │   ├── 📄 UserProfileRepositoryAdapter.java
 │   │   │   │   ├── 📄 UserRepositoryAdapter.java
@@ -116,6 +122,7 @@
 │   │   │   │   ├── 📄 ShopItemEntity.java
 │   │   │   │   ├── 📄 UnitEntity.java
 │   │   │   │   ├── 📄 UserEntity.java
+│   │   │   │   ├── 📄 UserInventoryEntity.java
 │   │   │   │   ├── 📄 UserLessonProgressEntity.java
 │   │   │   │   ├── 📄 UserLessonProgressId.java
 │   │   │   │   ├── 📄 UserProfileEntity.java
@@ -128,17 +135,19 @@
 │   │   │   │   ├── 📄 ProgressPersistenceMapper.java
 │   │   │   │   ├── 📄 UserPersistenceMapper.java
 │   │   │   ├── 📁 repository/
-│   │   │   │   ├── 📄 LeagueJpaRepository.java
 │   │   │   │   ├── 📄 LessonJpaRepository.java
 │   │   │   │   ├── 📄 ModuleJpaRepository.java
 │   │   │   │   ├── 📄 ProblemJpaRepository.java
 │   │   │   │   ├── 📄 ShopItemJpaRepository.java
 │   │   │   │   ├── 📄 UnitJpaRepository.java
+│   │   │   │   ├── 📄 UserInventoryJpaRepository.java
 │   │   │   │   ├── 📄 UserJpaRepository.java
 │   │   │   │   ├── 📄 UserLessonProgressJpaRepository.java
 │   │   │   │   ├── 📄 UserProfileJpaRepository.java
 │   │   │   │   ├── 📄 UserStreakJpaRepository.java
 │   │   │   │   ├── 📄 UserXpHistoryJpaRepository.java
+│   │   │   │   ├── 📁 projections/
+│   │   │   │   │   ├── 📄 LeaderboardProjection.java
 │   │   ├── 📁 security/
 │   │   │   ├── 📁 adapter/
 │   │   │   │   ├── 📄 JwtTokenGeneratorAdapter.java
@@ -211,25 +220,6 @@ public class BugHunterSagaApiApplication {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/ClaimTreasureCommand.java
-================================================================================
-
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
-import lombok.Getter;
-
-
-    @Getter
-@Builder
-    public class ClaimTreasureCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
-
-================================================================================
 📄 CONTENIDO DE: application/dto/CompleteLessonCommand.java
 ================================================================================
 
@@ -254,59 +244,19 @@ import lombok.Getter;
 ================================================================================
 📄 CONTENIDO DE: application/dto/ForgotPasswordCommand.java
 ================================================================================
+package com.bughuntersaga.api.application.dto;
 
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
-
-    @Getter
+/**
+ * Comando para el caso de uso ForgotPassword.
+ */
+@Getter
 @Builder
-    public class ForgotPasswordCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
-
-================================================================================
-📄 CONTENIDO DE: application/dto/GetModuleProblemsQuery.java
-================================================================================
-
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
-import lombok.Getter;
-
-
-    @Getter
-@Builder
-    public class GetModuleProblemsQuery {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
-
-================================================================================
-📄 CONTENIDO DE: application/dto/GetModuleUnitQuery.java
-================================================================================
-
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
-import lombok.Getter;
-
-
-    @Getter
-@Builder
-    public class GetModuleUnitQuery {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
+public class ForgotPasswordCommand {
+    private final String email;
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/dto/LoginUserCommand.java
@@ -322,25 +272,6 @@ public class LoginUserCommand {
     private final String emailOrUsername;
     private final String password;
 }
-
-================================================================================
-📄 CONTENIDO DE: application/dto/PurchaseItemCommand.java
-================================================================================
-
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
-import lombok.Getter;
-
-
-    @Getter
-@Builder
-    public class PurchaseItemCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/dto/RegisterUserCommand.java
@@ -363,100 +294,148 @@ public class RegisterUserCommand {
 ================================================================================
 📄 CONTENIDO DE: application/dto/UpdateUserAccountCommand.java
 ================================================================================
+package com.bughuntersaga.api.application.dto;
 
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
-
-    @Getter
+/**
+ * Comando para el caso de uso UpdateUserAccount.
+ */
+@Getter
 @Builder
-    public class UpdateUserAccountCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
-
+public class UpdateUserAccountCommand {
+    private final String name;
+    private final String username;
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/dto/UpdateUserSettingsCommand.java
 ================================================================================
+package com.bughuntersaga.api.application.dto;
 
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
-
-    @Getter
+/**
+ * Comando para el caso de uso UpdateUserSettings.
+ */
+@Getter
 @Builder
-    public class UpdateUserSettingsCommand {
+public class UpdateUserSettingsCommand {
+    private final Integer dailyXpGoal;
+    private final Boolean soundEffectsEnabled;
+}
 
-    // TODO: Definir campos para el comando/query
+================================================================================
+📄 CONTENIDO DE: application/port/in/ClaimTreasureResult.java
+================================================================================
+package com.bughuntersaga.api.application.port.in;
 
-    }
-
+/**
+ * Objeto de dominio que representa el resultado de reclamar un tesoro.
+ * Usamos un 'record' de Java para un DTO inmutable simple.
+ *
+ * Debe estar en su propio archivo .java ya que es 'public'.
+ */
+public record ClaimTreasureResult(int lingotsEarned, int totalLingots) {}
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/ClaimTreasureUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
-
-
+/**
+ * Caso de uso para reclamar un tesoro (lección de tipo 'treasure').
+ */
 public interface ClaimTreasureUseCase {
 
-    // Contenido de la interfaz
-
+    /**
+     * Permite a un usuario autenticado reclamar un tesoro.
+     *
+     * @param lessonId ID de la lección (debe ser tipo 'treasure')
+     * @return Un objeto ClaimTreasureResult con los lingots ganados y el total actualizado.
+     * @throws com.bughuntersaga.api.domain.exception.LessonNotFoundException si la lección no existe.
+     * @throws com.bughuntersaga.api.domain.exception.TreasureAlreadyClaimedException si ya fue reclamado.
+     * @throws com.bughuntersaga.api.domain.exception.UserNotFoundException si el usuario o perfil no se encuentra.
+     */
+    ClaimTreasureResult claimTreasure(Integer lessonId);
 }
 
+================================================================================
+📄 CONTENIDO DE: application/port/in/CompleteLessonResult.java
+================================================================================
+package com.bughuntersaga.api.application.port.in;
+
+/**
+ * Objeto de dominio que representa el resultado de completar una lección.
+ * Es 'public' para ser accesible desde el servicio.
+ */
+public record CompleteLessonResult(
+        int xpEarned,
+        int lingotsEarned,
+        int newTotalLingots,
+        int newStreak
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/CompleteLessonUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.application.dto.CompleteLessonCommand;
 
-
+/**
+ * Caso de uso para registrar la finalización de una lección.
+ */
 public interface CompleteLessonUseCase {
 
-    // Contenido de la interfaz
-
+    /**
+     * Maneja la lógica de negocio de completar una lección.
+     *
+     * @param command DTO con los detalles de la lección completada.
+     * @return Un objeto CompleteLessonResult con las recompensas obtenidas.
+     * @throws com.bughuntersaga.api.domain.exception.LessonAlreadyCompletedException si la lección ya fue completada.
+     */
+    CompleteLessonResult handle(CompleteLessonCommand command);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/ForgotPasswordUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.application.dto.ForgotPasswordCommand;
 
-
+/**
+ * Caso de uso para iniciar el flujo de reseteo de contraseña.
+ */
 public interface ForgotPasswordUseCase {
-
-    // Contenido de la interfaz
-
+    /**
+     * Maneja la lógica de negocio para el reseteo de contraseña.
+     *
+     * @param command El comando que contiene el email.
+     * @return void - Este caso de uso no devuelve datos.
+     */
+    void handle(ForgotPasswordCommand command);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/GetLeaderboardUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.domain.model.Leaderboard;
 
-
+/**
+ * Caso de uso para obtener la tabla de clasificación (leaderboard).
+ */
 public interface GetLeaderboardUseCase {
-
-    // Contenido de la interfaz
-
+    /**
+     * Obtiene el leaderboard semanal de la liga actual del usuario.
+     */
+    Leaderboard getLeaderboard();
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/GetModuleProblemsUseCase.java
@@ -512,47 +491,49 @@ public interface GetModulesUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/port/in/GetShopItemsUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.domain.model.ShopItem;
+import java.util.List;
 
-
+/**
+ * Caso de uso para obtener todos los artículos de la tienda.
+ */
 public interface GetShopItemsUseCase {
-
-    // Contenido de la interfaz
-
+    List<ShopItem> getShopItems();
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/GetUserProfileUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.domain.model.FullUserProfile;
 
-
+/**
+ * Caso de uso para obtener el perfil combinado del usuario autenticado.
+ */
 public interface GetUserProfileUseCase {
-
-    // Contenido de la interfaz
-
+    FullUserProfile getProfile();
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/GetUserStatsUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
-
-
+/**
+ * Caso de uso para obtener las estadísticas de gamificación del usuario autenticado.
+ */
 public interface GetUserStatsUseCase {
 
-    // Contenido de la interfaz
-
+    /**
+     * Obtiene las estadísticas agregadas del usuario actual.
+     *
+     * @return Un objeto UserStatsResult con todos los datos calculados.
+     */
+    UserStatsResult getStats();
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/LoginUserUseCase.java
@@ -574,17 +555,25 @@ public interface LoginUserUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/port/in/PurchaseItemUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.application.port.in.UserStatsResult; // Importar
 
-
+/**
+ * Caso de uso para comprar un artículo de la tienda.
+ */
 public interface PurchaseItemUseCase {
 
-    // Contenido de la interfaz
-
+    /**
+     * Permite a un usuario autenticado comprar un artículo.
+     *
+     * @param itemCode El código del artículo a comprar (ej. "streak-freeze")
+     * @return Las estadísticas actualizadas del usuario (UserStatsResult)
+     * @throws com.bughuntersaga.api.domain.exception.ResourceNotFoundException si el artículo no existe.
+     * @throws com.bughuntersaga.api.domain.exception.InsufficientFundsException si el usuario no tiene suficientes lingots.
+     */
+    UserStatsResult purchaseItem(String itemCode);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/RegisterUserUseCase.java
@@ -602,47 +591,123 @@ public interface RegisterUserUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/port/in/UpdateUserAccountUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.application.dto.UpdateUserAccountCommand;
+import com.bughuntersaga.api.domain.model.User;
 
-
+/**
+ * Caso de uso para actualizar los datos de la cuenta (nombre, username) del usuario.
+ */
 public interface UpdateUserAccountUseCase {
-
-    // Contenido de la interfaz
-
+    /**
+     * Actualiza los datos de la cuenta y devuelve el User actualizado.
+     */
+    User updateAccount(UpdateUserAccountCommand command);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/in/UpdateUserSettingsUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
+import com.bughuntersaga.api.application.dto.UpdateUserSettingsCommand;
+import com.bughuntersaga.api.domain.model.FullUserProfile;
 
-
+/**
+ * Caso de uso para actualizar la configuración (coach, sonido) del usuario.
+ */
 public interface UpdateUserSettingsUseCase {
-
-    // Contenido de la interfaz
-
+    /**
+     * Actualiza las configuraciones y devuelve el perfil completo actualizado.
+     */
+    FullUserProfile updateSettings(UpdateUserSettingsCommand command);
 }
 
+================================================================================
+📄 CONTENIDO DE: application/port/in/UserStatsResult.java
+================================================================================
+package com.bughuntersaga.api.application.port.in;
+
+import java.time.LocalDate;
+import java.util.Set;
+
+/**
+ * Objeto de dominio que representa las estadísticas de un usuario.
+ * Es 'public' para ser accesible desde el servicio.
+ */
+public record UserStatsResult(
+        int totalXp,
+        int totalLingots,
+        int currentStreak,
+        int xpToday,
+        int xpThisWeek,
+        Integer leagueRank, // Nulo por ahora (Fase 6)
+        Set<LocalDate> activeDays
+) {}
+
+================================================================================
+📄 CONTENIDO DE: application/port/out/EmailSenderPort.java
+================================================================================
+package com.bughuntersaga.api.application.port.out;
+
+import com.bughuntersaga.api.domain.model.User;
+
+/**
+ * Puerto de salida para un servicio de envío de emails.
+ * La implementación (adaptador) podría ser SMTP, SendGrid, Mailgun, etc.
+ */
+public interface EmailSenderPort {
+
+    /**
+     * Envía un email de reseteo de contraseña al usuario.
+     *
+     * @param user El objeto User (que contiene el email)
+     * @param token El token de reseteo (ej. "abc-123")
+     * @param resetUrlBase La URL base para construir el enlace (ej. "http://localhost:3000/reset-password")
+     */
+    void sendPasswordResetEmail(User user, String token, String resetUrlBase);
+}
+
+================================================================================
+📄 CONTENIDO DE: application/port/out/LeaderboardData.java
+================================================================================
+package com.bughuntersaga.api.application.port.out;
+
+import java.util.UUID;
+
+/**
+ * DTO de datos crudos del leaderboard, transferido desde el
+ * Adaptador de Persistencia al Servicio de Aplicación.
+ */
+public record LeaderboardData(
+        UUID userId,
+        String name,
+        int totalXp
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/LeaderboardRepositoryPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 
-
+/**
+ * Puerto de repositorio para obtener datos agregados del leaderboard.
+ */
 public interface LeaderboardRepositoryPort {
-
-    // Contenido de la interfaz
-
+    /**
+     * Obtiene los datos del leaderboard (usuarios y su XP total)
+     * dentro de un rango de fechas específico.
+     *
+     * @param start Rango de inicio (Lunes)
+     * @param end Rango de fin (Domingo)
+     * @return Lista de datos crudos del leaderboard
+     */
+    List<LeaderboardData> findLeaderboardData(ZonedDateTime start, ZonedDateTime end);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/LessonRepositoryPort.java
@@ -723,15 +788,23 @@ public interface ProblemRepositoryPort {
 ================================================================================
 📄 CONTENIDO DE: application/port/out/ShopItemRepositoryPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
-
+import com.bughuntersaga.api.domain.model.ShopItem;
+import java.util.List;
+import java.util.Optional;
 
 public interface ShopItemRepositoryPort {
+    /**
+     * Obtiene todos los artículos de la tienda.
+     */
+    List<ShopItem> findAll();
 
+    /**
+     * Busca un artículo por su código único.
+     */
+    Optional<ShopItem> findByItemCode(String itemCode);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/TokenGeneratorPort.java
@@ -744,21 +817,6 @@ public interface TokenGeneratorPort {
      */
     String generateToken(String username);
 }
-
-================================================================================
-📄 CONTENIDO DE: application/port/out/TransactionPort.java
-================================================================================
-
-package com.bughuntersaga.api.application.port.out;
-
-
-
-public interface TransactionPort {
-
-    // Contenido de la interfaz
-
-}
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/UnitRepositoryPort.java
@@ -802,19 +860,58 @@ public interface UnitRepositoryPort {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserLessonProgressRepositoryPort.java
+📄 CONTENIDO DE: application/port/out/UserInventoryRepositoryPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
+import com.bughuntersaga.api.domain.model.UserInventory;
 
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * Puerto de repositorio para el inventario de artículos del usuario.
+ */
+public interface UserInventoryRepositoryPort {
+    /**
+     * Busca un artículo en el inventario por usuario y código de item.
+     */
+    Optional<UserInventory> findByUserIdAndItemCode(UUID userId, String itemCode);
+
+    /**
+     * Guarda (crea o actualiza) un artículo en el inventario.
+     */
+    UserInventory save(UserInventory inventory);
+}
+
+================================================================================
+📄 CONTENIDO DE: application/port/out/UserLessonProgressRepositoryPort.java
+================================================================================
+package com.bughuntersaga.api.application.port.out;
+
+import com.bughuntersaga.api.domain.model.UserLessonProgress;
+
+import java.util.Set;
+import java.util.UUID;
 
 public interface UserLessonProgressRepositoryPort {
 
-    // Contenido de la interfaz
+    /**
+     * Obtiene un conjunto de IDs de lecciones completadas por un usuario.
+     * (Lo usamos en la Fase 2/4 para el endpoint /unit)
+     */
+    Set<Integer> findCompletedLessonIdsByUserId(UUID userId);
 
+    /**
+     * Verifica si un registro de progreso específico existe.
+     */
+    boolean existsByUserIdAndLessonId(UUID userId, Integer lessonId);
+
+    /**
+     * Guarda un nuevo registro de progreso de lección.
+     */
+    UserLessonProgress save(UserLessonProgress progress);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/UserProfileRepositoryPort.java
@@ -838,6 +935,7 @@ package com.bughuntersaga.api.application.port.out;
 
 import com.bughuntersaga.api.domain.model.User;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepositoryPort {
 
@@ -860,117 +958,463 @@ public interface UserRepositoryPort {
      * Busca un usuario por username O email (para el login).
      */
     Optional<User> findByUsernameOrEmail(String username, String email);
+
+    boolean existsByUsernameAndIdNot(String username, UUID userId);
 }
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/UserStreakRepositoryPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
-
+import com.bughuntersaga.api.domain.model.UserStreak;
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.UUID;
 
 public interface UserStreakRepositoryPort {
+    /**
+     * Guarda un nuevo registro de actividad (racha).
+     */
+    UserStreak save(UserStreak streak);
 
-    // Contenido de la interfaz
-
+    /**
+     * Obtiene todos los días de actividad de un usuario.
+     * Se usa para calcular la racha actual.
+     */
+    Set<LocalDate> findAllActivityDatesByUserId(UUID userId);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/port/out/UserXpHistoryRepositoryPort.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.out;
 
+import com.bughuntersaga.api.domain.model.UserXpHistory;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 public interface UserXpHistoryRepositoryPort {
+    /**
+     * Guarda un nuevo registro de XP. (Fase 3)
+     */
+    UserXpHistory save(UserXpHistory history);
 
-    // Contenido de la interfaz
+    /**
+     * Suma el XP total de un usuario.
+     */
+    int sumTotalXpByUserId(UUID userId);
 
+    /**
+     * Suma el XP de un usuario entre dos fechas.
+     */
+    int sumXpEarnedBetween(UUID userId, ZonedDateTime start, ZonedDateTime end);
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/service/ClaimTreasureService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.port.in.ClaimTreasureResult;
 import com.bughuntersaga.api.application.port.in.ClaimTreasureUseCase;
+import com.bughuntersaga.api.application.port.out.LessonRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserLessonProgressRepositoryPort;
+import com.bughuntersaga.api.domain.exception.LessonNotFoundException;
+import com.bughuntersaga.api.domain.exception.TreasureAlreadyClaimedException;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.Lesson;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.model.UserLessonProgress;
+import com.bughuntersaga.api.domain.model.UserProfile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class ClaimTreasureService implements ClaimTreasureUseCase {
+public class ClaimTreasureService implements ClaimTreasureUseCase {
 
-    // Contenido de la clase
 
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final LessonRepositoryPort lessonRepositoryPort;
+    private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
+
+    @Value("${app.rewards.treasure:20}")
+    private int TREASURE_REWARD_LINGOTS;
+
+    @Override
+    @Transactional // ¡MUY IMPORTANTE! Esto asegura atomicidad
+    public ClaimTreasureResult claimTreasure(Integer lessonId) {
+
+        // 1. Obtener usuario autenticado (Lógica de Seguridad)
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+
+        // 2. Validar la Lección (Lógica de Negocio)
+        Lesson lesson = lessonRepositoryPort.findById(lessonId)
+                .orElseThrow(() -> new LessonNotFoundException(lessonId));
+
+        if (!"treasure".equalsIgnoreCase(lesson.getType())) {
+            throw new IllegalArgumentException("La lección no es un tesoro.");
+        }
+
+        // 3. Validar que no se haya reclamado (Lógica de Negocio)
+        boolean alreadyClaimed = userLessonProgressRepositoryPort
+                .existsByUserIdAndLessonId(currentUser.getId(), lessonId);
+
+        if (alreadyClaimed) {
+            throw new TreasureAlreadyClaimedException("Tesoro ya reclamado por el usuario.");
+        }
+
+        // 4. Otorgar recompensa (Lógica de Negocio)
+        UserProfile userProfile = userProfileRepositoryPort.findById(currentUser.getId())
+                .orElseThrow(() -> new UserNotFoundException("Perfil de usuario no encontrado."));
+
+        userProfile.setLingots(userProfile.getLingots() + TREASURE_REWARD_LINGOTS);
+        userProfileRepositoryPort.save(userProfile); // Guardar el perfil actualizado
+
+        // 5. Marcar como reclamado (Lógica de Negocio)
+        UserLessonProgress progress = UserLessonProgress.builder()
+                .userId(currentUser.getId())
+                .lessonId(lessonId)
+                .completedAt(ZonedDateTime.now())
+                .build();
+
+        userLessonProgressRepositoryPort.save(progress);
+
+        // 6. Devolver resultado
+        return new ClaimTreasureResult(TREASURE_REWARD_LINGOTS, userProfile.getLingots());
     }
-
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/CompleteLessonService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.dto.CompleteLessonCommand;
+import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
 import com.bughuntersaga.api.application.port.in.CompleteLessonUseCase;
+import com.bughuntersaga.api.application.port.out.*;
+import com.bughuntersaga.api.domain.exception.LessonAlreadyCompletedException;
+import com.bughuntersaga.api.domain.exception.LessonNotFoundException;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Set;
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class CompleteLessonService implements CompleteLessonUseCase {
+public class CompleteLessonService implements CompleteLessonUseCase {
 
-    // Contenido de la clase
+    // Puertos requeridos por este caso de uso
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final LessonRepositoryPort lessonRepositoryPort;
+    private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
+    private final UserXpHistoryRepositoryPort userXpHistoryRepositoryPort;
+    private final UserStreakRepositoryPort userStreakRepositoryPort;
 
+    // Para consistencia en fechas (y facilitar pruebas)
+    private final Clock clock;
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+
+    // Valores de recompensa (configurables)
+    @Value("${app.rewards.lesson.baseXp:10}")
+    private int BASE_XP;
+
+    @Value("${app.rewards.lesson.lingot:5}")
+    private int LINGOT_REWARD;
+
+    @Override
+    @Transactional
+    public CompleteLessonResult handle(CompleteLessonCommand command) {
+
+        // 1. OBTENER ESTADO ACTUAL
+        ZonedDateTime now = ZonedDateTime.now(clock.withZone(UTC_ZONE));
+        LocalDate today = now.toLocalDate();
+
+        User currentUser = getCurrentUser();
+        UserProfile userProfile = getUserProfile(currentUser.getId());
+
+        validateLesson(command.getLessonId(), currentUser.getId());
+
+        // 2. CALCULAR RECOMPENSAS
+        int xpEarned = BASE_XP + command.getCorrectAnswerCount();
+        int lingotsEarned = command.getIsPractice() ? 0 : LINGOT_REWARD;
+
+        // 3. LÓGICA DE PERSISTENCIA
+
+        // Guardar progreso de lección
+        userLessonProgressRepositoryPort.save(UserLessonProgress.builder()
+                .userId(currentUser.getId())
+                .lessonId(command.getLessonId())
+                .completedAt(now)
+                .build());
+
+        // Guardar historial de XP
+        userXpHistoryRepositoryPort.save(UserXpHistory.builder()
+                .userId(currentUser.getId())
+                .xpEarned(xpEarned)
+                .sourceType("LESSON")
+                .sourceId(command.getLessonId())
+                .createdAt(now)
+                .build());
+
+        // Actualizar Lingots
+        int newTotalLingots = userProfile.getLingots() + lingotsEarned;
+        userProfile.setLingots(newTotalLingots);
+        userProfileRepositoryPort.save(userProfile);
+
+        // 4. LÓGICA DE RACHA
+        int newStreak = calculateAndUpdateStreak(currentUser.getId(), today);
+
+        // 5. DEVOLVER RESULTADO
+        return new CompleteLessonResult(xpEarned, lingotsEarned, newTotalLingots, newStreak);
     }
 
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    private UserProfile getUserProfile(UUID userId) {
+        return userProfileRepositoryPort.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Perfil de usuario no encontrado."));
+    }
+
+    private void validateLesson(Integer lessonId, UUID userId) {
+        // Validar que la lección existe (lanza excepción si no)
+        lessonRepositoryPort.findById(lessonId)
+                .orElseThrow(() -> new LessonNotFoundException(lessonId));
+
+        // Validar que no se haya completado
+        boolean alreadyCompleted = userLessonProgressRepositoryPort
+                .existsByUserIdAndLessonId(userId, lessonId);
+
+        if (alreadyCompleted) {
+            throw new LessonAlreadyCompletedException("Lección ya completada: " + lessonId);
+        }
+    }
+
+    /**
+     * Lógica central de cálculo de racha.
+     */
+    private int calculateAndUpdateStreak(UUID userId, LocalDate today) {
+        Set<LocalDate> allDates = userStreakRepositoryPort.findAllActivityDatesByUserId(userId);
+
+        // Si el usuario ya jugó hoy, no guardamos de nuevo, solo calculamos
+        if (!allDates.contains(today)) {
+            userStreakRepositoryPort.save(UserStreak.builder()
+                    .userId(userId)
+                    .activityDate(today)
+                    .build());
+
+            // Añadimos 'hoy' al set para el cálculo
+            allDates.add(today);
+        }
+
+        // Calculamos la racha contando hacia atrás desde 'hoy'
+        int currentStreak = 0;
+        LocalDate dayToCheck = today;
+
+        while (allDates.contains(dayToCheck)) {
+            currentStreak++;
+            dayToCheck = dayToCheck.minusDays(1);
+        }
+
+        return currentStreak;
+    }
+
+
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/ForgotPasswordService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.dto.ForgotPasswordCommand;
 import com.bughuntersaga.api.application.port.in.ForgotPasswordUseCase;
+import com.bughuntersaga.api.application.port.out.EmailSenderPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.model.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.ZonedDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class ForgotPasswordService implements ForgotPasswordUseCase {
+@Slf4j
+public class ForgotPasswordService implements ForgotPasswordUseCase {
 
-    // Contenido de la clase
+    private final UserRepositoryPort userRepositoryPort;
+    private final EmailSenderPort emailSenderPort;
+    private final Clock clock; // (Asegúrate de tener este Bean de Fase 3)
 
+    @Value("${app.frontend.url:http://localhost:3000}")
+    private String frontendBaseUrl;
+
+    @Value("${app.security.reset-token-duration-hours:1}")
+    private long resetTokenDurationHours;
+
+    @Override
+    @Transactional
+    public void handle(ForgotPasswordCommand command) {
+
+        Optional<User> userOptional = userRepositoryPort.findByEmail(command.getEmail());
+
+        // --- ¡PROTECCIÓN DE SEGURIDAD! ---
+        // Si el usuario no existe, NO lanzamos un error.
+        // Simplemente terminamos la ejecución silenciosamente.
+        // Esto previene que los atacantes "adivinen" qué emails están registrados.
+        if (userOptional.isEmpty()) {
+            log.warn("Solicitud de reseteo para email no existente: {}", command.getEmail());
+            return; // No hacer nada
+        }
+
+        User user = userOptional.get();
+        ZonedDateTime now = ZonedDateTime.now(clock);
+
+        // 1. Generar Token
+        String token = UUID.randomUUID().toString();
+
+        // 2. Establecer Expiración
+        user.setPasswordResetToken(token);
+        user.setPasswordResetExpires(now.plusHours(resetTokenDurationHours));
+
+        // 3. Guardar en BD
+        userRepositoryPort.save(user);
+
+        // 4. Pedir al puerto de email que envíe
+        String resetUrlBase = frontendBaseUrl + "/reset-password";
+        emailSenderPort.sendPasswordResetEmail(user, token, resetUrlBase);
+
+        log.info("Token de reseteo generado para el usuario: {}", user.getUsername());
     }
-
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/GetLeaderboardService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetLeaderboardUseCase;
+import com.bughuntersaga.api.application.port.out.LeaderboardData;
+import com.bughuntersaga.api.application.port.out.LeaderboardRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.Leaderboard;
+import com.bughuntersaga.api.domain.model.LeaderboardEntry;
+import com.bughuntersaga.api.domain.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class GetLeaderboardService implements GetLeaderboardUseCase {
+@Transactional(readOnly = true)
+public class GetLeaderboardService implements GetLeaderboardUseCase {
 
-    // Contenido de la clase
+    private final LeaderboardRepositoryPort leaderboardRepositoryPort;
+    private final UserRepositoryPort userRepositoryPort;
+    private final Clock clock;
 
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+
+    @Override
+    public Leaderboard getLeaderboard() {
+        // 1. OBTENER ESTADO ACTUAL
+        User currentUser = getCurrentUser();
+        ZonedDateTime now = ZonedDateTime.now(clock.withZone(UTC_ZONE));
+
+        // 2. CALCULAR RANGO DE LA SEMANA (Lunes 00:00 a Domingo 23:59 en UTC)
+        ZonedDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .toLocalDate().atStartOfDay(UTC_ZONE);
+        ZonedDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                .toLocalDate().atTime(LocalTime.MAX).atZone(UTC_ZONE);
+
+        // 3. OBTENER DATOS DE LA BD
+        List<LeaderboardData> dbData = leaderboardRepositoryPort.findLeaderboardData(startOfWeek, endOfWeek);
+
+        // 4. PROCESAR Y ENRIQUECER (Lógica de Negocio)
+        List<LeaderboardEntry> entries = new ArrayList<>();
+        int rank = 1;
+        for (LeaderboardData data : dbData) {
+            entries.add(LeaderboardEntry.builder()
+                    .rank(rank++)
+                    .name(data.name())
+                    .xp(data.totalXp())
+                    .isCurrentUser(data.userId().equals(currentUser.getId()))
+                    .build());
+        }
+
+        // 5. CALCULAR TIEMPO RESTANTE
+        String timeUntilEnd = formatTimeUntilEnd(now, endOfWeek);
+
+        // 6. CONSTRUIR RESULTADO
+        return Leaderboard.builder()
+                .leagueName("Liga Bronce") // Fijo, como en el OpenAPI
+                .timeUntilEnd(timeUntilEnd)
+                .users(entries)
+                .build();
     }
 
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    private String formatTimeUntilEnd(ZonedDateTime now, ZonedDateTime endOfWeek) {
+        Duration duration = Duration.between(now, endOfWeek);
+        long days = duration.toDays();
+        long hours = duration.toHours() % 24;
+
+        if (days > 0) {
+            return String.format("%d días %d horas restantes", days, hours);
+        } else if (hours > 0) {
+            return String.format("%d horas restantes", hours);
+        } else {
+            return String.format("%d minutos restantes", duration.toMinutes() % 60);
+        }
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/GetModuleProblemsService.java
@@ -1004,15 +1448,22 @@ public class GetModuleProblemsService implements GetModuleProblemsUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/service/GetModuleUnitService.java
 ================================================================================
-
 package com.bughuntersaga.api.application.service;
 
-import com.bughuntersaga.api.application.port.out.UnitRepositoryPort;
-import com.bughuntersaga.api.domain.model.Unit;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetModuleUnitUseCase;
+import com.bughuntersaga.api.application.port.out.UnitRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserLessonProgressRepositoryPort;
+import com.bughuntersaga.api.domain.model.Unit;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 
 @Service
@@ -1021,24 +1472,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetModuleUnitService implements GetModuleUnitUseCase {
 
     private final UnitRepositoryPort unitRepository;
-
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
 
     @Override
     public Unit getModuleUnit(String moduleCode) {
-        // FASE 1: Obtener la primera unidad
+
+        // --- 1. Obtener el usuario autenticado ---
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Esto viene del token JWT
+
+        User currentUser = userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+
+        // --- 2. Obtener la unidad (Lógica de Fase 2) ---
         Unit unit = unitRepository.findFirstUnitByModuleCode(moduleCode)
                 .orElseThrow(() -> new RuntimeException("Módulo no encontrado: " + moduleCode));
 
-        // FASE 1: Marcar todas las lecciones como ACTIVE
+        // --- 3. Obtener el progreso del usuario (Lógica de Fase 4) ---
+        Set<Integer> completedLessonIds = userLessonProgressRepositoryPort
+                .findCompletedLessonIdsByUserId(currentUser.getId());
+
+        // --- 4. Calcular el 'status' real ---
         if (unit.getLessons() != null) {
-            unit.getLessons().forEach(lesson -> lesson.setStatus("ACTIVE"));
+            unit.getLessons().forEach(lesson -> {
+                if (completedLessonIds.contains(lesson.getId())) {
+                    lesson.setStatus("COMPLETE"); // ¡Correcto!
+                } else {
+                    lesson.setStatus("ACTIVE"); // (Lógica de 'LOCKED' se puede añadir después)
+                }
+            });
         }
 
         return unit;
     }
-
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: application/service/GetModulesService.java
@@ -1075,62 +1543,199 @@ public class GetModulesService implements GetModulesUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/service/GetShopItemsService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetShopItemsUseCase;
+import com.bughuntersaga.api.application.port.out.ShopItemRepositoryPort;
+import com.bughuntersaga.api.domain.model.ShopItem;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class GetShopItemsService implements GetShopItemsUseCase {
+@Transactional(readOnly = true)
+public class GetShopItemsService implements GetShopItemsUseCase {
 
-    // Contenido de la clase
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
 
+    @Override
+    public List<ShopItem> getShopItems() {
+        return shopItemRepositoryPort.findAll();
     }
-
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/GetUserProfileService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetUserProfileUseCase;
+import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.FullUserProfile;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.model.UserProfile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class GetUserProfileService implements GetUserProfileUseCase {
+@Transactional(readOnly = true)
+public class GetUserProfileService implements GetUserProfileUseCase {
 
-    // Contenido de la clase
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
 
+    @Override
+    public FullUserProfile getProfile() {
+        // 1. Obtener usuario autenticado
+        User currentUser = getCurrentUser();
+        UserProfile userProfile = getUserProfile(currentUser.getId());
+
+        // 2. Combinar en el modelo de dominio
+        return FullUserProfile.builder()
+                .userId(currentUser.getId())
+                .name(currentUser.getName())
+                .username(currentUser.getUsername())
+                .email(currentUser.getEmail())
+                .joinedAt(currentUser.getCreatedAt())
+                .lingots(userProfile.getLingots())
+                .dailyXpGoal(userProfile.getDailyXpGoal())
+                .soundEffectsEnabled(userProfile.getSoundEffectsEnabled())
+                .build();
     }
 
+    // --- Métodos de ayuda (reutilizables) ---
+
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    private UserProfile getUserProfile(UUID userId) {
+        return userProfileRepositoryPort.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Perfil de usuario no encontrado."));
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/GetUserStatsService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.bughuntersaga.api.application.port.in.GetUserStatsUseCase;
+import com.bughuntersaga.api.application.port.in.UserStatsResult;
+import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserStreakRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserXpHistoryRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.model.UserProfile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Set;
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class GetUserStatsService implements GetUserStatsUseCase {
+@Transactional(readOnly = true) // Este endpoint es de solo lectura
+public class GetUserStatsService implements GetUserStatsUseCase {
 
-    // Contenido de la clase
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final UserXpHistoryRepositoryPort userXpHistoryRepositoryPort;
+    private final UserStreakRepositoryPort userStreakRepositoryPort;
+    private final Clock clock;
 
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+
+    @Override
+    public UserStatsResult getStats() {
+
+        // 1. OBTENER USUARIO Y ESTADO ACTUAL
+        User currentUser = getCurrentUser();
+        UUID userId = currentUser.getId();
+        UserProfile userProfile = getUserProfile(userId);
+
+        ZonedDateTime now = ZonedDateTime.now(clock.withZone(UTC_ZONE));
+        LocalDate today = now.toLocalDate();
+
+        // 2. OBTENER DATOS FÁCILES (DEL PERFIL)
+        int totalLingots = userProfile.getLingots();
+
+        // 3. OBTENER DATOS DE RACHA
+        Set<LocalDate> activeDays = userStreakRepositoryPort.findAllActivityDatesByUserId(userId);
+        int currentStreak = calculateCurrentStreak(activeDays, today);
+
+        // 4. OBTENER DATOS AGREGADOS (XP)
+        int totalXp = userXpHistoryRepositoryPort.sumTotalXpByUserId(userId);
+
+        // Calcular rangos de fecha
+        ZonedDateTime startOfToday = today.atStartOfDay(UTC_ZONE);
+        ZonedDateTime startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).atStartOfDay(UTC_ZONE);
+
+        int xpToday = userXpHistoryRepositoryPort.sumXpEarnedBetween(userId, startOfToday, now);
+        int xpThisWeek = userXpHistoryRepositoryPort.sumXpEarnedBetween(userId, startOfWeek, now);
+
+        // 5. CONSTRUIR RESULTADO
+        // leagueRank se deja como null (es de Fase 6)
+
+        return new UserStatsResult(
+                totalXp,
+                totalLingots,
+                currentStreak,
+                xpToday,
+                xpThisWeek,
+                null, // leagueRank
+                activeDays
+        );
     }
 
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    private UserProfile getUserProfile(UUID userId) {
+        return userProfileRepositoryPort.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Perfil de usuario no encontrado."));
+    }
+
+    /**
+     * Lógica de cálculo de racha. (Reutilizada de CompleteLessonService)
+     */
+    private int calculateCurrentStreak(Set<LocalDate> allDates, LocalDate today) {
+        int currentStreak = 0;
+        LocalDate dayToCheck = today;
+
+        while (allDates.contains(dayToCheck)) {
+            currentStreak++;
+            dayToCheck = dayToCheck.minusDays(1);
+        }
+        return currentStreak;
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/LoginUserService.java
@@ -1194,22 +1799,104 @@ public class LoginUserService implements LoginUserUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/service/PurchaseItemService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.port.in.GetUserStatsUseCase;
 import com.bughuntersaga.api.application.port.in.PurchaseItemUseCase;
+import com.bughuntersaga.api.application.port.in.UserStatsResult;
+import com.bughuntersaga.api.application.port.out.*;
+import com.bughuntersaga.api.domain.exception.InsufficientFundsException;
+import com.bughuntersaga.api.domain.exception.ResourceNotFoundException;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.ZonedDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class PurchaseItemService implements PurchaseItemUseCase {
+public class PurchaseItemService implements PurchaseItemUseCase {
 
-    // Contenido de la clase
+    // Puertos
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
+    private final UserInventoryRepositoryPort userInventoryRepositoryPort;
 
+    // Casos de uso
+    private final GetUserStatsUseCase getUserStatsUseCase; // Para devolver stats actualizados
+
+    private final Clock clock;
+
+    @Override
+    @Transactional
+    public UserStatsResult purchaseItem(String itemCode) {
+
+        // 1. OBTENER ESTADO ACTUAL
+        User currentUser = getCurrentUser();
+        UUID userId = currentUser.getId();
+        UserProfile userProfile = getUserProfile(userId);
+
+        // 2. OBTENER ARTÍCULO Y VALIDAR
+        ShopItem item = shopItemRepositoryPort.findByItemCode(itemCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Artículo no encontrado: Artículo no encontrado: " + itemCode, itemCode));
+
+        // 3. LÓGICA DE COMPRA
+        if (userProfile.getLingots() < item.getCost()) {
+            throw new InsufficientFundsException("Fondos insuficientes. Necesita " + item.getCost() + " lingots.");
+        }
+
+        // 4. EJECUTAR TRANSACCIÓN
+
+        // Restar lingots
+        userProfile.setLingots(userProfile.getLingots() - item.getCost());
+        userProfileRepositoryPort.save(userProfile);
+
+        // Añadir a inventario
+        Optional<UserInventory> existingInventory = userInventoryRepositoryPort
+                .findByUserIdAndItemCode(userId, itemCode);
+
+        UserInventory inventoryToSave;
+        if (existingInventory.isPresent()) {
+            // Actualizar cantidad
+            inventoryToSave = existingInventory.get();
+            inventoryToSave.setQuantity(inventoryToSave.getQuantity() + 1);
+        } else {
+            // Crear nuevo registro
+            inventoryToSave = UserInventory.builder()
+                    .userId(userId)
+                    .itemCode(itemCode)
+                    .quantity(1)
+                    .createdAt(ZonedDateTime.now(clock))
+                    .build();
+        }
+
+        userInventoryRepositoryPort.save(inventoryToSave);
+
+        // 5. DEVOLVER STATS ACTUALIZADOS (como pide el OpenAPI)
+        // Reutilizamos el caso de uso que ya construimos
+        return getUserStatsUseCase.getStats();
     }
 
+    // --- Métodos de ayuda ---
+
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    private UserProfile getUserProfile(UUID userId) {
+        return userProfileRepositoryPort.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Perfil de usuario no encontrado."));
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/RegisterUserService.java
@@ -1294,42 +1981,140 @@ public class RegisterUserService implements RegisterUserUseCase {
 ================================================================================
 📄 CONTENIDO DE: application/service/UpdateUserAccountService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.dto.UpdateUserAccountCommand;
 import com.bughuntersaga.api.application.port.in.UpdateUserAccountUseCase;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.exception.UsernameAlreadyExistsException;
+import com.bughuntersaga.api.domain.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class UpdateUserAccountService implements UpdateUserAccountUseCase {
+public class UpdateUserAccountService implements UpdateUserAccountUseCase {
 
-    // Contenido de la clase
+    private final UserRepositoryPort userRepositoryPort;
 
+    @Override
+    @Transactional
+    public User updateAccount(UpdateUserAccountCommand command) {
+        // 1. Obtener usuario actual
+        User currentUser = getCurrentUser();
+
+        // 2. Validar unicidad del username (si cambió)
+        if (command.getUsername() != null && !command.getUsername().equals(currentUser.getUsername())) {
+            boolean exists = userRepositoryPort.existsByUsernameAndIdNot(command.getUsername(), currentUser.getId());
+            if (exists) {
+                throw new UsernameAlreadyExistsException("El username ya está en uso: " + command.getUsername());
+            }
+            currentUser.setUsername(command.getUsername());
+        }
+
+        // 3. Aplicar cambios
+        if (command.getName() != null) {
+            currentUser.setName(command.getName());
+        }
+
+        // 4. Guardar y devolver
+        return userRepositoryPort.save(currentUser);
     }
 
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: application/service/UpdateUserSettingsService.java
 ================================================================================
+package com.bughuntersaga.api.application.service;
 
-    package com.bughuntersaga.api.application.service;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.bughuntersaga.api.application.dto.UpdateUserSettingsCommand;
 import com.bughuntersaga.api.application.port.in.UpdateUserSettingsUseCase;
+import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.FullUserProfile;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.model.UserProfile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List; // IMPORTAR
+import java.util.UUID;
 
-    @Service
+@Service
 @RequiredArgsConstructor
-    public class UpdateUserSettingsService implements UpdateUserSettingsUseCase {
+public class UpdateUserSettingsService implements UpdateUserSettingsUseCase {
 
-    // Contenido de la clase
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
 
+    // Lista de valores permitidos (definida en tu OpenAPI)
+    private static final List<Integer> VALID_XP_GOALS = List.of(1, 10, 20, 30, 50);
+
+    @Override
+    @Transactional
+    public FullUserProfile updateSettings(UpdateUserSettingsCommand command) {
+        // 1. Obtener usuario y perfil
+        User currentUser = getCurrentUser();
+        UserProfile userProfile = getUserProfile(currentUser.getId());
+
+        // 2. Aplicar cambios (solo si no son nulos)
+        if (command.getDailyXpGoal() != null) {
+
+            // --- ¡NUEVA VALIDACIÓN DE REGLA DE NEGOCIO! ---
+            if (!VALID_XP_GOALS.contains(command.getDailyXpGoal())) {
+                throw new IllegalArgumentException(
+                        "Meta de XP inválida. Debe ser una de: " + VALID_XP_GOALS
+                );
+            }
+            userProfile.setDailyXpGoal(command.getDailyXpGoal());
+        }
+
+        if (command.getSoundEffectsEnabled() != null) {
+            userProfile.setSoundEffectsEnabled(command.getSoundEffectsEnabled());
+        }
+
+        // 3. Guardar cambios
+        UserProfile updatedProfile = userProfileRepositoryPort.save(userProfile);
+
+        // 4. Devolver el perfil combinado actualizado
+        return FullUserProfile.builder()
+                .userId(currentUser.getId())
+                .name(currentUser.getName())
+                .username(currentUser.getUsername())
+                .email(currentUser.getEmail())
+                .joinedAt(currentUser.getCreatedAt())
+                .lingots(updatedProfile.getLingots())
+                .dailyXpGoal(updatedProfile.getDailyXpGoal())
+                .soundEffectsEnabled(updatedProfile.getSoundEffectsEnabled())
+                .build();
     }
 
+    // --- Métodos de ayuda ---
+    private User getCurrentUser() {
+        // ... (código existente)
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    private UserProfile getUserProfile(UUID userId) {
+        // ... (código existente)
+        return userProfileRepositoryPort.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Perfil de usuario no encontrado."));
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: domain/exception/EmailAlreadyExistsException.java
@@ -1533,50 +2318,94 @@ public class AuthToken {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/Leaderboard.java
+📄 CONTENIDO DE: domain/model/FullUserProfile.java
 ================================================================================
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-    @Getter
+/**
+ * Modelo de dominio que combina User y UserProfile
+ * para el endpoint GET /users/me/profile.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class Leaderboard {
+@AllArgsConstructor
+public class FullUserProfile {
+    // Campos de User
+    private UUID userId;
+    private String name;
+    private String username;
+    private String email;
+    private LocalDateTime joinedAt; // (createdAt de User)
 
-    // Contenido de la clase
+    // Campos de UserProfile
+    private Integer lingots;
+    private Integer dailyXpGoal;
+    private Boolean soundEffectsEnabled;
+}
 
-    }
+================================================================================
+📄 CONTENIDO DE: domain/model/Leaderboard.java
+================================================================================
+package com.bughuntersaga.api.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+/**
+ * Entidad de dominio que representa la tabla de clasificación completa.
+ */
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Leaderboard {
+    private String leagueName; // (Fijo por ahora, Fase 6 no implementa ligas)
+    private String timeUntilEnd;
+    private List<LeaderboardEntry> users;
+}
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/LeaderboardEntry.java
 ================================================================================
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
-    @Getter
+/**
+ * Entidad de dominio que representa una sola fila en el leaderboard.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class LeaderboardEntry {
-
-    // Contenido de la clase
-
-    }
-
+@AllArgsConstructor
+public class LeaderboardEntry {
+    private int rank;
+    private String name;
+    private int xp;
+    private boolean isCurrentUser;
+}
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/Lesson.java
@@ -1690,25 +2519,27 @@ public class Problem {
 ================================================================================
 📄 CONTENIDO DE: domain/model/ShopItem.java
 ================================================================================
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
-    @Getter
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class ShopItem {
-
-    // Contenido de la clase
-
-    }
-
+@AllArgsConstructor
+public class ShopItem {
+    private Integer id;
+    private String itemCode;
+    private String name;
+    private String description;
+    private Integer cost;
+    private String icon;
+}
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/Unit.java
@@ -1730,10 +2561,6 @@ public class Unit {
     private Integer id;
     private Integer unitNumber;
     private String description;
-    /**
-     * Lecciones que componen esta unidad.
-     * Se carga bajo demanda según la necesidad.
-     */
     private List<Lesson> lessons;
 }
 
@@ -1745,6 +2572,7 @@ package com.bughuntersaga.api.domain.model;
 
 import lombok.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime; // Importar
 import java.util.UUID;
 
 
@@ -1762,30 +2590,67 @@ public class User {
     private String lastname;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String passwordResetToken;
+    private ZonedDateTime passwordResetExpires;
+}
+
+================================================================================
+📄 CONTENIDO DE: domain/model/UserInventory.java
+================================================================================
+package com.bughuntersaga.api.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+/**
+ * Entidad de dominio que representa un artículo en el inventario de un usuario.
+ */
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserInventory {
+    private Long id;
+    private UUID userId;
+    private String itemCode;
+    private Integer quantity;
+    private ZonedDateTime createdAt;
 }
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/UserLessonProgress.java
 ================================================================================
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
-    @Getter
+/**
+ * Entidad de dominio que representa el progreso de un usuario en una lección.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class UserLessonProgress {
-
-    // Contenido de la clase
-
-    }
-
+@AllArgsConstructor
+public class UserLessonProgress {
+    private UUID userId;
+    private Integer lessonId;
+    private ZonedDateTime completedAt;
+}
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/UserProfile.java
@@ -1816,22 +2681,26 @@ public class UserProfile {
     private Integer lingots;
     private Integer dailyXpGoal;
     private Boolean soundEffectsEnabled;
+    private Integer currentModuleId;
 }
 
 ================================================================================
 📄 CONTENIDO DE: domain/model/UserStreak.java
 ================================================================================
-
 package com.bughuntersaga.api.domain.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Entidad de dominio UserStreak.
- *
- * Representa la racha de días consecutivos de un usuario.
+ * Entidad de dominio que representa un día de actividad para un usuario.
+ * La 'racha' es el cálculo de días consecutivos de esta tabla.
  */
 @Getter
 @Setter
@@ -1846,43 +2715,85 @@ public class UserStreak {
 ================================================================================
 📄 CONTENIDO DE: domain/model/UserXpHistory.java
 ================================================================================
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
-    @Getter
+/**
+ * Entidad de dominio que representa un evento donde un usuario ganó XP.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class UserXpHistory {
+@AllArgsConstructor
+public class UserXpHistory {
+    private Long id;
+    private UUID userId;
+    private Integer xpEarned;
+    private String sourceType; // "LESSON", "TREASURE", "CHALLENGE"
+    private Integer sourceId; // e.g., lessonId
+    private ZonedDateTime createdAt;
+}
 
-    // Contenido de la clase
+================================================================================
+📄 CONTENIDO DE: infrastructure/adapters/email/ConsoleEmailSenderAdapter.java
+================================================================================
+package com.bughuntersaga.api.infrastructure.adapters.email;
 
+import com.bughuntersaga.api.application.port.out.EmailSenderPort;
+import com.bughuntersaga.api.domain.model.User;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * Adaptador de Email "Simulado" (Mock/Stub).
+ * En lugar de enviar un email real, imprime el enlace en la consola.
+ * Perfecto para desarrollo y pruebas.
+ */
+@Component
+@Slf4j
+public class ConsoleEmailSenderAdapter implements EmailSenderPort {
+
+    @Override
+    public void sendPasswordResetEmail(User user, String token, String resetUrlBase) {
+        String resetLink = resetUrlBase + "?token=" + token;
+
+        log.info("==================================================");
+        log.info("===== SIMULACIÓN DE ENVÍO DE EMAIL =====");
+        log.info("Para: {}", user.getEmail());
+        log.info("Asunto: Resetea tu contraseña de BugHunter Saga");
+        log.info("Cuerpo: ¡Hola, {}! Para resetear tu contraseña, haz clic en este enlace:", user.getName());
+        log.info("Enlace: {}", resetLink);
+        log.info("==================================================");
     }
-
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/config/BeanConfiguration.java
 ================================================================================
-
 package com.bughuntersaga.api.infrastructure.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import java.time.Clock;
 
 @Configuration
 public class BeanConfiguration {
-    // La mayoría de los beans se inyectarán automáticamente
-    // con @Service, @Repository, @Component y @RequiredArgsConstructor.
-    // Puedes usar esta clase para beans personalizados.
 
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
+    }
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/config/OpenAPIConfig.java
@@ -1938,55 +2849,78 @@ public class OpenAPIConfig {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/LeaderboardRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import com.bughuntersaga.api.application.port.out.LeaderboardData;
 import com.bughuntersaga.api.application.port.out.LeaderboardRepositoryPort;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class LeaderboardRepositoryAdapter implements LeaderboardRepositoryPort {
+public class LeaderboardRepositoryAdapter implements LeaderboardRepositoryPort {
 
-    // Contenido de la clase
+    private final UserXpHistoryJpaRepository userXpHistoryRepository;
 
+    @Override
+    public List<LeaderboardData> findLeaderboardData(ZonedDateTime start, ZonedDateTime end) {
+
+        List<LeaderboardProjection> projections = userXpHistoryRepository
+                .findLeaderboardForWeek(start, end);
+
+
+        return projections.stream()
+                .map(p -> new LeaderboardData(
+                        p.getUserId(),
+                        p.getName(),
+                        p.getTotalXp()
+                ))
+                .collect(Collectors.toList());
     }
-
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/LessonRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import com.bughuntersaga.api.domain.model.Lesson;
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import com.bughuntersaga.api.application.port.out.LessonRepositoryPort;
+import com.bughuntersaga.api.domain.model.Lesson;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.ContentPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.LessonJpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-    import java.util.List;
-    import java.util.Optional;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class LessonRepositoryAdapter implements LessonRepositoryPort {
+public class LessonRepositoryAdapter implements LessonRepositoryPort {
 
-    // Contenido de la clase
+    private final LessonJpaRepository lessonJpaRepository;
+    private final ContentPersistenceMapper contentMapper;
 
-        @Override
-        public Optional<Lesson> findById(Integer id) {
-            return Optional.empty();
-        }
-
-        @Override
-        public List<Lesson> findByUnitId(Integer unitId) {
-            return List.of();
-        }
+    @Override
+    public Optional<Lesson> findById(Integer id) {
+        return lessonJpaRepository.findById(id)
+                .map(contentMapper::lessonToDomain);
     }
 
+    @Override
+    public List<Lesson> findByUnitId(Integer unitId) {
+        return lessonJpaRepository.findByUnitIdOrderByPositionAsc(unitId).stream()
+                .map(contentMapper::lessonToDomain)
+                .collect(Collectors.toList());
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/ModuleRepositoryAdapter.java
@@ -2084,42 +3018,39 @@ public class ProblemRepositoryAdapter implements ProblemRepositoryPort {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/ShopItemRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import com.bughuntersaga.api.application.port.out.ShopItemRepositoryPort;
-
-
-    @Repository
-@RequiredArgsConstructor
-    public class ShopItemRepositoryAdapter implements ShopItemRepositoryPort {
-
-    // Contenido de la clase
-
-    }
-
-
-================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/TransactionAdapter.java
-================================================================================
-
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
+import com.bughuntersaga.api.domain.model.ShopItem;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.ShopItemJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import com.bughuntersaga.api.application.port.out.TransactionPort;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class TransactionAdapter implements TransactionPort {
+public class ShopItemRepositoryAdapter implements ShopItemRepositoryPort {
 
-    // Contenido de la clase
+    private final ShopItemJpaRepository jpaRepository;
+    private final GamificationPersistenceMapper mapper;
 
+    @Override
+    public List<ShopItem> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<ShopItem> findByItemCode(String itemCode) {
+        return jpaRepository.findByItemCode(itemCode)
+                .map(mapper::toDomain);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/UnitRepositoryAdapter.java
@@ -2199,24 +3130,124 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserLessonProgressRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure/persistence/adapter/UserInventoryRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
+import com.bughuntersaga.api.application.port.out.UserInventoryRepositoryPort;
+import com.bughuntersaga.api.domain.model.UserInventory;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserInventoryEntity;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserInventoryJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import com.bughuntersaga.api.application.port.out.UserLessonProgressRepositoryPort;
 
+import java.util.Optional;
+import java.util.UUID;
 
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class UserLessonProgressRepositoryAdapter implements UserLessonProgressRepositoryPort {
+public class UserInventoryRepositoryAdapter implements UserInventoryRepositoryPort {
 
-    // Contenido de la clase
+    private final UserInventoryJpaRepository jpaRepository;
+    private final UserJpaRepository userJpaRepository; // Necesario para la relación
+    private final GamificationPersistenceMapper mapper;
 
+    @Override
+    public Optional<UserInventory> findByUserIdAndItemCode(UUID userId, String itemCode) {
+        return jpaRepository.findByUserIdAndItemCode(userId, itemCode)
+                .map(mapper::toDomain);
     }
 
+    @Override
+    public UserInventory save(UserInventory inventory) {
+        // Mapear de Dominio a Entidad
+        UserInventoryEntity entity = jpaRepository.findById(inventory.getId() != null ? inventory.getId() : -1)
+                .orElse(mapper.toEntity(inventory));
+
+        // Asignar los campos mapeados
+        entity.setQuantity(inventory.getQuantity());
+        entity.setItemCode(inventory.getItemCode());
+
+        // Adjuntar la entidad de usuario (requerido por el @ManyToOne)
+        if (entity.getUser() == null) {
+            UserEntity userEntity = userJpaRepository.findById(inventory.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado al guardar inventario: " + inventory.getUserId()));
+            entity.setUser(userEntity);
+        }
+
+        // Guardar la entidad
+        UserInventoryEntity savedEntity = jpaRepository.save(entity);
+
+        // Mapear de vuelta a Dominio
+        return mapper.toDomain(savedEntity);
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: infrastructure/persistence/adapter/UserLessonProgressRepositoryAdapter.java
+================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
+
+import com.bughuntersaga.api.application.port.out.UserLessonProgressRepositoryPort;
+import com.bughuntersaga.api.domain.model.UserLessonProgress;
+import com.bughuntersaga.api.infrastructure.persistence.entity.LessonEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressId;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.ProgressPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.LessonJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserLessonProgressJpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.Set;
+import java.util.UUID;
+
+@Repository
+@RequiredArgsConstructor
+public class UserLessonProgressRepositoryAdapter implements UserLessonProgressRepositoryPort {
+
+    private final UserLessonProgressJpaRepository jpaRepository;
+    private final UserJpaRepository userJpaRepository;
+    private final LessonJpaRepository lessonJpaRepository;
+    private final ProgressPersistenceMapper mapper;
+
+    @Override
+    public Set<Integer> findCompletedLessonIdsByUserId(UUID userId) {
+        return jpaRepository.findCompletedLessonIdsByUserId(userId);
+    }
+
+    @Override
+    public boolean existsByUserIdAndLessonId(UUID userId, Integer lessonId) {
+        return jpaRepository.existsById_UserIdAndId_LessonId(userId, lessonId);
+    }
+
+    @Override
+    public UserLessonProgress save(UserLessonProgress progress) {
+        // Para manejar @MapsId correctamente, debemos cargar las entidades padre
+        UserEntity userEntity = userJpaRepository.findById(progress.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado para guardar progreso: " + progress.getUserId()));
+
+        LessonEntity lessonEntity = lessonJpaRepository.findById(progress.getLessonId())
+                .orElseThrow(() -> new RuntimeException("Lección no encontrada para guardar progreso: " + progress.getLessonId()));
+
+        // Construimos la entidad
+        UserLessonProgressEntity entity = new UserLessonProgressEntity();
+        entity.setId(new UserLessonProgressId(progress.getUserId(), progress.getLessonId()));
+        entity.setUser(userEntity);
+        entity.setLesson(lessonEntity);
+        entity.setCompletedAt(progress.getCompletedAt()); // O ZonedDateTime.now() si se prefiere
+
+        UserLessonProgressEntity savedEntity = jpaRepository.save(entity);
+
+        // Devolvemos el modelo de dominio
+        return mapper.toDomain(savedEntity);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/UserProfileRepositoryAdapter.java
@@ -2249,12 +3280,21 @@ public class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
     @Override
     public UserProfile save(UserProfile userProfile) {
 
-        UserProfileEntity entity = userPersistenceMapper.toUserProfileEntity(userProfile);
+        UserProfileEntity entity = userProfileJpaRepository.findById(userProfile.getUserId())
+                .orElse(userPersistenceMapper.toUserProfileEntity(userProfile));
 
-        UserEntity userEntity = userJpaRepository.findById(userProfile.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado al crear perfil: " + userProfile.getUserId()));
+        // Mapear campos simples
+        entity.setLingots(userProfile.getLingots());
+        entity.setDailyXpGoal(userProfile.getDailyXpGoal());
+        entity.setSoundEffectsEnabled(userProfile.getSoundEffectsEnabled());
 
-        entity.setUser(userEntity);
+        // Manejar relaciones
+        if (entity.getUser() == null) {
+            UserEntity userEntity = userJpaRepository.findById(userProfile.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado al crear perfil: " + userProfile.getUserId()));
+            entity.setUser(userEntity);
+        }
+
 
         UserProfileEntity savedEntity = userProfileJpaRepository.save(entity);
         return userPersistenceMapper.toUserProfileDomain(savedEntity);
@@ -2281,6 +3321,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -2317,47 +3358,109 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findByUsernameOrEmail(username, email)
                 .map(userPersistenceMapper::toUserDomain);
     }
+    @Override
+    public boolean existsByUsernameAndIdNot(String username, UUID userId) {
+        return userJpaRepository.existsByUsernameAndIdNot(username, userId);
+    }
 }
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/UserStreakRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import com.bughuntersaga.api.application.port.out.UserStreakRepositoryPort;
+import com.bughuntersaga.api.domain.model.UserStreak;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserStreakEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserStreakId;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserStreakJpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.UUID;
 
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class UserStreakRepositoryAdapter implements UserStreakRepositoryPort {
+public class UserStreakRepositoryAdapter implements UserStreakRepositoryPort {
 
-    // Contenido de la clase
+    private final UserStreakJpaRepository jpaRepository;
+    private final UserJpaRepository userJpaRepository;
+    private final GamificationPersistenceMapper mapper;
 
+    @Override
+    public UserStreak save(UserStreak streak) {
+
+        UserEntity userEntity = userJpaRepository.findById(streak.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado al guardar racha: " + streak.getUserId()));
+
+
+        UserStreakEntity entity = new UserStreakEntity();
+        entity.setId(new UserStreakId(streak.getUserId(), streak.getActivityDate()));
+        entity.setUser(userEntity);
+
+        UserStreakEntity savedEntity = jpaRepository.save(entity);
+        return mapper.toDomain(savedEntity);
     }
 
+    @Override
+    public Set<LocalDate> findAllActivityDatesByUserId(UUID userId) {
+        return jpaRepository.findAllActivityDatesByUserId(userId);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/adapter/UserXpHistoryRepositoryAdapter.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
-    package com.bughuntersaga.api.infrastructure.persistence.adapter;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import com.bughuntersaga.api.application.port.out.UserXpHistoryRepositoryPort;
+import com.bughuntersaga.api.domain.model.UserXpHistory;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
-
-    @Repository
+@Repository
 @RequiredArgsConstructor
-    public class UserXpHistoryRepositoryAdapter implements UserXpHistoryRepositoryPort {
 
-    // Contenido de la clase
+public class UserXpHistoryRepositoryAdapter implements UserXpHistoryRepositoryPort {
 
+    private final UserXpHistoryJpaRepository jpaRepository;
+    private final UserJpaRepository userJpaRepository;
+    private final GamificationPersistenceMapper mapper;
+
+    @Override
+    public UserXpHistory save(UserXpHistory history) {
+
+        UserXpHistoryEntity entity = mapper.toEntity(history);
+        UserEntity userEntity = userJpaRepository.findById(history.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado al guardar XP: " + history.getUserId()));
+        entity.setUser(userEntity);
+        entity.setCreatedAt(history.getCreatedAt());
+        UserXpHistoryEntity savedEntity = jpaRepository.save(entity);
+        return mapper.toDomain(savedEntity);
     }
 
+    @Override
+    public int sumTotalXpByUserId(UUID userId) {
+        return jpaRepository.sumTotalXpByUserId(userId);
+    }
+
+    @Override
+    public int sumXpEarnedBetween(UUID userId, ZonedDateTime start, ZonedDateTime end) {
+        return jpaRepository.sumXpEarnedBetween(userId, start, end);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/entity/LeagueEntity.java
@@ -2606,6 +3709,8 @@ package com.bughuntersaga.api.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
@@ -2646,6 +3751,12 @@ public class UserEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "password_reset_token", length = 255)
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_expires", columnDefinition = "timestamptz")
+    private ZonedDateTime passwordResetExpires;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfileEntity userProfile;
 
@@ -2659,6 +3770,48 @@ public class UserEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+}
+
+================================================================================
+📄 CONTENIDO DE: infrastructure/persistence/entity/UserInventoryEntity.java
+================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "user_inventory", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "item_code"})
+})
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserInventoryEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+    @Column(name = "item_code", nullable = false, length = 50)
+    private String itemCode;
+
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, columnDefinition = "timestamptz DEFAULT (now())")
+    private ZonedDateTime createdAt;
 }
 
 ================================================================================
@@ -2763,6 +3916,7 @@ import java.util.UUID;
 
     @Column(name = "sound_effects_enabled", nullable = false)
     private Boolean soundEffectsEnabled;
+
 
     }
 
@@ -2955,7 +4109,7 @@ public interface ContentPersistenceMapper {
 
 
     // ========================================
-    // Mapeo de Problem (Corregido)
+    // Mapeo de Problem
     // ========================================
 
     default Problem problemToDomain(ProblemEntity entity) {
@@ -3073,37 +4227,72 @@ public interface ContentPersistenceMapper {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/mapper/GamificationPersistenceMapper.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.mapper;
 
-    package com.bughuntersaga.api.infrastructure.persistence.mapper;
-
-    import org.mapstruct.Mapper;
+import com.bughuntersaga.api.domain.model.UserStreak;
+import com.bughuntersaga.api.domain.model.UserXpHistory;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserStreakEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
+import com.bughuntersaga.api.domain.model.ShopItem;
+import com.bughuntersaga.api.infrastructure.persistence.entity.ShopItemEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import com.bughuntersaga.api.domain.model.UserInventory;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserInventoryEntity;
 
 
-    @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GamificationPersistenceMapper {
 
-        // Contenido de la interfaz
+    // --- UserXpHistory ---
+    @Mapping(source = "user.id", target = "userId")
+    UserXpHistory toDomain(UserXpHistoryEntity entity);
 
-    }
+    @Mapping(target = "user", ignore = true)
+    UserXpHistoryEntity toEntity(UserXpHistory domain);
 
+    // --- UserStreak ---
+    @Mapping(source = "id.userId", target = "userId")
+    @Mapping(source = "id.activityDate", target = "activityDate")
+    UserStreak toDomain(UserStreakEntity entity);
+
+    ShopItem toDomain(ShopItemEntity entity);
+    ShopItemEntity toEntity(ShopItem domain);
+
+    // --- UserInventory (NUEVO) ---
+    @Mapping(source = "user.id", target = "userId")
+    UserInventory toDomain(UserInventoryEntity entity);
+
+    @Mapping(target = "user", ignore = true) // El adaptador se encarga de las relaciones
+    UserInventoryEntity toEntity(UserInventory domain);
+
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/mapper/ProgressPersistenceMapper.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.mapper;
 
-    package com.bughuntersaga.api.infrastructure.persistence.mapper;
-
-    import org.mapstruct.Mapper;
+import com.bughuntersaga.api.domain.model.UserLessonProgress;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProgressPersistenceMapper {
 
+    /**
+     * Mapea de Entidad (JPA) a Dominio.
+     * Maneja la clave compuesta @EmbeddedId.
+     */
+    @Mapping(source = "id.userId", target = "userId")
+    @Mapping(source = "id.lessonId", target = "lessonId")
+    UserLessonProgress toDomain(UserLessonProgressEntity entity);
 
-    }
 
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/mapper/UserPersistenceMapper.java
@@ -3132,22 +4321,9 @@ public interface UserPersistenceMapper {
     @Mapping(target = "user", ignore = true)
     UserProfileEntity toUserProfileEntity(UserProfile domain);
 
-}
 
-================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/LeagueJpaRepository.java
-================================================================================
-package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-import com.bughuntersaga.api.infrastructure.persistence.entity.LeagueEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface LeagueJpaRepository extends JpaRepository<LeagueEntity, Integer> {
 
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/LessonJpaRepository.java
@@ -3258,22 +4434,21 @@ public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Integ
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/ShopItemJpaRepository.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository;
 
-    package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-    import com.bughuntersaga.api.infrastructure.persistence.entity.ShopItemEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.ShopItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 
-
-    @Repository
+@Repository
 public interface ShopItemJpaRepository extends JpaRepository<ShopItemEntity, Integer> {
-
-        // Contenido de la interfaz
-
-    }
-
+    /**
+     * Busca un artículo por su código de item.
+     */
+    Optional<ShopItemEntity> findByItemCode(String itemCode);
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UnitJpaRepository.java
@@ -3329,6 +4504,30 @@ public interface UnitJpaRepository extends JpaRepository<UnitEntity, Integer> {
 
 
 ================================================================================
+📄 CONTENIDO DE: infrastructure/persistence/repository/UserInventoryJpaRepository.java
+================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository;
+
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserInventoryEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface UserInventoryJpaRepository extends JpaRepository<UserInventoryEntity, Long> {
+
+    /**
+     * Busca un registro de inventario por usuario y código de item.
+     */
+    @Query("SELECT inv FROM UserInventoryEntity inv WHERE inv.user.id = :userId AND inv.itemCode = :itemCode")
+    Optional<UserInventoryEntity> findByUserIdAndItemCode(@Param("userId") UUID userId, @Param("itemCode") String itemCode);
+}
+
+================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
@@ -3348,27 +4547,43 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByEmail(String email);
 
     Optional<UserEntity> findByUsernameOrEmail(String username, String email);
+    boolean existsByUsernameAndIdNot(String username, UUID id);
 }
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserLessonProgressJpaRepository.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository;
 
-    package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-    import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressId;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+import java.util.UUID;
 
-    @Repository
+@Repository
 public interface UserLessonProgressJpaRepository extends JpaRepository<UserLessonProgressEntity, UserLessonProgressId> {
 
-        // Contenido de la interfaz
+    /**
+     * Obtiene un conjunto de IDs de lecciones completadas por un usuario.
+     */
+    @Query("""
+        SELECT ulp.id.lessonId 
+        FROM UserLessonProgressEntity ulp 
+        WHERE ulp.id.userId = :userId
+    """)
+    Set<Integer> findCompletedLessonIdsByUserId(@Param("userId") UUID userId);
 
-    }
-
+    /**
+     * Verifica la existencia por la clave compuesta.
+     * Spring Data JPA genera este query automáticamente basado en el nombre.
+     */
+    boolean existsById_UserIdAndId_LessonId(UUID userId, Integer lessonId);
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserProfileJpaRepository.java
@@ -3393,42 +4608,88 @@ public interface UserProfileJpaRepository extends JpaRepository<UserProfileEntit
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserStreakJpaRepository.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository;
 
-    package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-    import com.bughuntersaga.api.infrastructure.persistence.entity.UserStreakEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserStreakEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserStreakId;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.UUID;
 
-    @Repository
+@Repository
 public interface UserStreakJpaRepository extends JpaRepository<UserStreakEntity, UserStreakId> {
 
-        // Contenido de la interfaz
-
-    }
-
+    /**
+     * Obtiene un conjunto de todas las fechas de actividad únicas para un usuario.
+     * Optimizado para el cálculo de racha.
+     */
+    @Query("SELECT s.id.activityDate FROM UserStreakEntity s WHERE s.id.userId = :userId")
+    Set<LocalDate> findAllActivityDatesByUserId(@Param("userId") UUID userId);
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/persistence/repository/UserXpHistoryJpaRepository.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository;
 
-    package com.bughuntersaga.api.infrastructure.persistence.repository;
-
-    import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
+import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection; // Importar
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
+import java.util.List; // Importar
+import java.util.UUID;
 
-
-    @Repository
+@Repository
 public interface UserXpHistoryJpaRepository extends JpaRepository<UserXpHistoryEntity, Long> {
 
-        // Contenido de la interfaz
+    // ... (Queries de SUM de Fase 4) ...
+    @Query("SELECT COALESCE(SUM(h.xpEarned), 0) FROM UserXpHistoryEntity h WHERE h.user.id = :userId")
+    int sumTotalXpByUserId(@Param("userId") UUID userId);
 
-    }
+    @Query("SELECT COALESCE(SUM(h.xpEarned), 0) FROM UserXpHistoryEntity h WHERE h.user.id = :userId AND h.createdAt BETWEEN :start AND :end")
+    int sumXpEarnedBetween(@Param("userId") UUID userId, @Param("start") ZonedDateTime start, @Param("end") ZonedDateTime end);
 
+    @Query("""
+        SELECT 
+            h.user.id as userId, 
+            h.user.name as name, 
+            SUM(h.xpEarned) as totalXp
+        FROM UserXpHistoryEntity h
+        WHERE h.createdAt BETWEEN :start AND :end
+        GROUP BY h.user.id, h.user.name
+        ORDER BY totalXp DESC
+    """)
+    List<LeaderboardProjection> findLeaderboardForWeek(
+            @Param("start") ZonedDateTime start,
+            @Param("end") ZonedDateTime end
+    );
+}
+
+================================================================================
+📄 CONTENIDO DE: infrastructure/persistence/repository/projections/LeaderboardProjection.java
+================================================================================
+package com.bughuntersaga.api.infrastructure.persistence.repository.projections;
+
+import java.util.UUID;
+
+/**
+ * Interfaz de Proyección de Spring Data para el resultado del query
+ * del leaderboard.
+ */
+public interface LeaderboardProjection {
+    UUID getUserId();
+    String getName();
+    Integer getTotalXp();
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/security/adapter/JwtTokenGeneratorAdapter.java
@@ -3675,11 +4936,14 @@ public class JwtUtil {
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
+import com.bughuntersaga.api.application.dto.ForgotPasswordCommand;
 import com.bughuntersaga.api.application.dto.LoginUserCommand;
 import com.bughuntersaga.api.application.dto.RegisterUserCommand;
+import com.bughuntersaga.api.application.port.in.ForgotPasswordUseCase;
 import com.bughuntersaga.api.application.port.in.LoginUserUseCase;
 import com.bughuntersaga.api.application.port.in.RegisterUserUseCase;
 import com.bughuntersaga.api.domain.model.AuthToken;
+import com.bughuntersaga.api.infrastructure.web.dto.ForgotPasswordDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UserRegistrationDTO;
 import com.bughuntersaga.api.infrastructure.web.mapper.AuthApiMapper;
 import jakarta.validation.Valid;
@@ -3690,6 +4954,8 @@ import org.springframework.web.bind.annotation.*;
 import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -3698,6 +4964,7 @@ public class AuthController {
     private final RegisterUserUseCase registerUserUseCase;
     private final LoginUserUseCase loginUserUseCase;
     private final AuthApiMapper authApiMapper;
+    private final ForgotPasswordUseCase forgotPasswordUseCase;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody UserRegistrationDTO request) {
@@ -3716,6 +4983,26 @@ public class AuthController {
         LoginUserCommand command = authApiMapper.toLoginCommand(request);
         AuthToken authToken = loginUserUseCase.login(command);
         AuthResponseDTO response = authApiMapper.toAuthResponseDTO(authToken);
+        return ResponseEntity.ok(response);
+    }
+    /**
+     * POST /api/auth/forgot-password (Fase 7)
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+
+        // 1. Mapear
+        ForgotPasswordCommand command = authApiMapper.toCommand(forgotPasswordDTO);
+
+        // 2. Ejecutar
+        forgotPasswordUseCase.handle(command);
+
+        // 3. Devolver siempre una respuesta genérica (por seguridad)
+        Map<String, String> response = Map.of(
+                "message", "Si tu email está registrado, recibirás un enlace para resetear tu contraseña."
+        );
+
         return ResponseEntity.ok(response);
     }
 }
@@ -3789,55 +5076,145 @@ public class ContentController {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/controller/GamificationController.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.controller;
 
-    package com.bughuntersaga.api.infrastructure.web.controller;
-
-    import lombok.RequiredArgsConstructor;
+import com.bughuntersaga.api.application.port.in.GetLeaderboardUseCase;
+import com.bughuntersaga.api.application.port.in.GetShopItemsUseCase;
+import com.bughuntersaga.api.application.port.in.PurchaseItemUseCase;
+import com.bughuntersaga.api.application.port.in.UserStatsResult;
+import com.bughuntersaga.api.domain.model.Leaderboard;
+import com.bughuntersaga.api.domain.model.ShopItem;
+import com.bughuntersaga.api.infrastructure.web.dto.LeaderboardDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.ShopItemDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserStatsDTO;
+import com.bughuntersaga.api.infrastructure.web.mapper.GamificationApiMapper;
+import com.bughuntersaga.api.infrastructure.web.mapper.UserApiMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.bughuntersaga.api.application.port.in.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
-    @RestController
+@RestController
 @RequiredArgsConstructor
-    public class GamificationController {
+@RequestMapping("/api")
+public class GamificationController {
 
-    private final com.bughuntersaga.api.application.port.in.GetLeaderboardUseCase getLeaderboardUseCase;
-    private final com.bughuntersaga.api.application.port.in.GetShopItemsUseCase getShopItemsUseCase;
-    private final com.bughuntersaga.api.application.port.in.PurchaseItemUseCase purchaseItemUseCase;
+    private final GetLeaderboardUseCase getLeaderboardUseCase;
+    private final GetShopItemsUseCase getShopItemsUseCase;
+    private final PurchaseItemUseCase purchaseItemUseCase;
 
-    // TODO: Implementar endpoints de OpenAPI
-    // @GetMapping("/leaderboard") ...
-    // @GetMapping("/shop/items") ...
-    // @PostMapping("/shop/purchase/{itemId}") ...
+    // Mappers
+    private final GamificationApiMapper gamificationApiMapper;
+    private final UserApiMapper userApiMapper;
 
+    /**
+     * GET /api/leaderboard (Fase 6)
+     */
+    @GetMapping("/leaderboard")
+    public ResponseEntity<LeaderboardDTO> getLeaderboard() {
+
+        // 1. Ejecutar el caso de uso
+        Leaderboard leaderboard = getLeaderboardUseCase.getLeaderboard();
+
+        // 2. Mapear de Dominio (App) a DTO (Web)
+        LeaderboardDTO responseDTO = gamificationApiMapper.toLeaderboardDTO(leaderboard);
+
+        return ResponseEntity.ok(responseDTO);
     }
 
+    /**
+     * GET /api/shop/items (Fase 6)
+     */
+    @GetMapping("/shop/items")
+    public ResponseEntity<List<ShopItemDTO>> getShopItems() {
+        // ... (implementado)
+        List<ShopItem> items = getShopItemsUseCase.getShopItems();
+        List<ShopItemDTO> responseDTOs = items.stream()
+                .map(gamificationApiMapper::toShopItemDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    /**
+     * POST /api/shop/purchase/{itemId} (Fase 6)
+     */
+    @PostMapping("/shop/purchase/{itemId}")
+    public ResponseEntity<UserStatsDTO> purchaseItem(@PathVariable("itemId") String itemId) {
+        // ... (implementado)
+        UserStatsResult updatedStats = purchaseItemUseCase.purchaseItem(itemId);
+        UserStatsDTO responseDTO = userApiMapper.toStatsDTO(updatedStats);
+        return ResponseEntity.ok(responseDTO);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/controller/ProgressController.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.controller;
 
-    package com.bughuntersaga.api.infrastructure.web.controller;
-
-    import lombok.RequiredArgsConstructor;
+import com.bughuntersaga.api.application.dto.CompleteLessonCommand;
+import com.bughuntersaga.api.application.port.in.ClaimTreasureResult;
+import com.bughuntersaga.api.application.port.in.ClaimTreasureUseCase;
+import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
+import com.bughuntersaga.api.application.port.in.CompleteLessonUseCase;
+import com.bughuntersaga.api.infrastructure.web.dto.LessonCompletionResponseDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.LessonResultDTO;
+import com.bughuntersaga.api.infrastructure.web.mapper.ProgressApiMapper;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.bughuntersaga.api.application.port.in.*;
 
+import java.util.Map;
 
-    @RestController
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/progress")
-    public class ProgressController {
+@RequestMapping("/api/progress")
+public class ProgressController {
 
-    private final com.bughuntersaga.api.application.port.in.CompleteLessonUseCase completeLessonUseCase;
-    private final com.bughuntersaga.api.application.port.in.ClaimTreasureUseCase claimTreasureUseCase;
+    private final CompleteLessonUseCase completeLessonUseCase;
+    private final ClaimTreasureUseCase claimTreasureUseCase;
+    private final ProgressApiMapper progressApiMapper; // Añadido
 
-    // TODO: Implementar endpoints de OpenAPI
-    // @PostMapping("/lesson") ...
-    // @PostMapping("/treasure/{lessonId}") ...
+    /**
+     * Endpoint para registrar la finalización de una lección (Fase 3).
+     * Coincide con: POST /api/progress/lesson
+     */
+    @PostMapping("/lesson")
+    public ResponseEntity<LessonCompletionResponseDTO> completeLesson(
+            @Valid @RequestBody LessonResultDTO lessonResultDTO) {
 
+        // 1. Mapear DTO (web) a Comando (app)
+        CompleteLessonCommand command = progressApiMapper.toCommand(lessonResultDTO);
+
+        // 2. Ejecutar el caso de uso
+        CompleteLessonResult result = completeLessonUseCase.handle(command);
+
+        // 3. Mapear Resultado (app) a DTO (web)
+        LessonCompletionResponseDTO responseDTO = progressApiMapper.toDTO(result);
+
+        return ResponseEntity.ok(responseDTO);
     }
 
+    /**
+     * Endpoint para reclamar un tesoro (Fase 4).
+     * Coincide con: POST /api/progress/treasure/{lessonId}
+     */
+    @PostMapping("/treasure/{lessonId}")
+    public ResponseEntity<Map<String, Integer>> claimTreasure(@PathVariable("lessonId") Integer lessonId) {
+
+        ClaimTreasureResult result = claimTreasureUseCase.claimTreasure(lessonId);
+
+        Map<String, Integer> response = Map.of(
+                "lingotsEarned", result.lingotsEarned(),
+                "totalLingots", result.totalLingots()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/controller/SwaggerRedirectController.java
@@ -3859,32 +5236,84 @@ public class SwaggerRedirectController {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/controller/UserController.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.controller;
 
-    package com.bughuntersaga.api.infrastructure.web.controller;
-
-    import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import com.bughuntersaga.api.application.dto.UpdateUserAccountCommand;
+import com.bughuntersaga.api.application.dto.UpdateUserSettingsCommand;
 import com.bughuntersaga.api.application.port.in.*;
+import com.bughuntersaga.api.domain.model.FullUserProfile;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.infrastructure.web.dto.UserAccountUpdateDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserProfileDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserSettingsUpdateDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserStatsDTO;
+import com.bughuntersaga.api.infrastructure.web.mapper.UserApiMapper;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-
-    @RestController
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
-    public class UserController {
+@RequestMapping("/api/users")
+public class UserController {
 
-    private final com.bughuntersaga.api.application.port.in.GetUserProfileUseCase getUserProfileUseCase;
-    private final com.bughuntersaga.api.application.port.in.UpdateUserAccountUseCase updateUserAccountUseCase;
-    private final com.bughuntersaga.api.application.port.in.UpdateUserSettingsUseCase updateUserSettingsUseCase;
-    private final com.bughuntersaga.api.application.port.in.GetUserStatsUseCase getUserStatsUseCase;
+    // Casos de uso
+    private final GetUserProfileUseCase getUserProfileUseCase;
+    private final UpdateUserAccountUseCase updateUserAccountUseCase;
+    private final UpdateUserSettingsUseCase updateUserSettingsUseCase;
+    private final GetUserStatsUseCase getUserStatsUseCase;
 
-    // TODO: Implementar endpoints de OpenAPI
-    // @GetMapping("/me/profile") ...
-    // @PutMapping("/me/account") ...
-    // @PutMapping("/me/settings") ...
-    // @GetMapping("/me/stats") ...
+    // Mappers
+    private final UserApiMapper userApiMapper;
 
+    /**
+     * GET /api/users/me/profile (Fase 5)
+     */
+    @GetMapping("/me/profile")
+    public ResponseEntity<UserProfileDTO> getUserProfile() {
+        FullUserProfile profileDomain = getUserProfileUseCase.getProfile();
+        UserProfileDTO responseDTO = userApiMapper.toProfileDTO(profileDomain);
+        return ResponseEntity.ok(responseDTO);
     }
 
+    /**
+     * PUT /api/users/me/account (Fase 5)
+     */
+    @PutMapping("/me/account")
+    public ResponseEntity<UserInfoDTO> updateUserAccount(
+            @Valid @RequestBody UserAccountUpdateDTO accountUpdateDTO) {
+
+        UpdateUserAccountCommand command = userApiMapper.toCommand(accountUpdateDTO);
+        User updatedUser = updateUserAccountUseCase.updateAccount(command);
+        UserInfoDTO responseDTO = userApiMapper.toUserInfoDTO(updatedUser);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    /**
+     * PUT /api/users/me/settings (Fase 5)
+     */
+    @PutMapping("/me/settings")
+    public ResponseEntity<UserProfileDTO> updateUserSettings(
+            @Valid @RequestBody UserSettingsUpdateDTO settingsUpdateDTO) {
+
+        UpdateUserSettingsCommand command = userApiMapper.toCommand(settingsUpdateDTO);
+        FullUserProfile updatedProfile = updateUserSettingsUseCase.updateSettings(command);
+        UserProfileDTO responseDTO = userApiMapper.toProfileDTO(updatedProfile);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    /**
+     * GET /api/users/me/stats (Fase 4)
+     */
+    @GetMapping("/me/stats")
+    public ResponseEntity<UserStatsDTO> getUserStats() {
+        UserStatsResult result = getUserStatsUseCase.getStats();
+        UserStatsDTO responseDTO = userApiMapper.toStatsDTO(result);
+        return ResponseEntity.ok(responseDTO);
+    }
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/AuthResponseDTO.java
@@ -3938,101 +5367,75 @@ public class ErrorDTO {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/ForgotPasswordDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para ForgotPasswordDTO.
-     * Schema: ForgotPasswordDTO de OpenAPI
-     */
-    public record ForgotPasswordDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: ForgotPasswordDTO de OpenAPI
-    ) {
-    }
-
+public record ForgotPasswordDTO(
+        @NotBlank(message = "El email es obligatorio")
+        @Email(message = "Debe ser un email válido")
+        String email
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/LeaderboardDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para LeaderboardDTO.
-     * Schema: LeaderboardDTO de OpenAPI
-     */
-    public record LeaderboardDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: LeaderboardDTO de OpenAPI
-    ) {
-    }
-
+public record LeaderboardDTO(
+        String leagueName,
+        String timeUntilEnd,
+        List<LeaderboardEntryDTO> users
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/LeaderboardEntryDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para LeaderboardEntryDTO.
-     * Schema: LeaderboardEntryDTO de OpenAPI
-     */
-    public record LeaderboardEntryDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: LeaderboardEntryDTO de OpenAPI
-    ) {
-    }
-
+public record LeaderboardEntryDTO(
+        Integer rank,
+        String name,
+        Integer xp,
+        Boolean isCurrentUser
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/LessonCompletionResponseDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para LessonCompletionResponseDTO.
-     * Schema: LessonCompletionResponseDTO de OpenAPI
-     */
-    public record LessonCompletionResponseDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: LessonCompletionResponseDTO de OpenAPI
-    ) {
-    }
-
+public record LessonCompletionResponseDTO(
+        Integer xpEarned,
+        Integer lingotsEarned,
+        Integer newTotalLingots,
+        Integer newStreak
+) {
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/LessonResultDTO.java
 ================================================================================
-
 package com.bughuntersaga.api.infrastructure.web.dto;
 
-import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO para LessonResultDTO.
- * Schema: LessonResultDTO de OpenAPI
- */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record LessonResultDTO(
         @NotNull(message = "Lesson ID is required")
         @Min(value = 1, message = "Lesson ID must be positive")
@@ -4054,7 +5457,6 @@ public record LessonResultDTO(
         Boolean isPractice
 ) {
 }
-
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/LessonTileDTO.java
@@ -4103,59 +5505,39 @@ public record ModuleResponseDTO(
 package com.bughuntersaga.api.infrastructure.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
-/**
- * DTO de respuesta para problema.
- * Campos nulos no aparecen en el JSON.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ProblemDTO(
         String type,
-
-        // Campos para tipo INFO
         String moduleTitle,
         String introduction,
         List<String> objectives,
-
-        // Campos para preguntas
         String question,
-
-        // Campos para SELECT_1_OF_3
         List<AnswerOption> answers,
         Integer correctAnswer,
-
-        // Campos para FILL_IN_THE_BLANK
         List<String> answerTiles,
-
-        @JsonProperty("correctAnswer")
         List<Integer> correctAnswerIndices
-        // --- FIN DE LA CORRECCIÓN ---
-) {
+)
+{
     public record AnswerOption(String name) {}
 }
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/ShopItemDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para ShopItemDTO.
-     * Schema: ShopItemDTO de OpenAPI
-     */
-    public record ShopItemDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: ShopItemDTO de OpenAPI
-    ) {
-    }
-
+public record ShopItemDTO(
+        String itemId,
+        String name,
+        String description,
+        Integer cost
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UnitDetailDTO.java
@@ -4188,23 +5570,19 @@ public record UnitDetailDTO(
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserAccountUpdateDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Size;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
+public record UserAccountUpdateDTO(
+        @Size(max = 100)
+        String name,
 
-    /**
-     * DTO para UserAccountUpdateDTO.
-     * Schema: UserAccountUpdateDTO de OpenAPI
-     */
-    public record UserAccountUpdateDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserAccountUpdateDTO de OpenAPI
-    ) {
-    }
-
+        @Size(min = 3, max = 50)
+        String username
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserInfoDTO.java
@@ -4255,23 +5633,23 @@ public record UserLoginDTO(
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserProfileDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para UserProfileDTO.
-     * Schema: UserProfileDTO de OpenAPI
-     */
-    public record UserProfileDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserProfileDTO de OpenAPI
-    ) {
-    }
-
+public record UserProfileDTO(
+        UUID userId,
+        String name,
+        String username,
+        String email,
+        LocalDateTime joinedAt,
+        Integer lingots,
+        Integer dailyXpGoal,
+        Boolean soundEffectsEnabled
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserRegistrationDTO.java
@@ -4302,44 +5680,37 @@ public record UserRegistrationDTO(
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserSettingsUpdateDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para UserSettingsUpdateDTO.
-     * Schema: UserSettingsUpdateDTO de OpenAPI
-     */
-    public record UserSettingsUpdateDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserSettingsUpdateDTO de OpenAPI
-    ) {
-    }
-
+public record UserSettingsUpdateDTO(
+        Integer dailyXpGoal, // (Tu OpenAPI permite [1, 10, 20, 30, 50])
+        Boolean soundEffectsEnabled,
+        Boolean speakingExercises,
+        Boolean listeningExercises
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/dto/UserStatsDTO.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDate;
+import java.util.Set;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
-    /**
-     * DTO para UserStatsDTO.
-     * Schema: UserStatsDTO de OpenAPI
-     */
-    public record UserStatsDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserStatsDTO de OpenAPI
-    ) {
-    }
-
+public record UserStatsDTO(
+        Integer totalXp,
+        Integer totalLingots,
+        Integer currentStreak,
+        Integer xpToday,
+        Integer xpThisWeek,
+        Integer leagueRank, // Puede ser nulo
+        Set<LocalDate> activeDays
+) {}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/exception/GlobalApiExceptionHandler.java
@@ -4475,7 +5846,17 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDTO> handleIllegalArgument(IllegalArgumentException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
     /**
      * Maneja CUALQUIER otra excepción no capturada (500 Internal Server Error).
      */
@@ -4494,6 +5875,40 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
+    // --- NUEVO HANDLER (Contrato: POST /shop/purchase) ---
+    /**
+     * Maneja InsufficientFundsException (400 Bad Request).
+     * Definido en el contrato como un error 400.
+     */
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ErrorDTO> handleInsufficientFunds(InsufficientFundsException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    // --- NUEVO HANDLER (Contrato: POST /progress/treasure) ---
+    /**
+     * Maneja TreasureAlreadyClaimedException (400 Bad Request).
+     * Definido en el contrato como un error 400.
+     */
+    @ExceptionHandler(TreasureAlreadyClaimedException.class)
+    public ResponseEntity<ErrorDTO> handleTreasureAlreadyClaimed(TreasureAlreadyClaimedException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 }
 
 ================================================================================
@@ -4501,14 +5916,12 @@ public class GlobalApiExceptionHandler {
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
+import com.bughuntersaga.api.application.dto.ForgotPasswordCommand;
 import com.bughuntersaga.api.application.dto.LoginUserCommand;
 import com.bughuntersaga.api.application.dto.RegisterUserCommand;
 import com.bughuntersaga.api.domain.model.AuthToken;
 import com.bughuntersaga.api.domain.model.User;
-import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserLoginDTO;
-import com.bughuntersaga.api.infrastructure.web.dto.UserRegistrationDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -4529,6 +5942,7 @@ public interface AuthApiMapper {
     // Info básica del usuario
     @Mapping(source = "id", target = "id")
     UserInfoDTO toUserInfoDTO(User user);
+    ForgotPasswordCommand toCommand(ForgotPasswordDTO dto);
 }
 
 ================================================================================
@@ -4591,52 +6005,100 @@ public interface ContentApiMapper {
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/mapper/GamificationApiMapper.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.mapper;
 
-    package com.bughuntersaga.api.infrastructure.web.mapper;
-
-    import org.mapstruct.Mapper;
+import com.bughuntersaga.api.domain.model.Leaderboard;
+import com.bughuntersaga.api.domain.model.LeaderboardEntry;
+import com.bughuntersaga.api.domain.model.ShopItem;
+import com.bughuntersaga.api.infrastructure.web.dto.LeaderboardDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.LeaderboardEntryDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.ShopItemDTO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-
-    @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GamificationApiMapper {
 
-        // Contenido de la interfaz
 
-    }
+    @Mapping(source = "itemCode", target = "itemId")
+    ShopItemDTO toShopItemDTO(ShopItem domain);
 
+
+    LeaderboardDTO toLeaderboardDTO(Leaderboard domain);
+    LeaderboardEntryDTO toLeaderboardEntryDTO(LeaderboardEntry domain);
+
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/mapper/ProgressApiMapper.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.mapper;
 
-    package com.bughuntersaga.api.infrastructure.web.mapper;
-
-    import org.mapstruct.Mapper;
+import com.bughuntersaga.api.application.dto.CompleteLessonCommand;
+import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
+import com.bughuntersaga.api.infrastructure.web.dto.LessonCompletionResponseDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.LessonResultDTO;
+import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-
-    @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProgressApiMapper {
 
-        // Contenido de la interfaz
+    /**
+     * Mapea el DTO web de entrada al Comando de aplicación.
+     */
+    CompleteLessonCommand toCommand(LessonResultDTO dto);
 
-    }
-
+    /**
+     * Mapea el Resultado de dominio al DTO web de salida.
+     */
+    LessonCompletionResponseDTO toDTO(CompleteLessonResult result);
+}
 
 ================================================================================
 📄 CONTENIDO DE: infrastructure/web/mapper/UserApiMapper.java
 ================================================================================
+package com.bughuntersaga.api.infrastructure.web.mapper;
 
-    package com.bughuntersaga.api.infrastructure.web.mapper;
-
-    import org.mapstruct.Mapper;
+import com.bughuntersaga.api.application.dto.UpdateUserAccountCommand;
+import com.bughuntersaga.api.application.dto.UpdateUserSettingsCommand;
+import com.bughuntersaga.api.application.port.in.UserStatsResult;
+import com.bughuntersaga.api.domain.model.FullUserProfile;
+import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.infrastructure.web.dto.UserAccountUpdateDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserProfileDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserSettingsUpdateDTO;
+import com.bughuntersaga.api.infrastructure.web.dto.UserStatsDTO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-
-    @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserApiMapper {
 
-        // Contenido de la interfaz
+    // --- Fase 4 ---
+    UserStatsDTO toStatsDTO(UserStatsResult result);
 
-    }
+    /**
+     * Mapea el modelo de dominio combinado al DTO de respuesta.
+     */
+    UserProfileDTO toProfileDTO(FullUserProfile domain);
+
+    /**
+     * Mapea el DTO de entrada de settings al Comando de aplicación.
+     */
+    UpdateUserSettingsCommand toCommand(UserSettingsUpdateDTO dto);
+
+    /**
+     * Mapea el DTO de entrada de account al Comando de aplicación.
+     */
+    UpdateUserAccountCommand toCommand(UserAccountUpdateDTO dto);
+
+    /**
+     * Mapea el User de dominio al UserInfoDTO (usado por /account y /login).
+     */
+    @Mapping(source = "id", target = "id")
+    UserInfoDTO toUserInfoDTO(User user);
+}

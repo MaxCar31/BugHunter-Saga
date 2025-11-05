@@ -1,16 +1,13 @@
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import jakarta.validation.constraints.Size;
 
-    /**
-     * DTO para UserAccountUpdateDTO.
-     * Schema: UserAccountUpdateDTO de OpenAPI
-     */
-    public record UserAccountUpdateDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: UserAccountUpdateDTO de OpenAPI
-    ) {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record UserAccountUpdateDTO(
+        @Size(max = 100)
+        String name,
+
+        @Size(min = 3, max = 50)
+        String username
+) {}

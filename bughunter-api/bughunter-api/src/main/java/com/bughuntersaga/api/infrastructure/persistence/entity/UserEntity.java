@@ -2,6 +2,8 @@ package com.bughuntersaga.api.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
@@ -41,6 +43,12 @@ public class UserEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "password_reset_token", length = 255)
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_expires", columnDefinition = "timestamptz")
+    private ZonedDateTime passwordResetExpires;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfileEntity userProfile;

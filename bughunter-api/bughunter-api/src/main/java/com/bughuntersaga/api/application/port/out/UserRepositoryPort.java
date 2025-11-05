@@ -2,6 +2,7 @@ package com.bughuntersaga.api.application.port.out;
 
 import com.bughuntersaga.api.domain.model.User;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepositoryPort {
 
@@ -24,4 +25,6 @@ public interface UserRepositoryPort {
      * Busca un usuario por username O email (para el login).
      */
     Optional<User> findByUsernameOrEmail(String username, String email);
+
+    boolean existsByUsernameAndIdNot(String username, UUID userId);
 }

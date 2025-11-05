@@ -1,14 +1,14 @@
+package com.bughuntersaga.api.application.dto;
 
-    package com.bughuntersaga.api.application.dto;
-
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
-
-    @Getter
+/**
+ * Comando para el caso de uso UpdateUserSettings.
+ */
+@Getter
 @Builder
-    public class UpdateUserSettingsCommand {
-
-    // TODO: Definir campos para el comando/query
-
-    }
+public class UpdateUserSettingsCommand {
+    private final Integer dailyXpGoal;
+    private final Boolean soundEffectsEnabled;
+}

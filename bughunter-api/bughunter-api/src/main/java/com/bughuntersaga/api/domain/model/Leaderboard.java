@@ -1,18 +1,23 @@
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.List;
 
-    @Getter
+/**
+ * Entidad de dominio que representa la tabla de clasificación completa.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class Leaderboard {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class Leaderboard {
+    private String leagueName; // (Fijo por ahora, Fase 6 no implementa ligas)
+    private String timeUntilEnd;
+    private List<LeaderboardEntry> users;
+}

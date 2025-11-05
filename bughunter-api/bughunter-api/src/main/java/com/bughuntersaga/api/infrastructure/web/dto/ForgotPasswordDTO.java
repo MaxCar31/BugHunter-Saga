@@ -1,16 +1,12 @@
+package com.bughuntersaga.api.infrastructure.web.dto;
 
-    package com.bughuntersaga.api.infrastructure.web.dto;
-
-    import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
-    /**
-     * DTO para ForgotPasswordDTO.
-     * Schema: ForgotPasswordDTO de OpenAPI
-     */
-    public record ForgotPasswordDTO(
-        // TODO: Definir campos basados en el OpenAPI
-        // Schema: ForgotPasswordDTO de OpenAPI
-    ) {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ForgotPasswordDTO(
+        @NotBlank(message = "El email es obligatorio")
+        @Email(message = "Debe ser un email válido")
+        String email
+) {}

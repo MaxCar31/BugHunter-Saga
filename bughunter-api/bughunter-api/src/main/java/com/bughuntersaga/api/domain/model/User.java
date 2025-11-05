@@ -2,6 +2,7 @@ package com.bughuntersaga.api.domain.model;
 
 import lombok.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime; // Importar
 import java.util.UUID;
 
 
@@ -19,4 +20,6 @@ public class User {
     private String lastname;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String passwordResetToken;
+    private ZonedDateTime passwordResetExpires;
 }

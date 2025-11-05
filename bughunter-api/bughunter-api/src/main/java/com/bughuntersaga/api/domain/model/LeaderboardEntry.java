@@ -1,18 +1,22 @@
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
-    @Getter
+/**
+ * Entidad de dominio que representa una sola fila en el leaderboard.
+ */
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class LeaderboardEntry {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class LeaderboardEntry {
+    private int rank;
+    private String name;
+    private int xp;
+    private boolean isCurrentUser;
+}

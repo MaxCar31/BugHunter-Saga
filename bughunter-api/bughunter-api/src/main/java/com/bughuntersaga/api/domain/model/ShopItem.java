@@ -1,18 +1,21 @@
+package com.bughuntersaga.api.domain.model;
 
-    package com.bughuntersaga.api.domain.model;
-
-    import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
-    @Getter
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
-    public class ShopItem {
-
-    // Contenido de la clase
-
-    }
+@AllArgsConstructor
+public class ShopItem {
+    private Integer id;
+    private String itemCode;
+    private String name;
+    private String description;
+    private Integer cost;
+    private String icon;
+}

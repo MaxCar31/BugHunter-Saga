@@ -24,4 +24,5 @@ public class UserProfile {
     private Integer lingots;
     private Integer dailyXpGoal;
     private Boolean soundEffectsEnabled;
+    private Integer currentModuleId;
 }
