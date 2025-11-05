@@ -3,24 +3,34 @@ package com.bughuntersaga.api;
 
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
 import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 import java.time.ZonedDateTime;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-@DataJpaTest // Esto configura una BD en memoria (H2) y solo carga el contexto de JPA
+import com.bughuntersaga.api.infrastructure.persistence.mapper.ContentPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.ProgressPersistenceMapper;
+@DataJpaTest
+@Import({
+        GamificationPersistenceMapper.class,
+        UserPersistenceMapper.class,
+        ContentPersistenceMapper.class,
+        ProgressPersistenceMapper.class
+})
 class UserXpHistoryJpaRepositoryTest {
 
     @Autowired
-    private TestEntityManager entityManager; // Helper para preparar la BD
+    private TestEntityManager entityManager;
 
     @Autowired
     private UserXpHistoryJpaRepository xpHistoryRepository;

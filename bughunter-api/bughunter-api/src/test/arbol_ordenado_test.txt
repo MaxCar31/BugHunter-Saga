@@ -1,0 +1,581 @@
+Árbol de archivos del directorio: test
+================================================================================
+
+## 🌳 ESTRUCTURA DE ARCHIVOS
+
+│   ├── 📁 java/
+│   │   ├── 📁 com/
+│   │   │   ├── 📁 bughuntersaga/
+│   │   │   │   ├── 📁 api/
+│   │   │   │   │   ├── 📄 BaseIntegrationTest.java
+│   │   │   │   │   ├── 📄 BugHunterSagaApiApplicationTests.java
+│   │   │   │   │   ├── 📄 PlayerJourneyE2ETest.java
+│   │   │   │   │   ├── 📄 ProgressControllerTest.java
+│   │   │   │   │   ├── 📄 RegisterUserServiceTest.java
+│   │   │   │   │   ├── 📄 UserXpHistoryJpaRepositoryTest.java
+
+
+================================================================================
+## 📄 CONTENIDO DETALLADO DE ARCHIVOS
+================================================================================
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/BaseIntegrationTest.java
+================================================================================
+package com.bughuntersaga.api;
+
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+public abstract class BaseIntegrationTest {
+
+
+    @Container
+    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine")
+            .withDatabaseName("bughunter-test-db")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        registry.add("spring.flyway.enabled", () -> true);
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/BugHunterSagaApiApplicationTests.java
+================================================================================
+package com.bughuntersaga.api;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class BugHunterSagaApiApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/PlayerJourneyE2ETest.java
+================================================================================
+// Ubicación: src/test/java/com/bughuntersaga/api/PlayerJourneyE2ETest.java
+
+package com.bughuntersaga.api;
+
+import com.bughuntersaga.api.infrastructure.web.dto.AuthResponseDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest // ✅ AGREGAR ESTA ANOTACIÓN
+@AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class PlayerJourneyE2ETest extends BaseIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    // Guardamos el token entre pruebas
+    private static String jwtToken;
+
+    @Test
+    @Order(1)
+    void playerCanRegister() throws Exception {
+        String registrationJson = """
+        {
+            "username": "E2E_Player",
+            "name": "E2E Player",
+            "email": "e2e@player.com",
+            "password": "password123"
+        }
+        """;
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registrationJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.user.username").value("E2E_Player"));
+    }
+
+    @Test
+    @Order(2)
+    void playerCanLogin() throws Exception {
+        String loginJson = """
+        {
+            "emailOrUsername": "e2e@player.com",
+            "password": "password123"
+        }
+        """;
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists())
+                .andReturn();
+
+        // Extraemos y guardamos el token
+        String jsonResponse = result.getResponse().getContentAsString();
+        AuthResponseDTO authResponse = objectMapper.readValue(jsonResponse, AuthResponseDTO.class);
+        jwtToken = authResponse.token();
+    }
+
+    @Test
+    @Order(3)
+    void playerCanCompleteLesson() throws Exception {
+        String lessonCompletionJson = """
+        {
+            "lessonId": 1, 
+            "correctAnswerCount": 10,
+            "incorrectAnswerCount": 0,
+            "timeTakenMs": 15000,
+            "isPractice": false
+        }
+        """;
+
+        mockMvc.perform(post("/api/progress/lesson")
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(lessonCompletionJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.xpEarned").isNumber())
+                .andExpect(jsonPath("$.xpEarned").value(20))
+                .andExpect(jsonPath("$.newStreak").value(1));
+    }
+
+    @Test
+    @Order(4)
+    void playerStatsAreUpdated() throws Exception {
+        mockMvc.perform(get("/api/users/me/stats")
+                        .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalXp").value(20))
+                .andExpect(jsonPath("$.currentStreak").value(1))
+                .andExpect(jsonPath("$.xpToday").value(20));
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/ProgressControllerTest.java
+================================================================================
+package com.bughuntersaga.api;
+
+import com.bughuntersaga.api.application.port.in.ClaimTreasureResult;
+import com.bughuntersaga.api.application.port.in.CompleteLessonUseCase;
+import com.bughuntersaga.api.application.port.in.ClaimTreasureUseCase;
+import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
+import com.bughuntersaga.api.domain.exception.LessonAlreadyCompletedException;
+import com.bughuntersaga.api.domain.exception.LessonNotFoundException;
+import com.bughuntersaga.api.domain.exception.TreasureAlreadyClaimedException;
+import com.bughuntersaga.api.infrastructure.web.controller.ProgressController;
+import com.bughuntersaga.api.infrastructure.web.mapper.ProgressApiMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import com.bughuntersaga.api.infrastructure.security.config.SecurityConfiguration;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(
+        controllers = ProgressController.class,
+        excludeAutoConfiguration = {SecurityConfiguration.class}
+)
+class ProgressControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+
+    @MockitoBean
+    private CompleteLessonUseCase completeLessonUseCase;
+
+    @MockitoBean
+    private ClaimTreasureUseCase claimTreasureUseCase;
+
+    @MockitoBean
+    private ProgressApiMapper progressApiMapper;
+
+    @Test
+    @WithMockUser
+    void completeLesson_shouldReturnBadRequest_whenDtoIsInvalid() throws Exception {
+        String invalidJson = """
+        {
+            "correctAnswerCount": 10,
+            "incorrectAnswerCount": 0,
+            "timeTakenMs": 5000,
+            "isPractice": false
+        }
+        """;
+
+        mockMvc.perform(post("/api/progress/lesson")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation Error"))
+                .andExpect(jsonPath("$.message").value("Lesson ID is required"));
+    }
+
+    @Test
+    @WithMockUser
+    void completeLesson_shouldReturnOk_whenDtoIsValid() throws Exception {
+        String validJson = """
+        {
+            "lessonId": 1,
+            "correctAnswerCount": 10,
+            "incorrectAnswerCount": 0,
+            "timeTakenMs": 5000,
+            "isPractice": false
+        }
+        """;
+
+        CompleteLessonResult result = new CompleteLessonResult(20, 5, 105, 3);
+        when(completeLessonUseCase.handle(any())).thenReturn(result);
+        when(progressApiMapper.toCommand(any())).thenReturn(null);
+        when(progressApiMapper.toDTO(result)).thenCallRealMethod();
+
+        mockMvc.perform(post("/api/progress/lesson")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.xpEarned").value(20))
+                .andExpect(jsonPath("$.newStreak").value(3));
+    }
+    @Test
+    @WithMockUser
+    void completeLesson_shouldReturnConflict_whenLessonAlreadyCompleted() throws Exception {
+        // Arrange
+        String validJson = """
+        { "lessonId": 2, "correctAnswerCount": 5, "incorrectAnswerCount": 0, "timeTakenMs": 10000, "isPractice": false }
+    """;
+
+        // 1. Simular que el Caso de Uso lanza la excepción de Dominio
+        when(progressApiMapper.toCommand(any())).thenReturn(null);
+        when(completeLessonUseCase.handle(any()))
+                .thenThrow(new LessonAlreadyCompletedException("Lección ya completada: 2"));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/progress/lesson")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validJson))
+                .andExpect(status().isConflict()) // Esperar HTTP 409
+                .andExpect(jsonPath("$.error").value("Conflict"))
+                .andExpect(jsonPath("$.message").value("Lección ya completada: 2"));
+    }
+
+    @Test
+    @WithMockUser
+    void completeLesson_shouldReturnNotFound_whenLessonDoesNotExist() throws Exception {
+        // Arrange
+        String validJson = """
+        { "lessonId": 999, "correctAnswerCount": 5, "incorrectAnswerCount": 0, "timeTakenMs": 10000, "isPractice": false }
+    """;
+
+        // 2. Simular que el Caso de Uso lanza la excepción de Dominio
+        when(progressApiMapper.toCommand(any())).thenReturn(null);
+        when(completeLessonUseCase.handle(any()))
+                .thenThrow(new LessonNotFoundException(999));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/progress/lesson")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validJson))
+                .andExpect(status().isNotFound()) // Esperar HTTP 404
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Lesson not found with id: 999"));
+    }
+
+    @Test
+    @WithMockUser
+    void claimTreasure_shouldReturnOkAndLingots() throws Exception {
+        // Arrange
+        Integer lessonId = 4; // ID de un tesoro
+
+        // Simular el resultado del Caso de Uso de Tesoro
+        ClaimTreasureResult result = new ClaimTreasureResult(20, 125);
+        when(claimTreasureUseCase.claimTreasure(lessonId)).thenReturn(result);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/progress/treasure/{lessonId}", lessonId)
+                        .header("Authorization", "Bearer mock-token")) // Simulación del token
+                .andExpect(status().isOk())
+                // El controlador devuelve un Map<String, Integer>
+                .andExpect(jsonPath("$.lingotsEarned").value(20))
+                .andExpect(jsonPath("$.totalLingots").value(125));
+    }
+
+    @Test
+    @WithMockUser
+    void claimTreasure_shouldReturnBadRequest_whenAlreadyClaimed() throws Exception {
+        // Arrange
+        Integer lessonId = 4;
+
+        // Simular que el Caso de Uso lanza la excepción de Dominio
+        when(claimTreasureUseCase.claimTreasure(lessonId))
+                .thenThrow(new TreasureAlreadyClaimedException("Tesoro ya reclamado."));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/progress/treasure/{lessonId}", lessonId)
+                        .header("Authorization", "Bearer mock-token"))
+                .andExpect(status().isBadRequest()) // Esperar HTTP 400 según tu GlobalExceptionHandler
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Tesoro ya reclamado."));
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/RegisterUserServiceTest.java
+================================================================================
+// Ubicación: src/test/java/com/bughuntersaga/api/application/service/RegisterUserServiceTest.java
+
+package com.bughuntersaga.api;
+
+import com.bughuntersaga.api.application.dto.RegisterUserCommand;
+import com.bughuntersaga.api.application.port.out.PasswordEncoderPort;
+import com.bughuntersaga.api.application.port.out.TokenGeneratorPort;
+import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.application.service.RegisterUserService;
+import com.bughuntersaga.api.domain.exception.UsernameAlreadyExistsException;
+import com.bughuntersaga.api.domain.exception.EmailAlreadyExistsException;
+import com.bughuntersaga.api.domain.model.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class RegisterUserServiceTest {
+
+    // Mockeamos todos los puertos (dependencias externas)
+    @Mock
+    private UserRepositoryPort userRepositoryPort;
+    @Mock
+    private UserProfileRepositoryPort userProfileRepositoryPort;
+    @Mock
+    private PasswordEncoderPort passwordEncoderPort;
+    @Mock
+    private TokenGeneratorPort tokenGeneratorPort;
+
+    // Inyectamos los mocks en el servicio que queremos probar
+    @InjectMocks
+    private RegisterUserService registerUserService;
+
+    private RegisterUserCommand command;
+
+    @BeforeEach
+    void setUp() {
+        command = RegisterUserCommand.builder()
+                .username("testuser")
+                .name("Test User")
+                .email("test@example.com")
+                .rawPassword("password123")
+                .build();
+    }
+
+    @Test
+    void register_shouldThrowException_whenUsernameExists() {
+        // Arrange
+        // Simulamos que el puerto del repositorio SÍ encuentra un usuario
+        when(userRepositoryPort.findByUsername("testuser")).thenReturn(Optional.of(new User()));
+
+        // Act & Assert
+        // Verificamos que se lanza la excepción de dominio correcta
+        assertThrows(UsernameAlreadyExistsException.class, () -> {
+            registerUserService.register(command);
+        });
+
+        // Verificamos que no se llamó a ningún otro puerto (fallo rápido)
+        verify(passwordEncoderPort, never()).encode(any());
+        verify(userRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void register_shouldThrowException_whenEmailExists() {
+        // Arrange
+        // Simulamos que el username está libre, pero el email NO
+        when(userRepositoryPort.findByUsername("testuser")).thenReturn(Optional.empty());
+        when(userRepositoryPort.findByEmail("test@example.com")).thenReturn(Optional.of(new User()));
+
+        // Act & Assert
+        assertThrows(EmailAlreadyExistsException.class, () -> {
+            registerUserService.register(command);
+        });
+
+        verify(passwordEncoderPort, never()).encode(any());
+        verify(userRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void register_shouldSaveUserAndProfile_whenDataIsNew() {
+        // Arrange
+        when(userRepositoryPort.findByUsername("testuser")).thenReturn(Optional.empty());
+        when(userRepositoryPort.findByEmail("test@example.com")).thenReturn(Optional.empty());
+
+        when(passwordEncoderPort.encode("password123")).thenReturn("hashedPassword");
+
+        User savedUser = User.builder()
+                .id(UUID.randomUUID())
+                .username("testuser")
+                .build();
+
+        // Simulamos el guardado del usuario
+        when(userRepositoryPort.save(any(User.class))).thenReturn(savedUser);
+
+        when(tokenGeneratorPort.generateToken("testuser")).thenReturn("test.jwt.token");
+
+        // Act
+        var authToken = registerUserService.register(command);
+
+        // Assert
+        assertNotNull(authToken);
+        assertEquals("test.jwt.token", authToken.getToken());
+        assertEquals("testuser", authToken.getUser().getUsername());
+
+        // Verificamos que los puertos fueron llamados en el orden correcto
+        verify(passwordEncoderPort).encode("password123");
+        verify(userRepositoryPort).save(any(User.class));
+        verify(userProfileRepositoryPort).save(any()); // Verificamos que el perfil también se guarda
+        verify(tokenGeneratorPort).generateToken("testuser");
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: java/com/bughuntersaga/api/UserXpHistoryJpaRepositoryTest.java
+================================================================================
+package com.bughuntersaga.api;
+
+
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
+import com.bughuntersaga.api.infrastructure.persistence.entity.UserXpHistoryEntity;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.GamificationPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.mapper.UserPersistenceMapper;
+import com.bughuntersaga.api.infrastructure.persistence.repository.UserXpHistoryJpaRepository;
+import com.bughuntersaga.api.infrastructure.persistence.repository.projections.LeaderboardProjection;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
+
+import java.time.ZonedDateTime;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+@Import({GamificationPersistenceMapper.class, UserPersistenceMapper.class})
+class UserXpHistoryJpaRepositoryTest {
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private UserXpHistoryJpaRepository xpHistoryRepository;
+
+    @Test
+    void findLeaderboardForWeek_shouldSumAndRankUsersCorrectly() {
+        // Arrange
+        ZonedDateTime start = ZonedDateTime.now().minusDays(1);
+        ZonedDateTime end = ZonedDateTime.now().plusDays(1);
+        ZonedDateTime outsideRange = ZonedDateTime.now().minusDays(2);
+
+        // Crear usuarios (necesarios por la FK)
+        UserEntity user1 = UserEntity.builder()
+                .username("player1")
+                .email("player1@test.com")
+                .name("Player One")
+                .passwordHash("hash")
+                .build();
+
+        UserEntity user2 = UserEntity.builder()
+                .username("player2")
+                .email("player2@test.com")
+                .name("Player Two")
+                .passwordHash("hash")
+                .build();
+
+        entityManager.persist(user1);
+        entityManager.persist(user2);
+
+        // Crear historial de XP
+        // Player 1: 10 + 20 = 30 XP
+        entityManager.persist(new UserXpHistoryEntity(null, user1, 10, "LESSON", 1, start.plusHours(1)));
+        entityManager.persist(new UserXpHistoryEntity(null, user1, 20, "LESSON", 2, start.plusHours(2)));
+
+        // Player 2: 15 XP
+        entityManager.persist(new UserXpHistoryEntity(null, user2, 15, "LESSON", 1, start.plusHours(3)));
+
+        // XP fuera de rango (no debe contar)
+        entityManager.persist(new UserXpHistoryEntity(null, user1, 1000, "LESSON", 1, outsideRange));
+
+        entityManager.flush();
+
+        // Act
+        List<LeaderboardProjection> leaderboard = xpHistoryRepository.findLeaderboardForWeek(start, end);
+
+        // Assert
+        assertThat(leaderboard).isNotNull();
+        assertThat(leaderboard).hasSize(2);
+
+        // Verifica el ranking (DESC)
+        assertThat(leaderboard.get(0).getName()).isEqualTo("Player One");
+        assertThat(leaderboard.get(0).getTotalXp()).isEqualTo(30);
+
+        assertThat(leaderboard.get(1).getName()).isEqualTo("Player Two");
+        assertThat(leaderboard.get(1).getTotalXp()).isEqualTo(15);
+    }
+}
