@@ -1,5 +1,6 @@
 package com.bughuntersaga.api.infrastructure.web.controller;
 
+import com.bughuntersaga.api.application.port.in.GetLessonProblemsUseCase;
 import com.bughuntersaga.api.application.port.in.GetModuleProblemsUseCase;
 import com.bughuntersaga.api.application.port.in.GetModuleUnitUseCase;
 import com.bughuntersaga.api.application.port.in.GetModulesUseCase;
@@ -29,6 +30,7 @@ public class ContentController {
     private final GetModulesUseCase getModulesUseCase;
     private final GetModuleProblemsUseCase getModuleProblemsUseCase;
     private final GetModuleUnitUseCase getModuleUnitUseCase;
+    private final GetLessonProblemsUseCase getLessonProblemsUseCase;
 
 
     @GetMapping("")
@@ -56,6 +58,19 @@ public class ContentController {
         // Convertir a DTO
         UnitDetailDTO response = contentApiMapper.toUnitDTO(unit);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/lessons/{lessonId}/problems")
+    public ResponseEntity<List<ProblemDTO>> getProblemsByLesson(@PathVariable("lessonId") Integer lessonId) {
+
+
+        List<Problem> problems = getLessonProblemsUseCase.getProblemsByLessonId(lessonId);
+
+        List<ProblemDTO> problemDTOS = problems.stream()
+                .map(contentApiMapper::toProblemDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(problemDTOS);
     }
 
 }
