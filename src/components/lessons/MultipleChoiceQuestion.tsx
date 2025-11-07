@@ -6,8 +6,8 @@ import type { ModuleLesson } from "~/utils/lessons";
 
 export const MultipleChoiceQuestion = ({
     problem,
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     selectedAnswer,
     setSelectedAnswer,
     quitMessageShown,
@@ -20,8 +20,8 @@ export const MultipleChoiceQuestion = ({
     hearts,
 }: {
     problem: ModuleLesson;
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     selectedAnswer: number | null;
     setSelectedAnswer: React.Dispatch<React.SetStateAction<number | null>>;
     correctAnswerShown: boolean;
@@ -45,21 +45,21 @@ export const MultipleChoiceQuestion = ({
             <div className="flex grow flex-col items-center gap-5">
                 <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
                     <ProgressBar
-                        correctAnswerCount={correctAnswerCount}
-                        totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+                        answeredQuestionsCount={answeredQuestionsCount}
+                        totalQuestionsCount={totalQuestionsCount}
                         setQuitMessageShown={setQuitMessageShown}
                         hearts={hearts}
                     />
                 </div>
                 <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-24 sm:px-5">
                     <h1 className="self-start text-2xl font-bold sm:text-3xl">
-                        {question}
+                        {question || "Pregunta no disponible"}
                     </h1>
                     <div
                         className="grid grid-cols-2 gap-2 sm:grid-cols-3"
                         role="radiogroup"
                     >
-                        {answers.map((answer, i) => {
+                        {answers?.map((answer, i) => {
                             return (
                                 <div
                                     key={i}
@@ -77,13 +77,17 @@ export const MultipleChoiceQuestion = ({
                                     <h2 className="text-center">{answer.name}</h2>
                                 </div>
                             );
-                        })}
+                        }) || (
+                                <div className="col-span-full text-center text-gray-500">
+                                    No hay opciones disponibles
+                                </div>
+                            )}
                     </div>
                 </section>
             </div>
 
             <CheckAnswer
-                correctAnswer={answers[correctAnswer]?.name ?? ""}
+                correctAnswer={answers && correctAnswer !== undefined ? answers[correctAnswer]?.name ?? "" : ""}
                 correctAnswerShown={correctAnswerShown}
                 isAnswerCorrect={isAnswerCorrect}
                 isAnswerSelected={selectedAnswer !== null}

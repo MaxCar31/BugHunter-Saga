@@ -8,7 +8,7 @@ export type LessonSlice = {
 
 export const createLessonSlice: BoundStateCreator<LessonSlice> = (set, get) => ({
   lessonsCompletedByModule: {},
-  getLessonsCompletedForModule: (moduleCode: string) => 
+  getLessonsCompletedForModule: (moduleCode: string) =>
     get().lessonsCompletedByModule[moduleCode] ?? 0,
   increaseLessonsCompleted: (moduleCode: string, by = 1) =>
     set(({ lessonsCompletedByModule }) => ({

@@ -4,15 +4,16 @@ export type Module = {
   id: number;
   code: string;
   name: string;
-  shortName: string; 
+  shortName: string;
   description: string;
   uiConfig: {
     backgroundColor: string;
-    color: string; 
-    borderColor?: string; 
+    color: string;
+    borderColor?: string;
     icon: string;
     textColor?: string;
   };
+  viewBox?: string; // Para compatibilidad con Flag.tsx
 };
 
 export const fetchModules = async (token?: string): Promise<Module[]> => {
@@ -29,9 +30,10 @@ export const fetchModules = async (token?: string): Promise<Module[]> => {
     }
 
     const modules: Module[] = await response.json();
-    
+
     return modules.map((module) => ({
       ...module,
+      viewBox: "0 0 24 19", // Default viewBox para Flag component
       uiConfig: {
         ...module.uiConfig,
         backgroundColor: module.uiConfig.backgroundColor as `bg-${string}`,

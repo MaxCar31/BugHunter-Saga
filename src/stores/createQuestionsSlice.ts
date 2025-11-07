@@ -1,6 +1,6 @@
 import type { StateCreator } from "zustand";
 import type { ModuleLesson } from "~/utils/lessons";
-import { apiBase } from "~/utils/config";
+import { fetchModuleProblems } from "~/utils/lessons";
 export interface QuestionsSlice {
   questions: Record<string, ModuleLesson[]>;
   loadQuestions: (moduleCode: string) => Promise<void>;
@@ -15,46 +15,30 @@ export const createQuestionsSlice: StateCreator<
   QuestionsSlice
 > = (set, get) => ({
   questions: {},
-  
-  loadQuestions: async (moduleCode: string) => {
 
-  if ((get().questions[moduleCode]?.length ?? 0) > 0) {
-    return;
-  }
+  loadQuestions: async (moduleCode: string) => {
+    // Si ya tenemos preguntas para este módulo, no las cargamos de nuevo
+    if ((get().questions[moduleCode]?.length ?? 0) > 0) {
+      return;
+    }
 
     try {
-      // Obtenemos el token de autenticación del localStorage
       const token = localStorage.getItem("bh_token");
-      
-      const response = await fetch(
-        `${apiBase}/api/content/modules/${moduleCode}/problems`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.error("Error 401: Token no válido o expirado.");
-        }
-        throw new Error(`Error ${response.status} cargando preguntas de ${moduleCode}`);
-      }
-
-      const data: ModuleLesson[] = await response.json();
+      const problems = await fetchModuleProblems(moduleCode, token || undefined);
 
       set((state) => ({
-        questions: { ...state.questions, [moduleCode]: data },
+        questions: { ...state.questions, [moduleCode]: problems },
       }));
     } catch (error) {
-      console.error(`Error cargando preguntas para ${moduleCode} desde la API:`, error);
+      console.error(`Error loading questions for ${moduleCode}:`, error);
+
+      // Mantener array vacío en caso de error
       set((state) => ({
         questions: { ...state.questions, [moduleCode]: [] },
       }));
     }
   },
 
-  getQuestionsForModule: (moduleCode: string) => 
+  getQuestionsForModule: (moduleCode: string) =>
     get().questions[moduleCode] || [],
 });

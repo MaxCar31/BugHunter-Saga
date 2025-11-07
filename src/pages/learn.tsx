@@ -33,10 +33,24 @@ import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
-import { apiBase } from "~/utils/config";
+import { fetchModuleUnit } from "~/utils/units";
 import { useRouter } from "next/router";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
+
+const tileStatus = (tile: Tile, lessonsCompleted: number, currentUnit: Unit | null): TileStatus => {
+  const lessonsPerTile = 4;
+  const tilesCompleted = Math.floor(lessonsCompleted / lessonsPerTile);
+  const tileIndex = currentUnit?.tiles.findIndex((t) => t === tile) ?? -1;
+
+  if (tileIndex < tilesCompleted) {
+    return "COMPLETE";
+  }
+  if (tileIndex > tilesCompleted) {
+    return "LOCKED";
+  }
+  return "ACTIVE";
+};
 
 const TileIcon = ({
   tileType,
@@ -97,6 +111,7 @@ const TileIcon = ({
   }
 };
 
+// Nuevo componente que envuelve el icono con una barra de progreso circular
 const tileLeftClassNames = [
   "left-0",
   "left-[-45px]",
@@ -152,9 +167,9 @@ const getTileTooltipLeftOffset = ({
     unitNumber % 2 === 1
       ? tileTooltipLeftOffsets
       : [
-          ...tileTooltipLeftOffsets.slice(4),
-          ...tileTooltipLeftOffsets.slice(0, 4),
-        ];
+        ...tileTooltipLeftOffsets.slice(4),
+        ...tileTooltipLeftOffsets.slice(0, 4),
+      ];
 
   return offsets[index % offsets.length] ?? tileTooltipLeftOffsets[0];
 };
@@ -186,6 +201,7 @@ const TileTooltip = ({
   description,
   status,
   closeTooltip,
+  tile,
 }: {
   selectedTile: number | null;
   index: number;
@@ -193,6 +209,7 @@ const TileTooltip = ({
   description: string;
   status: TileStatus;
   closeTooltip: () => void;
+  tile: Tile;
 }) => {
   const tileTooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -264,10 +281,7 @@ const TileTooltip = ({
         {status === "ACTIVE" ? (
           <Link
             href="/lesson"
-            className={[
-              "flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase",
-              unit.textColor,
-            ].join(" ")}
+            className="flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase text-blue-600 font-bold hover:bg-gray-50 transition-colors"
           >
             Iniciar +10 XP
           </Link>
@@ -307,7 +321,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
   const increaseLessonsCompleted = useBoundStore((x) => x.increaseLessonsCompleted);
   const increaseLingots = useBoundStore((x) => x.increaseLingots);
 
-  const lessonsCompleted = getLessonsCompletedForModule(currentModule.code);
+  const lessonsCompleted = getLessonsCompletedForModule(currentModule?.code || '');
 
   // Mostrar skeleton mientras se carga
   if (!unit) {
@@ -327,11 +341,11 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
         backgroundColor={unit.backgroundColor}
         borderColor={unit.borderColor}
       />
-      <div className="relative mb-8 mt-[67px] flex max-w-2xl flex-col items-center gap-4">
+      <div className="relative mb-12 mt-8 flex max-w-2xl flex-col items-center gap-6 px-4">
         {unit.tiles.map((tile, i): JSX.Element => {
-          // Ahora usamos el status que viene de la API
-          const status = tile.status;
-          
+          // Calcular el estado real basado en el progreso del usuario
+          const status = tileStatus(tile, lessonsCompleted, unit);
+
           return (
             <Fragment key={i}>
               {(() => {
@@ -388,7 +402,8 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                               tile.type === "fast-forward" &&
                               status === "LOCKED"
                             ) {
-                              increaseLessonsCompleted(currentModule.code, i * 4);
+                              // Saltar directamente al tile fast-forward en el módulo actual
+                              increaseLessonsCompleted(currentModule?.code || '', i * 4);
                               return;
                             }
                             setSelectedTile(i);
@@ -412,7 +427,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                         ].join(" ")}
                         onClick={() => {
                           if (status === "ACTIVE") {
-                            increaseLessonsCompleted(currentModule.code, 4);
+                            increaseLessonsCompleted(currentModule?.code || '', 4);
                             increaseLingots(1);
                           }
                         }}
@@ -451,6 +466,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                 })()}
                 status={status}
                 closeTooltip={closeTooltip}
+                tile={tile}
               />
             </Fragment>
           );
@@ -464,53 +480,29 @@ const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
   const router = useRouter();
-  console.log(currentModule);
+
   // --- CARGA DINÁMICA DE LA UNIDAD ---
   const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState(0);
 
-  if (!currentModule) {
-    // Si no hay módulo, mostramos un loader o redirigimos
-    useEffect(() => {
-      // Si después de cargar sigue sin haber módulo, redirige a la selección
-      if (!isLoading && !currentModule) {
-        router.push('/register');
-      }
-    }, [isLoading, currentModule, router]);
-
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-xl">Cargando módulo...</p>
-      </div>
-    );
-  }
+  // Hook para cargar la unidad
   useEffect(() => {
-    const fetchUnit = async () => {
+    const loadUnit = async () => {
+      // Si no hay módulo, no intentar cargar
       if (!currentModule?.code) {
         setIsLoading(false);
-        setError("No se ha seleccionado ningún módulo.");
         return;
       }
 
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("bh_token");
-      
-      try {
-        const response = await fetch(
-          `${apiBase}/api/content/modules/${currentModule.code}/unit`,
-          {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`Error ${response.status} cargando la unidad`);
-        }
 
-        const data: Unit = await response.json();
-        setCurrentUnit(data);
+      try {
+        const token = localStorage.getItem("bh_token");
+        const unit = await fetchModuleUnit(currentModule.code, token || undefined);
+        setCurrentUnit(unit);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
       } finally {
@@ -518,11 +510,19 @@ const Learn: NextPage = () => {
       }
     };
 
-    fetchUnit();
+    void loadUnit();
   }, [currentModule?.code]);
 
-  // Verificar si hay módulo seleccionado
-  if (!currentModule || !currentModule.code) {
+  // Hook para scroll
+  useEffect(() => {
+    const updateScrollY = () => setScrollY(globalThis.scrollY ?? scrollY);
+    updateScrollY();
+    document.addEventListener("scroll", updateScrollY);
+    return () => document.removeEventListener("scroll", updateScrollY);
+  }, [scrollY]);
+
+  // Early returns después de todos los hooks
+  if (!currentModule?.code) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -541,21 +541,38 @@ const Learn: NextPage = () => {
     );
   }
 
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const updateScrollY = () => setScrollY(globalThis.scrollY ?? scrollY);
-    updateScrollY();
-    document.addEventListener("scroll", updateScrollY);
-    return () => document.removeEventListener("scroll", updateScrollY);
-  }, [scrollY]);
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg">
+          <h1 className="text-xl font-bold mb-6 text-gray-800">Cargando módulo...</h1>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
 
-  console.log("Current Unit:", currentUnit);
-  console.log("Current Module:", currentModule);
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md">
+          <h1 className="text-xl font-bold mb-4 text-red-600">Error al cargar</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const topBarColors = {
-      backgroundColor: currentModule.uiConfig?.backgroundColor,
-      borderColor: currentModule.uiConfig?.borderColor,
-    };
+    backgroundColor: currentModule?.uiConfig?.backgroundColor as `bg-${string}` || 'bg-blue-500' as `bg-${string}`,
+    borderColor: currentModule?.uiConfig?.borderColor as `border-${string}` || 'border-blue-700' as `border-${string}`,
+  };
 
   return (
     <>
@@ -565,14 +582,20 @@ const Learn: NextPage = () => {
       />
       <LeftBar selectedTab="Aprender" />
 
-      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
-        <div className="flex max-w-2xl grow flex-col">
+      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12 min-h-screen bg-gray-50">
+        <div className="flex max-w-2xl grow flex-col px-4 sm:px-0">
           {isLoading && <UnitSection unit={null} />}
-          {error && <p className="text-center text-red-500">{error}</p>}
+          {error && (
+            <div className="flex justify-center py-8">
+              <p className="text-center text-red-500 bg-red-50 px-4 py-3 rounded-lg border border-red-200">
+                {error}
+              </p>
+            </div>
+          )}
           {!isLoading && !error && currentUnit && (
             <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
           )}
-          
+
           <div className="sticky bottom-28 left-0 right-0 flex items-end justify-between">
             <Link
               href="/lesson?practice"
@@ -650,7 +673,7 @@ const HoverLabel = ({
 
   return (
     <div
-      className={`absolute z-10 w-max animate-bounce rounded-lg border-2 border-gray-200 bg-white px-3 py-2 font-bold uppercase ${textColor}`}
+      className="absolute z-10 w-max animate-bounce rounded-lg border-2 border-gray-200 bg-white px-3 py-2 font-bold uppercase text-gray-700 shadow-lg"
       style={{
         top: "-25%",
         left: `calc(50% - ${width / 2}px)`,
@@ -680,19 +703,19 @@ const UnitHeader = ({
   const currentModule = useBoundStore((x) => x.module);
   return (
     <article
-      className={["max-w-2xl text-white sm:rounded-xl", backgroundColor].join(
+      className={["max-w-2xl text-white sm:rounded-xl shadow-lg", backgroundColor].join(
         " ",
       )}
     >
-      <header className="flex items-center justify-between gap-4 p-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold">Unidad {unitNumber}</h2>
-          <p className="text-lg">{description}</p>
+      <header className="flex items-center justify-between gap-4 p-6">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-3xl font-bold">Unidad {unitNumber}</h2>
+          <p className="text-xl opacity-90">{description}</p>
         </div>
         <Link
-          href={`/guidebook/${currentModule.code}/${unitNumber}`}
+          href={`/guidebook/${currentModule?.code || ''}/${unitNumber}`}
           className={[
-            "flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 transition hover:text-gray-100",
+            "flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 transition hover:bg-white hover:bg-opacity-20 text-white",
             borderColor,
           ].join(" ")}
         >

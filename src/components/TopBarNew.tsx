@@ -133,7 +133,7 @@ export const TopBar = ({
                       <div className="rounded-2xl border-4 border-blue-400">
                         <ModuleIcon module={module} width={80} />
                       </div>
-                      <span className="font-bold">{module.name}</span>
+                      <span className="font-bold">{module?.name}</span>
                     </div>
                     <Link
                       className="flex flex-col items-center justify-between gap-2"

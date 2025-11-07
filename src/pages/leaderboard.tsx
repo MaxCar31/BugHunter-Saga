@@ -119,7 +119,7 @@ const Leaderboard: NextPage = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
 
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  
+
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
@@ -137,7 +137,7 @@ const Leaderboard: NextPage = () => {
 
   const leaderboardLeague = "Bronze League";
 
-  const leaderboardUsers = useLeaderboardUsers();
+  const { users: leaderboardUsers, isLoading, error } = useLeaderboardUsers();
 
   return (
     <div>
@@ -187,7 +187,17 @@ const Leaderboard: NextPage = () => {
                 <div className="w-full border-b-2 border-gray-200"></div>
               </div>
               <div className="w-full">
-                {leaderboardUsers.map((user, i) => {
+                {isLoading && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-gray-500">Loading leaderboard...</p>
+                  </div>
+                )}
+                {error && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-red-500">Failed to load leaderboard</p>
+                  </div>
+                )}
+                {!isLoading && !error && leaderboardUsers.map((user, i) => {
                   return (
                     <LeaderboardProfile
                       key={user.name}

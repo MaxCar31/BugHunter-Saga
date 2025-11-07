@@ -342,7 +342,7 @@ const Shop: NextPage = () => {
   return (
     <div>
       <TopBar />
-      <LeftBar selectedTab="Shop" />
+      <LeftBar selectedTab="Tienda" />
       <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
         <div className="px-4 pb-20">
           <div className="py-7">
@@ -401,7 +401,7 @@ const Shop: NextPage = () => {
         </div>
         <RightBar />
       </div>
-      <BottomBar selectedTab="Shop" />
+      <BottomBar selectedTab="Tienda" />
     </div>
   );
 };

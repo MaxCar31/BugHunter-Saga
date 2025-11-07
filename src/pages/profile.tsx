@@ -30,7 +30,7 @@ const Profile: NextPage = () => {
         </div>
       </div>
       <div className="pt-[90px]"></div>
-      <BottomBar selectedTab="Profile" />
+      <BottomBar selectedTab="Perfil" />
     </div>
   );
 };

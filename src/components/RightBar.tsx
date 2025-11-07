@@ -25,7 +25,7 @@ export const RightBar = () => {
   const streak = useBoundStore((x) => x.streak);
   const module = useBoundStore((x) => x.module);
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  
+
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
@@ -49,7 +49,7 @@ export const RightBar = () => {
             tabIndex={0}
           >
             <ModuleIcon module={module} width={45} />
-            <div>{module.name}</div>
+            <div>{module?.name}</div>
             <div
               className="absolute top-full z-10 rounded-2xl border-2 border-gray-300 bg-white"
               style={{
@@ -63,7 +63,7 @@ export const RightBar = () => {
               </h2>
               <button className="flex w-full items-center gap-3 border-t-2 border-gray-300 bg-blue-100 px-5 py-3 text-left font-bold">
                 <ModuleIcon module={module} width={45} />
-                <span className="text-blue-500">{module.name}</span>
+                <span className="text-blue-500">{module?.name}</span>
               </button>
               <Link
                 className="flex w-full items-center gap-3 rounded-b-2xl border-t-2 border-gray-300 px-5 py-3 text-left font-bold hover:bg-gray-100"
@@ -168,7 +168,7 @@ export const RightBar = () => {
 
 const UnlockLeaderboardsSection = () => {
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  
+
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
@@ -180,7 +180,7 @@ const UnlockLeaderboardsSection = () => {
   const lessonsNeededToUnlockLeaderboards = 10 - totalLessonsCompleted;
 
   return (
-  <></>
+    <></>
   );
 };
 
@@ -284,7 +284,7 @@ const XpProgressSection = () => {
                 }}
               ></div>
             </div>
-            <LightningProgressSvg/>
+            <LightningProgressSvg />
           </div>
           <span className="text-sm font-normal text-gray-500">
             {xpToday}/{goalXp} XP

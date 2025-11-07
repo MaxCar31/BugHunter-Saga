@@ -7,7 +7,8 @@ import _bgSnow from "../../public/bg-snow.svg";
 import type { StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
 import type { Module } from "~/utils/modules";
-import { apiBase } from "~/utils/config";
+import { fetchModules } from "~/utils/modules";
+
 const bgSnow = _bgSnow as unknown as StaticImageData;
 
 const Register: NextPage = () => {
@@ -20,13 +21,10 @@ const Register: NextPage = () => {
 
 
   useEffect(() => {
-    const fetchModules = async () => {
+    const loadModules = async () => {
       try {
-        const response = await fetch(`${apiBase}/api/content/modules`);
-        if (!response.ok) {
-          throw new Error("No se pudieron cargar los módulos desde la API.");
-        }
-        const data: Module[] = await response.json();
+        const token = localStorage.getItem("bh_token");
+        const data = await fetchModules(token || undefined);
         setModules(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -35,7 +33,7 @@ const Register: NextPage = () => {
       }
     };
 
-    fetchModules();
+    void loadModules();
   }, []);
 
   return (
@@ -48,15 +46,15 @@ const Register: NextPage = () => {
         <h1 className="mt-20 text-center text-3xl font-extrabold tracking-tight text-white">
           Selecciona tu módulo de Testing...
         </h1>
-        
+
         {isLoading && (
           <div className="text-xl">Cargando módulos...</div>
         )}
-        
+
         {error && (
           <div className="text-xl text-red-300">Error: {error}</div>
         )}
-        
+
         {!isLoading && !error && (
           <section className="mx-auto flex w-full max-w-2xl grow flex-col gap-4">
             {modules.map((module) => (

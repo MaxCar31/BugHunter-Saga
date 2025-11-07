@@ -1,0 +1,110 @@
+[
+    {
+        "type": "INFO",
+        "moduleTitle": "La Equivalencia de Particiones es una técnica de caja negra...",
+        "introduction": "Bienvenido a Equivalencia de Particiones"
+    },
+    {
+        "type": "INFO",
+        "moduleTitle": "En lugar de probar TODOS los valores posibles (imposible)...",
+        "introduction": "¿Por qué es importante?"
+    },
+    {
+        "type": "SELECT_1_OF_3",
+        "question": "Un sistema acepta códigos promocionales de 5-10 caracteres. ¿Cuántas clases de equivalencia hay?",
+        "answers": [
+            {
+                "name": "2 clases..."
+            },
+            {
+                "name": "3 clases: menor a 5, 5-10, mayor a 10"
+            },
+            {
+                "name": "6 clases..."
+            }
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "type": "SELECT_1_OF_3",
+        "question": "¿Cuál NO es un beneficio de la Equivalencia de Particiones?",
+        "answers": [
+            {
+                "name": "Reduce el número de casos de prueba"
+            },
+            {
+                "name": "Garantiza encontrar todos los bugs"
+            },
+            {
+                "name": "Cubre rangos completos de valores"
+            }
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "type": "FILL_IN_THE_BLANK",
+        "question": "Para validar un email, identifica las clases de equivalencia. Un email tiene formato: ___@___.___",
+        "answerTiles": [
+            "usuario",
+            "dominio",
+            "extension"
+        ]
+    },
+    {
+        "type": "INFO",
+        "moduleTitle": "Los errores suelen ocurrir en los BORDES de las clases de equivalencia...",
+        "introduction": "¿Qué son los Valores Límite?"
+    },
+    {
+        "type": "INFO",
+        "moduleTitle": "Para un campo de edad válido entre 18-65 años, prueba: 17, 18, 19, 64, 65, 66",
+        "introduction": "Ejemplo Práctico"
+    },
+    {
+        "type": "SELECT_1_OF_3",
+        "question": "Un campo acepta enteros válidos de 10 a 50. ¿Cuál set de pruebas usa BVA de 3 puntos?",
+        "answers": [
+            {
+                "name": "10, 30, 50"
+            },
+            {
+                "name": "9, 10, 11, 49, 50, 51"
+            },
+            {
+                "name": "9, 51"
+            }
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "type": "FILL_IN_THE_BLANK",
+        "question": "BVA se enfoca en los ___ de las particiones de equivalencia, donde es más probable encontrar errores.",
+        "answerTiles": [
+            "respuesta"
+        ]
+    },
+    {
+        "type": "INFO",
+        "moduleTitle": "El BVA 'robusto' es una expansión del BVA normal... considera valores 'muy' inválidos.",
+        "introduction": "¿Qué es BVA Robusto?"
+    },
+    {
+        "type": "MATCH_PAIRS"
+    },
+    {
+        "type": "SELECT_1_OF_3",
+        "question": "Un campo de texto debe tener una longitud de 5 a 10 caracteres. ¿Cuál NO es un valor límite a probar?",
+        "answers": [
+            {
+                "name": "Una cadena de 4 caracteres"
+            },
+            {
+                "name": "Una cadena de 11 caracteres"
+            },
+            {
+                "name": "Una cadena de 7 caracteres"
+            }
+        ],
+        "correctAnswer": 2
+    }
+]

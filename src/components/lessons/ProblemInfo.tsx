@@ -5,16 +5,16 @@ import type { ModuleLesson } from "~/utils/lessons";
 
 export const ProblemInfo = ({
     problem,
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     quitMessageShown,
     setQuitMessageShown,
     onFinish,
     hearts,
 }: {
     problem: ModuleLesson;
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     quitMessageShown: boolean;
     setQuitMessageShown: React.Dispatch<React.SetStateAction<boolean>>;
     onFinish: () => void;
@@ -32,8 +32,8 @@ export const ProblemInfo = ({
             <div className="flex grow flex-col items-center gap-5">
                 <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
                     <ProgressBar
-                        correctAnswerCount={correctAnswerCount}
-                        totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+                        answeredQuestionsCount={answeredQuestionsCount}
+                        totalQuestionsCount={totalQuestionsCount}
                         setQuitMessageShown={setQuitMessageShown}
                         hearts={hearts}
                     />
@@ -41,24 +41,38 @@ export const ProblemInfo = ({
                 <section className="flex max-w-4xl grow flex-col gap-8 self-center sm:items-center sm:justify-center sm:px-5">
                     <div className="text-center">
                         <h1 className="mb-4 text-3xl font-bold text-[#f2a445] sm:text-4xl">
-                            {moduleTitle}
+                            {moduleTitle || "Información del Módulo"}
                         </h1>
                         <div className="mb-6 text-left text-lg leading-relaxed text-gray-700 sm:text-center">
-                            {introduction.split('\n').map((line, i) => (
+                            {introduction?.split('\n').map((line, i) => (
                                 <p key={i} className="mb-3">{line}</p>
-                            ))}
+                            )) || (
+                                    <p className="mb-3 text-gray-500">No hay introducción disponible.</p>
+                                )}
                         </div>
                     </div>
 
                     <div className="w-full max-w-2xl">
                         <h2 className="mb-4 text-xl font-bold text-gray-800">Objetivos del Nivel:</h2>
                         <ul className="space-y-3">
-                            {objectives.map((objective, i) => (
+                            {objectives?.map((objective, i) => (
                                 <li key={i} className="flex items-start gap-3">
                                     <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#f2a445]"></div>
                                     <span className="text-gray-700">{objective}</span>
                                 </li>
-                            ))}
+                            )) || (
+                                    // Objetivos por defecto si no vienen del backend
+                                    [
+                                        "Comprender los conceptos fundamentales del tema",
+                                        "Aplicar las técnicas aprendidas en ejercicios prácticos",
+                                        "Desarrollar habilidades de análisis y resolución de problemas"
+                                    ].map((objective, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#f2a445]"></div>
+                                            <span className="text-gray-700">{objective}</span>
+                                        </li>
+                                    ))
+                                )}
                         </ul>
                     </div>
                 </section>

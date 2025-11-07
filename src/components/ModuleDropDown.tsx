@@ -8,6 +8,10 @@ export const ModuleDropDown = () => {
   const module = useBoundStore((x) => x.module);
   const [modulesShown, setModulesShown] = useState(false);
 
+  if (!module) {
+    return null; // or a loading state
+  }
+
   return (
     <div className="relative">
       <button
