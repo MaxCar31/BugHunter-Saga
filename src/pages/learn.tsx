@@ -33,22 +33,52 @@ import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
-import { fetchModuleUnit } from "~/utils/units";
+import { fetchModuleUnits } from "~/utils/units";
 import { useRouter } from "next/router";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
 
-const tileStatus = (tile: Tile, lessonsCompleted: number, currentUnit: Unit | null): TileStatus => {
-  const lessonsPerTile = 4;
-  const tilesCompleted = Math.floor(lessonsCompleted / lessonsPerTile);
-  const tileIndex = currentUnit?.tiles.findIndex((t) => t === tile) ?? -1;
-
-  if (tileIndex < tilesCompleted) {
+// Nueva función: Calcula el estado de un tile basado en el progreso real
+const calculateTileStatus = (
+  tile: Tile,
+  unit: Unit,
+  allUnits: Unit[],
+  completedLessons: Set<number>
+): TileStatus => {
+  // 1. Si la lección ya está completada
+  if (completedLessons.has(tile.lessonId)) {
     return "COMPLETE";
   }
-  if (tileIndex > tilesCompleted) {
-    return "LOCKED";
+
+  // 2. Verificar si todas las unidades anteriores están completas
+  const currentUnitIndex = allUnits.findIndex(u => u.unitNumber === unit.unitNumber);
+
+  for (let i = 0; i < currentUnitIndex; i++) {
+    const previousUnit = allUnits[i];
+    const allTilesCompleted = previousUnit.tiles.every(t => completedLessons.has(t.lessonId));
+
+    if (!allTilesCompleted) {
+      // Si hay una unidad anterior incompleta, este tile está bloqueado
+      return "LOCKED";
+    }
   }
+
+  // 3. Dentro de la unidad actual, verificar si el tile anterior está completo
+  const tileIndex = unit.tiles.findIndex(t => t.lessonId === tile.lessonId);
+
+  // Primera lección de la unidad
+  if (tileIndex === 0) {
+    return "ACTIVE";
+  }
+
+  // Verificar si todas las lecciones anteriores en esta unidad están completas
+  for (let i = 0; i < tileIndex; i++) {
+    const previousTile = unit.tiles[i];
+    if (!completedLessons.has(previousTile.lessonId)) {
+      return "LOCKED";
+    }
+  }
+
   return "ACTIVE";
 };
 
@@ -280,7 +310,7 @@ const TileTooltip = ({
         </div>
         {status === "ACTIVE" ? (
           <Link
-            href="/lesson"
+            href={`/lesson?lessonId=${tile.lessonId}`}
             className="flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase text-blue-600 font-bold hover:bg-gray-50 transition-colors"
           >
             Iniciar +10 XP
@@ -294,7 +324,7 @@ const TileTooltip = ({
           </button>
         ) : (
           <Link
-            href="/lesson"
+            href={`/lesson?lessonId=${tile.lessonId}&practice=true`}
             className="flex w-full items-center justify-center rounded-xl border-b-4 border-yellow-200 bg-white p-3 uppercase text-yellow-400"
           >
             Practicar +5 XP
@@ -305,7 +335,13 @@ const TileTooltip = ({
   );
 };
 
-const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
+const UnitSection = ({
+  unit,
+  allUnits
+}: {
+  unit: Unit | null;
+  allUnits: Unit[];
+}): JSX.Element => {
   const [selectedTile, setSelectedTile] = useState<null | number>(null);
 
   useEffect(() => {
@@ -317,14 +353,13 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
   const closeTooltip = useCallback(() => setSelectedTile(null), []);
 
   const currentModule = useBoundStore((x) => x.module);
-  const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  const increaseLessonsCompleted = useBoundStore((x) => x.increaseLessonsCompleted);
-  const increaseLingots = useBoundStore((x) => x.increaseLingots);
+  const getCompletedLessons = useBoundStore((x) => x.getCompletedLessons);
+  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
 
-  const lessonsCompleted = getLessonsCompletedForModule(currentModule?.code || '');
+  const completedLessons = getCompletedLessons(currentModule?.code || '');
 
   // Mostrar skeleton mientras se carga
-  if (!unit) {
+  if (!unit || !unit.tiles || unit.tiles.length === 0) {
     return (
       <div className="flex max-w-2xl flex-col items-center gap-8">
         <div className="h-32 w-full animate-pulse rounded-xl bg-gray-200"></div>
@@ -344,7 +379,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
       <div className="relative mb-12 mt-8 flex max-w-2xl flex-col items-center gap-6 px-4">
         {unit.tiles.map((tile, i): JSX.Element => {
           // Calcular el estado real basado en el progreso del usuario
-          const status = tileStatus(tile, lessonsCompleted, unit);
+          const status = calculateTileStatus(tile, unit, allUnits, completedLessons);
 
           return (
             <Fragment key={i}>
@@ -384,10 +419,8 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                         ) : selectedTile !== i && status === "ACTIVE" ? (
                           <HoverLabel text="Start" textColor={unit.textColor} />
                         ) : null}
-                        <LessonCompletionSvg
-                          lessonsCompleted={lessonsCompleted}
-                          status={status}
-                        />
+                        {/* TODO: Implementar conteo de repeticiones de lección */}
+                        {/* <LessonCompletionSvg lessonsCompleted={0} status={status} /> */}
                         <button
                           className={[
                             "absolute m-3 rounded-full border-b-8 p-4",
@@ -402,8 +435,9 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                               tile.type === "fast-forward" &&
                               status === "LOCKED"
                             ) {
-                              // Saltar directamente al tile fast-forward en el módulo actual
-                              increaseLessonsCompleted(currentModule?.code || '', i * 4);
+                              // TODO: Implementar fast-forward con el nuevo sistema de progreso
+                              // Por ahora deshabilitado
+                              console.warn("Fast-forward temporalmente deshabilitado");
                               return;
                             }
                             setSelectedTile(i);
@@ -427,8 +461,9 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                         ].join(" ")}
                         onClick={() => {
                           if (status === "ACTIVE") {
-                            increaseLessonsCompleted(currentModule?.code || '', 4);
-                            increaseLingots(1);
+                            // TODO: Implementar treasure con el nuevo sistema de progreso
+                            // Por ahora deshabilitado
+                            console.warn("Treasure temporalmente deshabilitado");
                           }
                         }}
                         role="button"
@@ -481,15 +516,15 @@ const Learn: NextPage = () => {
   const currentModule = useBoundStore((x) => x.module);
   const router = useRouter();
 
-  // --- CARGA DINÁMICA DE LA UNIDAD ---
-  const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
+  // --- CARGA DINÁMICA DE LAS UNIDADES ---
+  const [units, setUnits] = useState<Unit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [scrollY, setScrollY] = useState(0);
 
-  // Hook para cargar la unidad
+  // Hook para cargar las unidades
   useEffect(() => {
-    const loadUnit = async () => {
+    const loadUnits = async () => {
       // Si no hay módulo, no intentar cargar
       if (!currentModule?.code) {
         setIsLoading(false);
@@ -501,16 +536,18 @@ const Learn: NextPage = () => {
 
       try {
         const token = localStorage.getItem("bh_token");
-        const unit = await fetchModuleUnit(currentModule.code, token || undefined);
-        setCurrentUnit(unit);
+        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
+        console.log("🔍 Units loaded:", loadedUnits);
+        setUnits(loadedUnits);
       } catch (err) {
+        console.error("❌ Error loading units:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
       } finally {
         setIsLoading(false);
       }
     };
 
-    void loadUnit();
+    void loadUnits();
   }, [currentModule?.code]);
 
   // Hook para scroll
@@ -584,7 +621,7 @@ const Learn: NextPage = () => {
 
       <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12 min-h-screen bg-gray-50">
         <div className="flex max-w-2xl grow flex-col px-4 sm:px-0">
-          {isLoading && <UnitSection unit={null} />}
+          {isLoading && <UnitSection unit={null} allUnits={[]} />}
           {error && (
             <div className="flex justify-center py-8">
               <p className="text-center text-red-500 bg-red-50 px-4 py-3 rounded-lg border border-red-200">
@@ -592,9 +629,9 @@ const Learn: NextPage = () => {
               </p>
             </div>
           )}
-          {!isLoading && !error && currentUnit && (
-            <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
-          )}
+          {!isLoading && !error && units.map((unit) => (
+            <UnitSection unit={unit} allUnits={units} key={unit.unitNumber} />
+          ))}
 
           <div className="sticky bottom-28 left-0 right-0 flex items-end justify-between">
             <Link

@@ -56,10 +56,16 @@ const mapBackendProblemToFrontend = (backendProblem: any): ModuleLesson => {
             type = "INFO";
     }
 
-    return {
-        ...backendProblem,
-        type,
-    } as ModuleLesson;
+    // Normalizar objectives como array
+    const normalizedProblem = { ...backendProblem, type };
+
+    if (type === "INFO" && normalizedProblem.objectives) {
+        normalizedProblem.objectives = Array.isArray(normalizedProblem.objectives)
+            ? normalizedProblem.objectives
+            : [normalizedProblem.objectives];
+    }
+
+    return normalizedProblem as ModuleLesson;
 };
 
 // Nueva función para cargar lecciones desde el backend
@@ -84,6 +90,32 @@ export const fetchModuleProblems = async (moduleCode: string, token?: string): P
         return mappedProblems;
     } catch (error) {
         console.error(`Error fetching problems for module ${moduleCode}:`, error);
+        throw error;
+    }
+};
+
+// Nueva función para cargar problemas de una lección específica
+export const fetchLessonProblems = async (lessonId: number, token?: string): Promise<ModuleLesson[]> => {
+    try {
+        const response = await fetch(`${apiBase}/api/content/modules/lessons/${lessonId}/problems`, {
+            headers: {
+                accept: "*/*",
+                ...(token && { Authorization: `Bearer ${token}` }),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status} fetching problems for lesson ${lessonId}`);
+        }
+
+        const data = await response.json();
+
+        // Mapear cada problema del backend al formato del frontend
+        const mappedProblems = data.map(mapBackendProblemToFrontend);
+
+        return mappedProblems;
+    } catch (error) {
+        console.error(`Error fetching problems for lesson ${lessonId}:`, error);
         throw error;
     }
 };

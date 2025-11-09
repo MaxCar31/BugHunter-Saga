@@ -37,18 +37,10 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
     }
 
     @Override
-    public List<Unit> findUnitsByModuleCode(String moduleCode) {
-
+    public List<Unit> findAllUnitsByModuleCode(String moduleCode) {
         return unitJpaRepository.findByModuleCode(moduleCode).stream()
                 .map(this::mapUnitWithLessons)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<Unit> findByIdWithLessons(Integer unitId) {
-
-        return unitJpaRepository.findById(unitId)
-                .map(this::mapUnitWithLessons);
     }
 
     /**
@@ -62,10 +54,10 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
         List<LessonEntity> lessonEntities = lessonJpaRepository
                 .findByUnitIdOrderByPositionAsc(unitEntity.getId());
 
+
         List<Lesson> lessons = lessonEntities.stream()
                 .map(mapper::lessonToDomain)
                 .collect(Collectors.toList());
-
         unit.setLessons(lessons);
 
         return unit;

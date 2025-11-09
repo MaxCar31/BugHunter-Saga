@@ -46,9 +46,12 @@ const formatTime = (timeMs: number): string => {
 const Lesson: NextPage = () => {
   // --- TODOS LOS HOOKS AL PRINCIPIO ---
   const router = useRouter();
+  const lessonId = parseInt(router.query.lessonId as string);
+  const isPractice = "practice" in router.query;
+
   const currentModule = useBoundStore((x) => x.module);
-  const getQuestionsForModule = useBoundStore((x) => x.getQuestionsForModule);
-  const loadQuestions = useBoundStore((x) => x.loadQuestions);
+  const loadLessonProblems = useBoundStore((x) => x.loadLessonProblems);
+  const lessonProblems = useBoundStore((x) => x.problems);
 
   const [lessonProblem, setLessonProblem] = useState(0);
   const [lessonFinished, setLessonFinished] = useState(false);
@@ -66,13 +69,13 @@ const Lesson: NextPage = () => {
   const startTime = useRef(Date.now());
   const endTime = useRef(startTime.current + 1000 * 60 * 3 + 1000 * 33);
 
-  // Cargar preguntas cuando el componente se monta
+  // Cargar problemas de la lección cuando se obtiene el lessonId
   useEffect(() => {
-    if (currentModule?.code) {
-      console.log("Loading questions for module:", currentModule?.code);
-      void loadQuestions(currentModule.code);
+    if (lessonId && !isNaN(lessonId)) {
+      console.log("Loading problems for lesson:", lessonId);
+      void loadLessonProblems(lessonId);
     }
-  }, [currentModule?.code]); // Removido loadQuestions de las dependencias
+  }, [lessonId, loadLessonProblems]);
 
   // Redirigir si no hay módulo
   useEffect(() => {
@@ -83,6 +86,15 @@ const Lesson: NextPage = () => {
 
   // --- LÓGICA CONDICIONAL DESPUÉS DE TODOS LOS HOOKS ---
 
+  // Si no hay lessonId válido, redirigir
+  if (!lessonId || isNaN(lessonId)) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-xl">Redireccionando...</p>
+      </div>
+    );
+  }
+
   // Si no hay módulo, mostrar loading mientras se redirige
   if (!currentModule) {
     return (
@@ -91,11 +103,6 @@ const Lesson: NextPage = () => {
       </div>
     );
   }
-
-  // Obtiene preguntas del módulo actual desde el store
-  const lessonProblems = getQuestionsForModule(currentModule!.code);
-  // console.log("Lesson problems for", currentModule!.code, ":", lessonProblems);
-  // console.log("Current problem type:", lessonProblems[lessonProblem]?.type);
 
   // Verificación: Si no hay preguntas, mostrar mensaje de carga
   if (lessonProblems.length === 0) {
@@ -115,7 +122,7 @@ const Lesson: NextPage = () => {
   const totalCorrectAnswersNeeded = lessonProblems.filter(p => p.type !== "INFO").length;
   // Para la barra de progreso, usar todos los problemas
   const totalQuestionsCount = lessonProblems.length;
-  
+
   // 🎯 PROGRESO CONSISTENTE: Siempre basado en la posición actual + 1
   const currentProgressCount = lessonProblem + 1;
 
@@ -282,7 +289,7 @@ const Lesson: NextPage = () => {
   // 1. Hemos respondido todas las preguntas no-INFO, O
   // 2. Se marcó explícitamente como terminada (para lecciones que terminan en INFO), O
   // 3. Hemos llegado al final de todos los problemas
-  const shouldShowLessonComplete = 
+  const shouldShowLessonComplete =
     lessonFinished ||
     (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
     (lessonProblem >= lessonProblems.length);
@@ -297,6 +304,8 @@ const Lesson: NextPage = () => {
         reviewLessonShown={reviewLessonShown}
         setReviewLessonShown={setReviewLessonShown}
         questionResults={questionResults}
+        lessonId={lessonId}
+        isPractice={isPractice}
       />
     );
   }
@@ -393,23 +402,9 @@ const Lesson: NextPage = () => {
       );
     }
   }
-  };
-
-// Función helper para obtener el lessonId actual basado en el módulo
-// Mapeo temporal basado en unit.json - cada módulo tiene sus propios lessonIds
-const getCurrentLessonId = (moduleCode: string): number => {
-  const moduleToLessonId: Record<string, number> = {
-    "moduleA": 1, // Equivale al primer lessonId del moduleA
-    "moduleB": 2, // Equivale al primer lessonId del moduleB  
-    "moduleC": 3, // Equivale al primer lessonId del moduleC
-    "moduleD": 4, // etc...
-    "moduleE": 5,
-  };
-  
-  return moduleToLessonId[moduleCode] || 1;
 };
 
-export default Lesson;const MultipleChoiceQuestion = ({
+export default Lesson; const MultipleChoiceQuestion = ({
   problem,
   answeredQuestionsCount,
   totalQuestionsCount,
@@ -513,6 +508,8 @@ const LessonComplete = ({
   reviewLessonShown,
   setReviewLessonShown,
   questionResults,
+  lessonId,
+  isPractice,
 }: {
   correctAnswerCount: number;
   incorrectAnswerCount: number;
@@ -521,14 +518,15 @@ const LessonComplete = ({
   reviewLessonShown: boolean;
   setReviewLessonShown: React.Dispatch<React.SetStateAction<boolean>>;
   questionResults: QuestionResult[];
+  lessonId: number;
+  isPractice: boolean;
 }) => {
   const router = useRouter();
-  const isPractice = "practice" in router.query;
 
   // Estados para el API call
   const [isCompletingLesson, setIsCompletingLesson] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
-  
+
   // 🎯 NUEVO: Estado para almacenar la respuesta del backend
   const [backendResponse, setBackendResponse] = useState<{
     xpEarned: number;
@@ -543,9 +541,7 @@ const LessonComplete = ({
   const setLingots = useBoundStore((x) => x.setLingots);
   const setStreak = useBoundStore((x) => x.setStreak);
   const currentStreak = useBoundStore((x) => x.streak);
-  const increaseLessonsCompleted = useBoundStore(
-    (x) => x.increaseLessonsCompleted,
-  );
+  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
   const currentModule = useBoundStore((x) => x.module);
 
   const handleContinue = async () => {
@@ -558,11 +554,7 @@ const LessonComplete = ({
     setIsCompletingLesson(true);
 
     try {
-      // Obtener lessonId basado en el módulo actual
-      // Por ahora uso un mapeo simple - esto se puede mejorar más tarde
-      const lessonId = getCurrentLessonId(currentModule?.code || '');
-      
-      // Preparar la request
+      // Preparar la request usando el lessonId de los props
       const request: LessonCompletionRequest = {
         lessonId,
         correctAnswerCount,
@@ -583,18 +575,19 @@ const LessonComplete = ({
       setStreak(response.newStreak);
       addToday();
 
+      // 🎯 MARCAR LA LECCIÓN COMO COMPLETADA (solo si NO es práctica)
       if (!isPractice) {
-        increaseLessonsCompleted(currentModule?.code || '', 1);
+        markLessonAsCompleted(currentModule?.code || '', lessonId);
       }
 
       setLessonCompleted(true);
-      
+
       // Navegar a /learn
       await router.push("/learn");
 
     } catch (error) {
       console.error("Error completing lesson:", error);
-      
+
       // En caso de error, usar fallback con datos locales
       setBackendResponse({
         xpEarned: correctAnswerCount,
@@ -602,16 +595,18 @@ const LessonComplete = ({
         newTotalLingots: useBoundStore.getState().lingots + (isPractice ? 0 : 5),
         newStreak: currentStreak + 1,
       });
-      
+
       // Actualizar store con fallback local
       increaseXp(correctAnswerCount);
       addToday();
       const currentLingots = useBoundStore.getState().lingots;
       setLingots(currentLingots + (isPractice ? 0 : 5));
+
+      // 🎯 MARCAR LA LECCIÓN COMO COMPLETADA (solo si NO es práctica)
       if (!isPractice) {
-        increaseLessonsCompleted(currentModule?.code || '', 1);
+        markLessonAsCompleted(currentModule?.code || '', lessonId);
       }
-      
+
       // Mostrar mensaje de error pero permitir continuar
       alert("Error guardando progreso en el servidor, pero se guardó localmente.");
       await router.push("/learn");
@@ -679,8 +674,8 @@ const LessonComplete = ({
           <button
             className={[
               "flex w-full items-center justify-center rounded-2xl border-b-4 p-3 font-bold uppercase text-white transition sm:min-w-[150px] sm:max-w-fit",
-              isCompletingLesson 
-                ? "border-gray-400 bg-gray-300 cursor-not-allowed" 
+              isCompletingLesson
+                ? "border-gray-400 bg-gray-300 cursor-not-allowed"
                 : "border-green-600 bg-green-500 hover:brightness-105"
             ].join(" ")}
             onClick={handleContinue}

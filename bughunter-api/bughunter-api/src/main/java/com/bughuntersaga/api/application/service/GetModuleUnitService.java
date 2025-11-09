@@ -13,8 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
-
 
 @Service
 @RequiredArgsConstructor
@@ -26,34 +26,39 @@ public class GetModuleUnitService implements GetModuleUnitUseCase {
     private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
 
     @Override
-    public Unit getModuleUnit(String moduleCode) {
+    public List<Unit> getModuleUnits(String moduleCode) {
 
         // --- 1. Obtener el usuario autenticado ---
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Esto viene del token JWT
+        String username = authentication.getName(); // viene del JWT
 
         User currentUser = userRepositoryPort.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
 
-        // --- 2. Obtener la unidad (Lógica de Fase 2) ---
-        Unit unit = unitRepository.findFirstUnitByModuleCode(moduleCode)
-                .orElseThrow(() -> new RuntimeException("Módulo no encontrado: " + moduleCode));
+        // --- 2. Obtener todas las unidades del módulo ---
+        List<Unit> units = unitRepository.findAllUnitsByModuleCode(moduleCode);
 
-        // --- 3. Obtener el progreso del usuario (Lógica de Fase 4) ---
-        Set<Integer> completedLessonIds = userLessonProgressRepositoryPort
-                .findCompletedLessonIdsByUserId(currentUser.getId());
-
-        // --- 4. Calcular el 'status' real ---
-        if (unit.getLessons() != null) {
-            unit.getLessons().forEach(lesson -> {
-                if (completedLessonIds.contains(lesson.getId())) {
-                    lesson.setStatus("COMPLETE"); // ¡Correcto!
-                } else {
-                    lesson.setStatus("ACTIVE"); // (Lógica de 'LOCKED' se puede añadir después)
-                }
-            });
+        if (units.isEmpty()) {
+            throw new RuntimeException("No se encontraron unidades para el módulo: " + moduleCode);
         }
 
-        return unit;
+        // --- 3. Obtener el progreso del usuario ---
+        Set<Integer> completedLessonIds =
+                userLessonProgressRepositoryPort.findCompletedLessonIdsByUserId(currentUser.getId());
+
+        // --- 4. Actualizar el estado de cada lección ---
+        units.forEach(unit -> {
+            if (unit.getLessons() != null) {
+                unit.getLessons().forEach(lesson -> {
+                    if (completedLessonIds.contains(lesson.getId())) {
+                        lesson.setStatus("COMPLETE");
+                    } else {
+                        lesson.setStatus("ACTIVE");
+                    }
+                });
+            }
+        });
+
+        return units;
     }
 }

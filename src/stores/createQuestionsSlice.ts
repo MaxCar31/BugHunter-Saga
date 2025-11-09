@@ -1,9 +1,11 @@
 import type { StateCreator } from "zustand";
 import type { ModuleLesson } from "~/utils/lessons";
-import { fetchModuleProblems } from "~/utils/lessons";
+import { fetchModuleProblems, fetchLessonProblems } from "~/utils/lessons";
 export interface QuestionsSlice {
   questions: Record<string, ModuleLesson[]>;
+  problems: ModuleLesson[]; // Problemas de la lección actual
   loadQuestions: (moduleCode: string) => Promise<void>;
+  loadLessonProblems: (lessonId: number) => Promise<void>;
   getQuestionsForModule: (moduleCode: string) => ModuleLesson[];
 }
 
@@ -15,6 +17,7 @@ export const createQuestionsSlice: StateCreator<
   QuestionsSlice
 > = (set, get) => ({
   questions: {},
+  problems: [],
 
   loadQuestions: async (moduleCode: string) => {
     // Si ya tenemos preguntas para este módulo, no las cargamos de nuevo
@@ -36,6 +39,18 @@ export const createQuestionsSlice: StateCreator<
       set((state) => ({
         questions: { ...state.questions, [moduleCode]: [] },
       }));
+    }
+  },
+
+  loadLessonProblems: async (lessonId: number) => {
+    try {
+      const token = localStorage.getItem("bh_token");
+      const problems = await fetchLessonProblems(lessonId, token || undefined);
+
+      set({ problems });
+    } catch (error) {
+      console.error(`Error loading problems for lesson ${lessonId}:`, error);
+      set({ problems: [] });
     }
   },
 

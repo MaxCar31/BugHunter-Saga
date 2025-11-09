@@ -20,7 +20,7 @@ export type Tile = {
 export type TileType = Tile["type"];
 
 // Función para cargar unidades desde el backend
-export const fetchModuleUnit = async (moduleCode: string, token?: string): Promise<Unit> => {
+export const fetchModuleUnits = async (moduleCode: string, token?: string): Promise<Unit[]> => {
   try {
     const response = await fetch(`${apiBase}/api/content/modules/${moduleCode}/unit`, {
       headers: {
@@ -30,13 +30,13 @@ export const fetchModuleUnit = async (moduleCode: string, token?: string): Promi
     });
 
     if (!response.ok) {
-      throw new Error(`Error ${response.status} fetching unit for module ${moduleCode}`);
+      throw new Error(`Error ${response.status} fetching units for module ${moduleCode}`);
     }
 
     const data = await response.json();
-    return data as Unit;
+    return data as Unit[];
   } catch (error) {
-    console.error(`Error fetching unit for module ${moduleCode}:`, error);
+    console.error(`Error fetching units for module ${moduleCode}:`, error);
     throw error;
   }
 };

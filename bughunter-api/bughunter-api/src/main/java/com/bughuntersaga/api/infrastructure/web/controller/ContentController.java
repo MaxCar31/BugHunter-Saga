@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,13 +52,13 @@ public class ContentController {
 
 
     @GetMapping("/{moduleCode}/unit")
-    public ResponseEntity<UnitDetailDTO> getUnitsByModule(@PathVariable("moduleCode") String moduleCode) {
+    public ResponseEntity<List<UnitDetailDTO>> getUnitsByModule(@PathVariable("moduleCode") String moduleCode) {
         // Ejecutar caso de uso
-        Unit unit = getModuleUnitUseCase.getModuleUnit(moduleCode);
-
+        List<Unit>units = getModuleUnitUseCase.getModuleUnits(moduleCode);
+        System.out.println(units.toString());
         // Convertir a DTO
-        UnitDetailDTO response = contentApiMapper.toUnitDTO(unit);
-        return ResponseEntity.ok(response);
+        List<UnitDetailDTO> responses = units.stream().map(contentApiMapper::toUnitDetailDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/lessons/{lessonId}/problems")

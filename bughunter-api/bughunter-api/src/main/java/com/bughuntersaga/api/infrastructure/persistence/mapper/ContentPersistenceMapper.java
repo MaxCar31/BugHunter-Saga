@@ -1,5 +1,5 @@
-
 package com.bughuntersaga.api.infrastructure.persistence.mapper;
+
 import com.bughuntersaga.api.domain.model.Lesson;
 import com.bughuntersaga.api.domain.model.Module;
 import com.bughuntersaga.api.domain.model.Problem;
@@ -17,181 +17,141 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Mapper consolidado para entidades de persistencia de Content.
- *
- * Usa nombres ESPECÍFICOS para evitar ambigüedad:
- * - moduleToDomain() / moduleToEntity() ← Para Module
- * - problemToDomain() / problemToEntity() ← Para Problem
- *
+ * Mapper consolidado para entidades de persistencia de contenido.
+ * 
+ * Mapea entidades ↔ modelos de dominio para modules, units, lessons y problems.
+ * 
  * Configuración:
- * - componentModel = "spring": Genera bean de Spring
- * - unmappedTargetPolicy = IGNORE: Ignora campos sin mapear
+ * - componentModel = "spring"
+ * - unmappedTargetPolicy = IGNORE
  */
-@Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
-)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContentPersistenceMapper {
 
-    // ========================================
-    // Mapeo de Module (Automático)
-    // ========================================
+    // ============================================================
+    // MODULE
+    // ============================================================
 
-    /**
-     * Convierte ModuleEntity → Module.
-     * MapStruct genera el código automáticamente.
-     */
     Module moduleToDomain(ModuleEntity moduleEntity);
-
-    /**
-     * Convierte Module → ModuleEntity.
-     * MapStruct genera el código automáticamente.
-     */
     ModuleEntity moduleToEntity(Module module);
 
+    // ============================================================
+    // UNIT
+    // ============================================================
 
-    // ========================================
-    // Mapeo de Unit
-    // ========================================
-
-    /**
-     * Convierte UnitEntity → Unit.
-     *
-     * NOTA: El campo 'lessons' no se mapea automáticamente.
-     * Se debe cargar y asignar manualmente en el adaptador.
-     */
     @Mapping(target = "lessons", ignore = true)
     Unit unitToDomain(UnitEntity entity);
-
     UnitEntity unitToEntity(Unit domain);
 
-    // ========================================
-    // Mapeo de Lesson
-    // ========================================
+    // ============================================================
+    // LESSON
+    // ============================================================
 
-    /**
-     * Convierte LessonEntity → Lesson.
-     *
-     * NOTA: El campo 'status' no existe en la BD.
-     * Se debe asignar manualmente según la lógica de negocio.
-     */
     @Mapping(target = "status", ignore = true)
     Lesson lessonToDomain(LessonEntity entity);
-
     LessonEntity lessonToEntity(Lesson domain);
 
+    // ============================================================
+    // PROBLEM
+    // ============================================================
 
-    // ========================================
-    // Mapeo de Problem
-    // ========================================
-
+    /**
+     * Convierte ProblemEntity → Problem (dominio).
+     * Mapea dinámicamente según el tipo definido en el JSON.
+     */
     default Problem problemToDomain(ProblemEntity entity) {
         if (entity == null) return null;
 
-        Problem.ProblemBuilder builder = Problem.builder()
-                .type(entity.getType());
-
         Map<String, Object> content = entity.getContent();
-        if (content == null) return builder.build();
+        if (content == null) {
+            return Problem.builder()
+                    .type(entity.getType())
+                    .build();
+        }
 
-        // Extraer campos comunes primero (como 'question')
-        builder.question((String) content.get("question"));
+        Problem.ProblemBuilder builder = Problem.builder()
+                .type(entity.getType())
+                .question((String) content.get("question"))
+                .moduleTitle((String) content.get("moduleTitle"))
+                .introduction((String) content.get("introduction"))
+                .objectives((List<String>) content.get("objectives"));
 
-        // Extraer campos específicos del tipo
         switch (entity.getType()) {
-            case "INFO" -> mapInfoType(builder, content);
-            case "SELECT_1_OF_3" -> mapSelectType(builder, content);
-            case "FILL_IN_THE_BLANK" -> mapFillInBlankType(builder, content);
+            case "INFO" -> mapInfo(builder, content);
+            case "MULTIPLE_CHOICE" -> mapMultipleChoice(builder, content);
+            case "FILL_IN_THE_BLANK" -> mapFillInBlank(builder, content);
         }
 
         return builder.build();
     }
 
-    // ... (problemToEntity está bien) ...
+    // ============================================================
+    // Métodos auxiliares por tipo
+    // ============================================================
 
-    // ========================================
-    // Métodos Auxiliares (Corregidos)
-    // ========================================
-
-    /**
-     * Mapea campos para tipo INFO.
-     * CORREGIDO: Extrae: title, content
-     */
     @SuppressWarnings("unchecked")
-    default void mapInfoType(Problem.ProblemBuilder builder, Map<String, Object> content) {
-        // Tu SQL usa 'title', no 'moduleTitle' en el problema
-        builder.introduction((String) content.get("title"));
-
-        // Aquí puedes decidir cómo mapear 'content' y 'example'
-        // Por ejemplo, podrías concatenarlos o usar 'introduction' para 'content'
-        // Asumamos que 'introduction' en el dominio es el 'title' de la BD
-        // y 'moduleTitle' es el 'content' de la BD.
-        builder.moduleTitle((String) content.get("content"));
-
-        // 'objectives' no existe en tu SQL.
+    private void mapInfo(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        // INFO ya tiene moduleTitle, introduction y objectives, nada extra.
     }
 
-    /**
-     * Mapea campos para tipo SELECT_1_OF_3.
-     * CORREGIDO: Extrae: question, options (como answers), correctAnswer
-     */
     @SuppressWarnings("unchecked")
-    default void mapSelectType(Problem.ProblemBuilder builder, Map<String, Object> content) {
-        // 'question' ya se mapea arriba
-
-        // CORREGIDO: Tu SQL usa "options", no "answers"
-        Object answersObj = content.get("options");
-        if (answersObj instanceof List) {
-            List<Map<String, Object>> answersRaw = (List<Map<String, Object>>) answersObj;
-            List<Problem.AnswerOption> answers = answersRaw.stream()
+    private void mapMultipleChoice(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        Object answersObj = content.get("answers");
+        if (answersObj instanceof List<?> answersList) {
+            List<Map<String, Object>> rawAnswers = (List<Map<String, Object>>) answersList;
+            List<Problem.AnswerOption> answers = rawAnswers.stream()
                     .map(map -> Problem.AnswerOption.builder()
-                            // CORREGIDO: Tu SQL usa "text", no "name"
-                            .name((String) map.get("text"))
+                            .name((String) map.get("name"))
                             .build())
                     .collect(Collectors.toList());
             builder.answers(answers);
         }
 
-        // Mapear respuesta correcta
-        // Tu SQL la tiene como String ("b"), pero tu dominio la espera como Integer.
-        // Aquí necesitarás una lógica para convertir "a"->0, "b"->1, "c"->2
         Object correctAnswer = content.get("correctAnswer");
-        if (correctAnswer instanceof String) {
-            switch ((String) correctAnswer) {
-                case "a" -> builder.correctAnswer(0);
-                case "b" -> builder.correctAnswer(1);
-                case "c" -> builder.correctAnswer(2);
-                // Añade más casos si es necesario
-            }
+        if (correctAnswer instanceof Number number) {
+            builder.correctAnswer(number.intValue());
         }
     }
 
-    /**
-     * Mapea campos para tipo FILL_IN_THE_BLANK.
-     * CORREGIDO: Extrae: question, blanks, correctAnswers
-     */
     @SuppressWarnings("unchecked")
-    default void mapFillInBlankType(Problem.ProblemBuilder builder, Map<String, Object> content) {
-        // 'question' ya se mapea arriba
-
-        // CORREGIDO: Tu SQL usa "blanks", no "answerTiles"
-        Object answerTiles = content.get("blanks");
-        if (answerTiles instanceof List) {
-            builder.answerTiles((List<String>) answerTiles);
+    private void mapFillInBlank(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        Object tiles = content.get("answerTiles");
+        if (tiles instanceof List<?> tileList) {
+            builder.answerTiles((List<String>) tileList);
         }
 
-        // CORREGIDO: Tu SQL usa "correctAnswers" (lista de Strings)
-        // pero tu dominio espera "correctAnswerIndices" (lista de Integers)
-        // Por ahora, asumiré que "correctAnswers" de tu SQL *debería*
-        // haber sido "correctAnswerIndices" con números.
-        // Si no, la lógica de conversión es más compleja.
-        Object correctIndices = content.get("correctAnswerIndices"); // Asumiendo que cambias el SQL
-        if (correctIndices instanceof List) {
-            List<Integer> indices = ((List<?>) correctIndices).stream()
-                    .filter(obj -> obj instanceof Number)
-                    .map(obj -> ((Number) obj).intValue())
+        Object indices = content.get("correctAnswerIndices");
+        if (indices instanceof List<?> indexList) {
+            List<Integer> parsed = ((List<?>) indexList).stream()
+                    .filter(o -> o instanceof Number)
+                    .map(o -> ((Number) o).intValue())
                     .collect(Collectors.toList());
-            builder.correctAnswerIndices(indices);
+            builder.correctAnswerIndices(parsed);
         }
+    }
+
+    // ============================================================
+    // problemToEntity
+    // ============================================================
+
+    default ProblemEntity problemToEntity(Problem domain) {
+        if (domain == null) return null;
+
+        Map<String, Object> content = Map.ofEntries(
+                Map.entry("type", domain.getType()),
+                Map.entry("moduleTitle", domain.getModuleTitle()),
+                Map.entry("introduction", domain.getIntroduction()),
+                Map.entry("objectives", domain.getObjectives()),
+                Map.entry("question", domain.getQuestion()),
+                Map.entry("answers", domain.getAnswers()),
+                Map.entry("correctAnswer", domain.getCorrectAnswer()),
+                Map.entry("answerTiles", domain.getAnswerTiles()),
+                Map.entry("correctAnswerIndices", domain.getCorrectAnswerIndices())
+        );
+
+        return ProblemEntity.builder()
+                .type(domain.getType())
+                .content(content)
+                .build();
     }
 }
