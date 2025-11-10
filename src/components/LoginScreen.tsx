@@ -36,6 +36,7 @@ export const LoginScreen = ({
   const logIn = useBoundStore((x) => x.logIn);
   const setUsername = useBoundStore((x) => x.setUsername);
   const setName = useBoundStore((x) => x.setName);
+  const setEmail = useBoundStore((x) => x.setEmail);
 
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +101,7 @@ export const LoginScreen = ({
         localStorage.setItem("bh_token", data.token);
         setUsername(data.user.username);
         setName(data.user.name);
+        setEmail(data.user.email);
         logIn();
         setIsLoading(false);
         void router.push("/learn");
@@ -208,17 +210,16 @@ export const LoginScreen = ({
           </div>
 
           <button
-            className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${
-              isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
-            }`}
-            onClick={() => handleSubmit().catch(() => {})}
+            className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
+              }`}
+            onClick={() => handleSubmit().catch(() => { })}
             disabled={isLoading}
           >
             {isLoading
               ? "Cargando..."
               : loginScreenState === "LOGIN"
-              ? "Iniciar sesión"
-              : "Crear cuenta"}
+                ? "Iniciar sesión"
+                : "Crear cuenta"}
           </button>
           <p className="text-center text-xs leading-5 text-gray-400">
             Al iniciar sesión en BugHunter Saga, aceptas nuestros{" "}

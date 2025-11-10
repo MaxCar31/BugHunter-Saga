@@ -63,11 +63,7 @@ export const MultipleChoiceQuestion = ({
                             return (
                                 <div
                                     key={i}
-                                    className={
-                                        i === selectedAnswer
-                                            ? "cursor-pointer rounded-xl border-2 border-b-4 border-blue-300 bg-blue-100 p-4 text-blue-400"
-                                            : "cursor-pointer rounded-xl border-2 border-b-4 border-gray-200 p-4 hover:bg-gray-100"
-                                    }
+                                    className={`cursor-pointer rounded-xl border-2 border-b-4 p-4 ${i === selectedAnswer ? "border-blue-300 bg-blue-100 text-blue-400" : "border-gray-200 hover:bg-gray-100"}`}
                                     role="radio"
                                     aria-checked={i === selectedAnswer}
                                     tabIndex={0}

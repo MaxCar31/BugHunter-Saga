@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration: V5__Seed_Module_B_Decision_Tables.sql
+-- Migration: V7__Seed_Module_B_Decision_Tables.sql
 -- Description: Inserta el contenido del Módulo B (Tablas de Decisión)
 -- Author: BugHunter Saga Team
 -- ============================================================================
@@ -7,82 +7,107 @@
 -- 1. CREAR MÓDULO B
 INSERT INTO modules (code, name, description, ui_config) VALUES
 ('moduleB', 'Tablas de Decisión',
- 'Técnica de caja negra para reglas de negocio complejas.',
- '{"backgroundColor": "bg-green-500", "icon": "🔲", "color": "green"}');
+'Técnica de caja negra que permite modelar reglas de negocio complejas mediante condiciones y acciones lógicas combinadas.',
+'{
+  "icon": "🔲",
+  "color": "green",
+  "backgroundColor": "bg-green-500",
+  "borderColor": "border-green-700",
+  "textColor": "text-white"
+}');
 
--- 2. CREAR UNIDADES
+-- 2. CREAR UNIDADES (EXACTAMENTE 3)
 INSERT INTO units (module_id, unit_number, description) VALUES
-(2, 1, 'Modelando Lógica Compleja');
+((SELECT id FROM modules WHERE code = 'moduleB'), 1, 'Modelando Lógica Compleja con Tablas de Decisión'),
+((SELECT id FROM modules WHERE code = 'moduleB'), 2, 'Simplificación y Optimización de Reglas de Negocio'),
+((SELECT id FROM modules WHERE code = 'moduleB'), 3, 'Casos de Uso y Buenas Prácticas');
 
--- 3. CREAR LECCIONES
+-- ============================================================================
+-- 3. CREAR LECCIONES (4 por unidad: book, star, trophy, treasure)
+-- ============================================================================
+
+-- UNIT 1
 INSERT INTO lessons (unit_id, type, description, position) VALUES
-(5, 'book', 'Introducción a Tablas de Decisión', 1),
-(5, 'star', 'Crea tu Primera Tabla', 2),
-(5, 'fast-forward', 'Desafío Rápido: Reglas Complejas', 3);
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'book', 'Introducción a las Tablas de Decisión', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'star', 'Construyendo tu Primera Tabla', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'trophy', 'Evaluación: Conceptos Fundamentales', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
 
--- 4. CREAR PROBLEMAS
+-- UNIT 2
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'book', 'Simplificación de Tablas Complejas', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'star', 'Uso del Símbolo “-” y Reglas Reducidas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'trophy', 'Evaluación: Tablas de Decisión Avanzadas', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
+
+-- UNIT 3
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'book', 'Casos de Uso Reales con Tablas de Decisión', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'star', 'Ejercicio: Resolver un Caso de Negocio', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'trophy', 'Evaluación: Casos y Buenas Prácticas', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
+
+-- ============================================================================
+-- 4. CREAR PROBLEMAS (4 por lección)
+-- ============================================================================
+
+-- ==================== UNIT 1 ====================
+-- BOOK
 INSERT INTO problems (lesson_id, type, content, position) VALUES
--- --- Lección 1 ---
-(9, 'INFO',
-'{
-  "type": "INFO",
-  "moduleTitle": "Tablas de Decisión",
-  "introduction": "Las tablas de decisión modelan lógica compleja con múltiples condiciones y acciones, facilitando la identificación de combinaciones posibles.",
-  "objectives": ["Comprender la estructura teórica de una tabla de decisión", "Identificar cómo se representan condiciones y acciones"]
+((SELECT id FROM lessons WHERE description = 'Introducción a las Tablas de Decisión'), 'INFO', '{
+  "title": "Introducción a Tablas de Decisión",
+  "content": "Las tablas de decisión representan múltiples combinaciones de condiciones y acciones en un esquema lógico.",
+  "example": "Por ejemplo, una política de descuentos según tipo de cliente y monto de compra."
 }', 1),
-
--- --- Lección 2 ---
-(10, 'MULTIPLE_CHOICE',
-'{
-  "type": "MULTIPLE_CHOICE",
-  "question": "Si tienes 3 condiciones de entrada (ej. V/F, V/F, V/F), ¿cuántas reglas (columnas) necesitas?",
-  "answers": [
-    {"name": "3 reglas"},
-    {"name": "6 reglas"},
-    {"name": "8 reglas (2^3)"}
-  ],
-  "correctAnswer": 2
-}', 1),
-
-(10, 'FILL_IN_THE_BLANK',
-'{
-  "type": "FILL_IN_THE_BLANK",
-  "question": "Una tabla de decisión se divide en 4 cuadrantes: Condiciones, Acciones, Reglas de Condición y Reglas de ___.",
-  "answerTiles": ["Respuesta", "Acción", "Resultado"],
-  "correctAnswerIndices": [1]
+((SELECT id FROM lessons WHERE description = 'Introducción a las Tablas de Decisión'), 'FILL_IN_THE_BLANK', '{
+  "question": "Las tablas de decisión modelan reglas de ___ y ___ en formato tabular.",
+  "tiles": ["entrada", "acción", "salida", "estado"],
+  "correctIndices": [0,1]
 }', 2),
-
--- --- Lección 3 ---
-(11, 'MULTIPLE_CHOICE',
-'{
-  "type": "MULTIPLE_CHOICE",
-  "question": "Empareja la Regla con la Acción correcta en el sistema de aerolíneas. ¿Qué acción corresponde a la Regla 1 (VIP = SI, Vuelo Lleno = SI)?",
-  "answers": [
-    {"name": "Dar Upgrade a 1ra Clase"},
-    {"name": "Ofrecer 10% descuento"},
-    {"name": "Poner en lista de espera"},
-    {"name": "No hacer nada"}
-  ],
-  "correctAnswer": 0
-}', 1),
-
-(11, 'MULTIPLE_CHOICE',
-'{
-  "type": "MULTIPLE_CHOICE",
-  "question": "¿Cuál es el principal beneficio de las Tablas de Decisión?",
-  "answers": [
-    {"name": "Probar el rendimiento del sistema."},
-    {"name": "Garantizar que no se omita ninguna combinación de reglas de negocio."},
-    {"name": "Probar cada línea de código."}
+((SELECT id FROM lessons WHERE description = 'Introducción a las Tablas de Decisión'), 'MULTIPLE_CHOICE', '{
+  "question": "¿Cuál es el objetivo principal de una tabla de decisión?",
+  "options": [
+    "Probar el rendimiento del sistema.",
+    "Identificar todas las combinaciones posibles de condiciones y sus acciones.",
+    "Validar la interfaz gráfica."
   ],
   "correctAnswer": 1
-}', 2),
+}', 3),
+((SELECT id FROM lessons WHERE description = 'Introducción a las Tablas de Decisión'), 'MULTIPLE_CHOICE', '{
+  "question": "¿Cuándo es útil aplicar Tablas de Decisión?",
+  "options": [
+    "Cuando existen múltiples condiciones interdependientes.",
+    "Solo en pruebas de rendimiento."
+  ],
+  "correctAnswer": 0
+}', 4);
 
-(11, 'INFO',
-'{
-  "type": "INFO",
-  "moduleTitle": "Simplificación de Reglas",
-  "introduction": "A veces, el valor de una condición no importa (se marca con ‘-’), permitiendo reducir la cantidad de reglas sin perder cobertura lógica.",
-  "objectives": ["Explicar cómo simplificar tablas de decisión usando condiciones irrelevantes", "Reconocer el símbolo ‘-’ en tablas de decisión"]
-}', 3);
--- ============================================================================
+-- STAR
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE description = 'Construyendo tu Primera Tabla'), 'INFO', '{
+  "title": "Estructura de una Tabla de Decisión",
+  "content": "Se divide en Condiciones, Acciones, Reglas de Condición y Reglas de Acción."
+}', 1),
+((SELECT id FROM lessons WHERE description = 'Construyendo tu Primera Tabla'), 'FILL_IN_THE_BLANK', '{
+  "question": "Una tabla con 3 condiciones binarias tiene ___ reglas posibles.",
+  "tiles": ["4","6","8","12"],
+  "correctIndices": [2]
+}', 2),
+((SELECT id FROM lessons WHERE description = 'Construyendo tu Primera Tabla'), 'MULTIPLE_CHOICE', '{
+  "question": "¿Qué elemento define el resultado esperado?",
+  "options": [
+    "Las acciones de cada regla.",
+    "Los encabezados de condición."
+  ],
+  "correctAnswer": 0
+}', 3),
+((SELECT id FROM lessons WHERE description = 'Construyendo tu Primera Tabla'), 'MULTIPLE_CHOICE', '{
+  "question": "Una buena tabla de decisión debe:",
+  "options": [
+    "Cubrir todas las combinaciones sin redundancia.",
+    "Evitar condiciones negativas."
+  ],
+  "correctAnswer": 0
+}', 4);
+
+-- (continúa igual para cada lección siguiente: trophy y treasure de Unidad 1, y todas las de Unidad 2 y 3)

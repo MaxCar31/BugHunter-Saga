@@ -40,10 +40,7 @@ export const ProgressBar = ({
                 aria-valuenow={answeredQuestionsCount / Math.max(1, totalQuestionsCount)}
             >
                 <div
-                    className={
-                        "h-full rounded-full bg-green-500 transition-all duration-700 " +
-                        (answeredQuestionsCount > 0 ? "px-2 pt-1 " : "")
-                    }
+                    className={`h-full rounded-full bg-green-500 transition-all duration-700 ${answeredQuestionsCount > 0 ? "px-2 pt-1" : ""}`}
                     style={{
                         width: `${progressPercentage}%`,
                     }}

@@ -55,7 +55,6 @@ public class ContentController {
     public ResponseEntity<List<UnitDetailDTO>> getUnitsByModule(@PathVariable("moduleCode") String moduleCode) {
         // Ejecutar caso de uso
         List<Unit>units = getModuleUnitUseCase.getModuleUnits(moduleCode);
-        System.out.println(units.toString());
         // Convertir a DTO
         List<UnitDetailDTO> responses = units.stream().map(contentApiMapper::toUnitDetailDTO).collect(Collectors.toList());
         return ResponseEntity.ok(responses);

@@ -6,6 +6,7 @@ import { LeftBar } from "~/components/LeftBar";
 import { TopBar } from "~/components/TopBar";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { SettingsRightNav } from "~/components/SettingsRightNav";
+import { updateUserSettings } from "~/services/userService";
 
 const CoachSvg = (props: ComponentProps<"svg">) => {
   return (
@@ -141,6 +142,35 @@ const Coach: NextPage = () => {
   const setGoalXp = useBoundStore((x) => x.setGoalXp);
 
   const [localGoalXp, setLocalGoalXp] = useState(goalXp);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Feature 3: Actualizar la meta de XP diaria
+  const handleSaveChanges = async () => {
+    setError(null);
+    setSuccessMessage(null);
+    setIsLoading(true);
+
+    try {
+      const updated = await updateUserSettings({
+        dailyXpGoal: localGoalXp,
+      });
+
+      // Actualizar el store con la respuesta del servidor
+      setGoalXp(updated.dailyXpGoal as 1 | 10 | 20 | 30 | 50);
+
+      setSuccessMessage("¡Meta diaria actualizada exitosamente!");
+
+      // Limpiar mensaje después de 3 segundos
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error("Error updating daily goal:", err);
+      setError(err instanceof Error ? err.message : "Error al guardar los cambios");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div>
       <TopBar />
@@ -153,12 +183,29 @@ const Coach: NextPage = () => {
           </h1>
           <button
             className="rounded-2xl border-b-4 border-green-600 bg-green-500 px-5 py-3 font-bold uppercase text-white transition hover:brightness-110 disabled:border-b-0 disabled:bg-gray-200 disabled:text-gray-400 disabled:hover:brightness-100"
-            onClick={() => setGoalXp(localGoalXp)}
-            disabled={localGoalXp === goalXp}
+            onClick={handleSaveChanges}
+            disabled={localGoalXp === goalXp || isLoading}
           >
-            Save changes
+            {isLoading ? "Guardando..." : "Save changes"}
           </button>
         </div>
+
+        {/* Mensajes de error y éxito */}
+        {error && (
+          <div className="mx-auto w-full max-w-xl lg:max-w-4xl">
+            <div className="rounded-lg bg-red-100 border border-red-400 text-red-700 px-4 py-3">
+              {error}
+            </div>
+          </div>
+        )}
+        {successMessage && (
+          <div className="mx-auto w-full max-w-xl lg:max-w-4xl">
+            <div className="rounded-lg bg-green-100 border border-green-400 text-green-700 px-4 py-3">
+              {successMessage}
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-center gap-12">
           <div className="flex w-full max-w-xl flex-col gap-8">
             <p className="text-gray-400">
@@ -182,6 +229,7 @@ const Coach: NextPage = () => {
                           : "",
                       ].join(" ")}
                       onClick={() => setLocalGoalXp(xp)}
+                      disabled={isLoading}
                     >
                       <div className="font-bold">{title}</div>
                       <div>{xp} XP per day</div>

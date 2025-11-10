@@ -24,7 +24,7 @@ import { CheckAnswer } from "~/components/lessons/CheckAnswer";
 import { ReviewLesson } from "~/components/lessons/ReviewLesson";
 import { ProblemInfo } from "~/components/lessons/ProblemInfo";
 import { FillInTheBlankQuestion } from "~/components/lessons/FillInTheBlankQuestion";
-// Elimina import de getModuleBLessons (ya no se usa)
+import { MultipleChoiceQuestion } from "~/components/lessons/MultipleChoiceQuestion";
 
 const numbersEqual = (a: readonly number[], b: readonly number[]): boolean => {
   return a.length === b.length && a.every((_, i) => a[i] === b[i]);
@@ -404,101 +404,7 @@ const Lesson: NextPage = () => {
   }
 };
 
-export default Lesson; const MultipleChoiceQuestion = ({
-  problem,
-  answeredQuestionsCount,
-  totalQuestionsCount,
-  selectedAnswer,
-  setSelectedAnswer,
-  quitMessageShown,
-  correctAnswerShown,
-  setQuitMessageShown,
-  isAnswerCorrect,
-  onCheckAnswer,
-  onFinish,
-  onSkip,
-  hearts,
-}: {
-  problem: ModuleLesson;
-  answeredQuestionsCount: number;
-  totalQuestionsCount: number;
-  selectedAnswer: number | null;
-  setSelectedAnswer: React.Dispatch<React.SetStateAction<number | null>>;
-  correctAnswerShown: boolean;
-  quitMessageShown: boolean;
-  setQuitMessageShown: React.Dispatch<React.SetStateAction<boolean>>;
-  isAnswerCorrect: boolean;
-  onCheckAnswer: () => void;
-  onFinish: () => void;
-  onSkip: () => void;
-  hearts: number | null;
-}) => {
-  // Type guard para asegurar que es una lección tipo MULTIPLE_CHOICE
-  if (problem.type !== "MULTIPLE_CHOICE") {
-    return null;
-  }
-
-  const { question, answers = [], correctAnswer } = problem;
-
-  return (
-    <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
-      <div className="flex grow flex-col items-center gap-5">
-        <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
-          <ProgressBar
-            answeredQuestionsCount={answeredQuestionsCount}
-            totalQuestionsCount={totalQuestionsCount}
-            setQuitMessageShown={setQuitMessageShown}
-            hearts={hearts}
-          />
-        </div>
-        <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-24 sm:px-5">
-          <h1 className="self-start text-2xl font-bold sm:text-3xl">
-            {question}
-          </h1>
-          <div
-            className="grid grid-cols-2 gap-2 sm:grid-cols-3"
-            role="radiogroup"
-          >
-            {answers.map((answer, i) => {
-              return (
-                <div
-                  key={i}
-                  className={
-                    i === selectedAnswer
-                      ? "cursor-pointer rounded-xl border-2 border-b-4 border-blue-300 bg-blue-100 p-4 text-blue-400"
-                      : "cursor-pointer rounded-xl border-2 border-b-4 border-gray-200 p-4 hover:bg-gray-100"
-                  }
-                  role="radio"
-                  aria-checked={i === selectedAnswer}
-                  tabIndex={0}
-                  onClick={() => setSelectedAnswer(i)}
-                >
-
-                  <h2 className="text-center">{answer.name}</h2>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </div>
-
-      <CheckAnswer
-        correctAnswer={correctAnswer !== undefined ? answers[correctAnswer]?.name ?? "" : ""}
-        correctAnswerShown={correctAnswerShown}
-        isAnswerCorrect={isAnswerCorrect}
-        isAnswerSelected={selectedAnswer !== null}
-        onCheckAnswer={onCheckAnswer}
-        onFinish={onFinish}
-        onSkip={onSkip}
-      />
-
-      <QuitMessage
-        quitMessageShown={quitMessageShown}
-        setQuitMessageShown={setQuitMessageShown}
-      />
-    </div>
-  );
-};
+export default Lesson;
 
 const LessonComplete = ({
   correctAnswerCount,
@@ -672,12 +578,7 @@ const LessonComplete = ({
             Review lesson
           </button>
           <button
-            className={[
-              "flex w-full items-center justify-center rounded-2xl border-b-4 p-3 font-bold uppercase text-white transition sm:min-w-[150px] sm:max-w-fit",
-              isCompletingLesson
-                ? "border-gray-400 bg-gray-300 cursor-not-allowed"
-                : "border-green-600 bg-green-500 hover:brightness-105"
-            ].join(" ")}
+            className={`flex w-full items-center justify-center rounded-2xl border-b-4 p-3 font-bold uppercase text-white transition sm:min-w-[150px] sm:max-w-fit ${isCompletingLesson ? "border-gray-400 bg-gray-300 cursor-not-allowed" : "border-green-600 bg-green-500 hover:brightness-105"}`}
             onClick={handleContinue}
             disabled={isCompletingLesson}
           >

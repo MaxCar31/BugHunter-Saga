@@ -20,16 +20,10 @@ export const ReviewLesson = ({
         useState<null | QuestionResult>(null);
     return (
         <div
-            className={[
-                "fixed inset-0 flex items-center justify-center p-5 transition duration-300",
-                reviewLessonShown ? "" : "pointer-events-none opacity-0",
-            ].join(" ")}
+            className={`fixed inset-0 flex items-center justify-center p-5 transition duration-300 ${reviewLessonShown ? "" : "pointer-events-none opacity-0"}`}
         >
             <div
-                className={[
-                    "absolute inset-0 bg-black",
-                    reviewLessonShown ? "opacity-75" : "pointer-events-none opacity-0",
-                ].join(" ")}
+                className={`absolute inset-0 bg-black ${reviewLessonShown ? "opacity-75" : "pointer-events-none opacity-0"}`}
                 onClick={() => setReviewLessonShown(false)}
             ></div>
             <div className="relative flex w-full max-w-4xl flex-col gap-5 rounded-2xl border-2 border-gray-200 bg-white p-8">
@@ -49,12 +43,7 @@ export const ReviewLesson = ({
                         return (
                             <button
                                 key={i}
-                                className={[
-                                    "relative flex flex-col items-stretch gap-3 rounded-xl p-5 text-left",
-                                    questionResult.yourResponse === questionResult.correctResponse
-                                        ? "bg-yellow-100 text-yellow-600"
-                                        : "bg-red-100 text-red-500",
-                                ].join(" ")}
+                                className={`relative flex flex-col items-stretch gap-3 rounded-xl p-5 text-left ${questionResult.yourResponse === questionResult.correctResponse ? "bg-yellow-100 text-yellow-600" : "bg-red-100 text-red-500"}`}
                                 onClick={() =>
                                     setSelectedQuestionResult((selectedQuestionResult) =>
                                         selectedQuestionResult === questionResult

@@ -47,13 +47,7 @@ export const CheckAnswer = ({
             </section>
 
             <div
-                className={
-                    correctAnswerShown
-                        ? isAnswerCorrect
-                            ? "fixed bottom-0 left-0 right-0 bg-lime-100 font-bold text-green-600 transition-all"
-                            : "fixed bottom-0 left-0 right-0 bg-red-100 font-bold text-red-500 transition-all"
-                        : "fixed -bottom-52 left-0 right-0"
-                }
+                className={`fixed ${correctAnswerShown ? (isAnswerCorrect ? "bottom-0 bg-lime-100 font-bold text-green-600" : "bottom-0 bg-red-100 font-bold text-red-500") : "-bottom-52"} left-0 right-0 transition-all`}
             >
                 <div className="flex max-w-5xl flex-col gap-4 p-5 sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:p-10 sm:py-14">
                     <>
@@ -78,11 +72,7 @@ export const CheckAnswer = ({
                     </>
                     <button
                         onClick={onFinish}
-                        className={
-                            isAnswerCorrect
-                                ? "w-full rounded-2xl border-b-4 border-green-600 bg-green-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
-                                : "w-full rounded-2xl border-b-4 border-red-600 bg-red-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
-                        }
+                        className={`w-full rounded-2xl border-b-4 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit ${isAnswerCorrect ? "border-green-600 bg-green-500" : "border-red-600 bg-red-500"}`}
                     >
                         Continuar
                     </button>

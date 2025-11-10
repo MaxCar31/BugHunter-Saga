@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import {
   BronzeLeagueSvg,
@@ -18,6 +18,7 @@ import { ModuleIcon } from "./ModuleIcon";
 import type { LoginScreenState } from "./LoginScreen";
 import { LoginScreen } from "./LoginScreen";
 import { useLeaderboardRank } from "~/hooks/useLeaderboard";
+import { getUserStats } from "~/services/userService";
 
 export const RightBar = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
@@ -25,6 +26,13 @@ export const RightBar = () => {
   const streak = useBoundStore((x) => x.streak);
   const module = useBoundStore((x) => x.module);
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
+
+  const setLingots = useBoundStore((x) => x.setLingots);
+  const setStreak = useBoundStore((x) => x.setStreak);
+  const setTotalXp = useBoundStore((x) => x.setTotalXp);
+  const setXpToday = useBoundStore((x) => x.setXpToday);
+  const setActiveDays = useBoundStore((x) => x.setActiveDays);
+  const setLeagueRank = useBoundStore((x) => x.setLeagueRank);
 
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
@@ -35,6 +43,28 @@ export const RightBar = () => {
   const [now, setNow] = useState(dayjs());
   const [gemsShown, setGemsShown] = useState(false);
   const [loginScreenState, setLoginScreenState] = useState<LoginScreenState>("HIDDEN");
+
+  // ✅ Cargar estadísticas del usuario al montar el componente
+  useEffect(() => {
+    if (!loggedIn) return;
+
+    const loadStats = async () => {
+      try {
+        const stats = await getUserStats();
+
+        setLingots(stats.totalLingots);
+        setStreak(stats.currentStreak);
+        setTotalXp(stats.totalXp);
+        setXpToday(stats.xpToday);
+        setActiveDays(stats.activeDays);
+        setLeagueRank(stats.leagueRank);
+      } catch (error) {
+        console.error("Error loading user stats:", error);
+      }
+    };
+
+    loadStats();
+  }, [loggedIn, setLingots, setStreak, setTotalXp, setXpToday, setActiveDays, setLeagueRank]);
 
   return (
     <>
@@ -186,8 +216,9 @@ const UnlockLeaderboardsSection = () => {
 
 const LeaderboardRankSection = () => {
   const xpThisWeek = useBoundStore((x) => x.xpThisWeek());
-  const rank = useLeaderboardRank();
+  const leagueRank = useBoundStore((x) => x.leagueRank);
   const leaderboardLeague = "Liga Bronce";
+
   return (
     <article className="flex flex-col gap-5 rounded-2xl border-2 border-gray-200 p-6 text-gray-700">
       <div className="flex items-center justify-between">
@@ -200,7 +231,7 @@ const LeaderboardRankSection = () => {
         <div className="flex items-center justify-center">
           <BronzeLeagueSvg />
           <span className="absolute text-xl font-black text-white">
-            {rank}
+            {leagueRank ?? "-"}
           </span>
         </div>
         <div className="flex flex-col gap-2">

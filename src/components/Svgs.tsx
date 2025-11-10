@@ -245,24 +245,37 @@ export const ChevronRightSvg = () => {
 export const CheckmarkSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <g clipPath="url(#clip0_7030_116512)">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M18.5239 18.112L14.4053 13.9934C13.1459 12.734 11.104 12.734 9.84455 13.9934C8.58514 15.2528 8.58514 17.2947 9.84455 18.5541L16.1331 24.8427C16.7889 25.4985 17.6569 25.8128 18.5161 25.7856C19.3802 25.817 20.2545 25.5028 20.9142 24.8432L32.2521 13.5053C33.5115 12.2459 33.5115 10.204 32.2521 8.94456C30.9927 7.68515 28.9508 7.68515 27.6914 8.94456L18.5239 18.112Z"
-          fill="#CD7900"
-        />
-      </g>
       <defs>
-        <clipPath id="clip0_7030_116512">
-          <rect
-            width="24.2966"
-            height="17.7878"
-            fill="white"
-            transform="translate(8.89999 8)"
-          />
-        </clipPath>
+        <linearGradient id="checkGrad" x1="21" y1="8" x2="21" y2="26">
+          <stop offset="0%" stopColor="#58CC02" />
+          <stop offset="100%" stopColor="#46A302" />
+        </linearGradient>
       </defs>
+
+      {/* Circular Sky Blue Background */}
+      <circle cx="21" cy="17" r="16" fill="#87CEEB" opacity="0.3" />
+      <circle cx="21" cy="17" r="14" fill="#87CEEB" opacity="0.2" />
+
+      {/* Success Circle Background */}
+      <circle cx="21" cy="17" r="12" fill="url(#checkGrad)" />
+      <circle cx="21" cy="17" r="11" fill="#58CC02" opacity="0.3" />
+
+      {/* Checkmark - Bold and Clear */}
+      <path
+        d="M16 17.5 L19.5 21.5 L27 13"
+        stroke="#FFF"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+
+      {/* Shine effect */}
+      <circle cx="17" cy="13" r="1.5" fill="#FFF" opacity="0.6" />
+      <circle cx="25" cy="15" r="1" fill="#FFF" opacity="0.5" />
+
+      {/* Outer glow */}
+      <circle cx="21" cy="17" r="13" stroke="#58CC02" strokeWidth="0.5" opacity="0.4" fill="none" />
     </svg>
   );
 };
@@ -285,22 +298,68 @@ export const GoldenShineSvg = () => {
 export const StarSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <g clipPath="url(#clip0_7030_116432)">
-        <path
-          d="M18.7521 4.41157C19.6598 2.52948 22.3402 2.52948 23.2479 4.41157L25.8539 9.81517C26.225 10.5847 26.9639 11.1109 27.8125 11.2099L33.7906 11.9076C35.9269 12.1569 36.7684 14.8114 35.1658 16.2459L30.8845 20.0785C30.224 20.6697 29.9267 21.567 30.1035 22.4357L31.2468 28.053C31.6684 30.124 29.4857 31.7487 27.6228 30.7506L22.1786 27.8339C21.4424 27.4395 20.5576 27.4395 19.8214 27.8339L14.3772 30.7506C12.5143 31.7487 10.3316 30.124 10.7532 28.053L11.8965 22.4357C12.0733 21.567 11.776 20.6697 11.1155 20.0785L6.83415 16.2459C5.23162 14.8114 6.07307 12.1569 8.20939 11.9076L14.1875 11.2099C15.0361 11.1109 15.775 10.5847 16.1461 9.81517L18.7521 4.41157Z"
-          fill="white"
-        />
-      </g>
       <defs>
-        <clipPath id="clip0_7030_116432">
-          <rect
-            width="30"
-            height="28"
-            fill="white"
-            transform="translate(6 3)"
-          />
-        </clipPath>
+        <linearGradient id="bugBodyGrad" x1="21" y1="8" x2="21" y2="26">
+          <stop offset="0%" stopColor="#FF6B6B" />
+          <stop offset="50%" stopColor="#FF5252" />
+          <stop offset="100%" stopColor="#E64545" />
+        </linearGradient>
+        <linearGradient id="bugShellGrad" x1="21" y1="14" x2="21" y2="24">
+          <stop offset="0%" stopColor="#FF8A80" />
+          <stop offset="100%" stopColor="#FF5252" />
+        </linearGradient>
       </defs>
+
+      {/* Circular Sky Blue Background */}
+      <circle cx="21" cy="17" r="16" fill="#87CEEB" opacity="0.3" />
+      <circle cx="21" cy="17" r="14" fill="#87CEEB" opacity="0.2" />
+
+      {/* Bug Icon - Stylized Ladybug for Gaming */}
+
+      {/* Bug Body Shell (Two-part like ladybug) */}
+      <ellipse cx="21" cy="19" rx="6" ry="7.5" fill="url(#bugShellGrad)" />
+
+      {/* Shell Division Line */}
+      <line x1="21" y1="12" x2="21" y2="26" stroke="#D32F2F" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Bug Spots (Black dots like ladybug) */}
+      <circle cx="18" cy="16" r="1.3" fill="#1A1A1A" />
+      <circle cx="24" cy="16" r="1.3" fill="#1A1A1A" />
+      <circle cx="17.5" cy="20" r="1.5" fill="#1A1A1A" />
+      <circle cx="24.5" cy="20" r="1.5" fill="#1A1A1A" />
+      <circle cx="19" cy="23" r="1.2" fill="#1A1A1A" />
+      <circle cx="23" cy="23" r="1.2" fill="#1A1A1A" />
+
+      {/* Bug Head */}
+      <circle cx="21" cy="12" r="3.5" fill="#1A1A1A" />
+
+      {/* Bug Eyes (cute gaming style) */}
+      <circle cx="19.2" cy="11.5" r="1.3" fill="#FFF" />
+      <circle cx="22.8" cy="11.5" r="1.3" fill="#FFF" />
+      <circle cx="19.5" cy="11.3" r="0.7" fill="#1A1A1A" />
+      <circle cx="23.1" cy="11.3" r="0.7" fill="#1A1A1A" />
+      <circle cx="19.2" cy="11" r="0.3" fill="#FFF" opacity="0.8" />
+      <circle cx="22.8" cy="11" r="0.3" fill="#FFF" opacity="0.8" />
+
+      {/* Bug Antennae with cute balls */}
+      <path d="M18.5 10 Q17 8.5 16 7.5" stroke="#1A1A1A" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      <path d="M23.5 10 Q25 8.5 26 7.5" stroke="#1A1A1A" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      <circle cx="16" cy="7.5" r="1.2" fill="#FF6B6B" />
+      <circle cx="26" cy="7.5" r="1.2" fill="#FF6B6B" />
+      <circle cx="16" cy="7.5" r="0.5" fill="#FFF" opacity="0.6" />
+      <circle cx="26" cy="7.5" r="0.5" fill="#FFF" opacity="0.6" />
+
+      {/* Bug Legs - Cartoony style (3 on each side) */}
+      <path d="M15.5 16 Q12 16 11 14.5" stroke="#1A1A1A" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+      <path d="M15 19.5 Q11.5 20 10 19.5" stroke="#1A1A1A" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+      <path d="M15.5 23 Q12 24 11 25.5" stroke="#1A1A1A" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+
+      <path d="M26.5 16 Q30 16 31 14.5" stroke="#1A1A1A" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+      <path d="M27 19.5 Q30.5 20 32 19.5" stroke="#1A1A1A" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+      <path d="M26.5 23 Q30 24 31 25.5" stroke="#1A1A1A" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+
+      {/* Shine/highlight on shell */}
+      <ellipse cx="18" cy="15" rx="1.5" ry="2" fill="#FFF" opacity="0.4" />
     </svg>
   );
 };
@@ -308,29 +367,26 @@ export const StarSvg = () => {
 export const LockedBookSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <path
-        d="M42 8.49236C42 6.4901 40.3329 4.86694 38.2765 4.86694H29.9359C24.4521 4.86694 20.0066 9.19536 20.0066 14.5347V31.8401C20.0066 32.5075 20.5686 33.0638 21.2481 32.9753C25.129 32.4696 23.7034 29.5177 30.4323 29.5177C32.3039 29.5177 36.1106 29.5177 38.2776 29.5177C40.3341 29.5177 42 27.8945 42 25.8923V8.49236Z"
-        fill="#AFAFAF"
-      />
-      <path
-        d="M0 8.49237C0 6.4901 1.66706 4.86694 3.72348 4.86694H12.0641C17.5479 4.86694 21.9934 9.19536 21.9934 14.5347V31.8401C21.9934 32.5075 21.4313 33.0594 20.749 32.9948C15.97 32.5427 18.3992 29.3905 11.5676 29.3905C9.69604 29.3905 5.88932 29.3905 3.72233 29.3905C1.66591 29.3905 0 27.7673 0 25.765V8.49237Z"
-        fill="#AFAFAF"
-      />
-      <path
-        d="M36.8864 3.90058C36.8864 2.29877 35.5527 1.00024 33.9076 1.00024H27.95C23.563 1.00024 20.0066 4.46298 20.0066 8.73448V26.1365C20.0066 26.6704 20.4591 27.1221 20.9949 27.0082C23.3482 26.5078 23.1355 24.2029 28.4465 24.2029C29.9718 24.2029 32.1481 24.2029 33.9087 24.2029C35.5538 24.2029 36.8864 22.9044 36.8864 21.3026V3.90058Z"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M5.11316 3.90058C5.11316 2.29877 6.44681 1.00024 8.09194 1.00024H14.0495C18.4366 1.00024 21.9929 4.46298 21.9929 8.73448V26.1365C21.9929 26.6704 21.5445 27.1184 21.0036 27.0307C18.236 26.5817 18.9484 24.2029 13.5531 24.2029C12.0277 24.2029 9.85141 24.2029 8.09083 24.2029C6.44569 24.2029 5.11316 22.9044 5.11316 21.3026V3.90058Z"
-        fill="#D8D8D8"
-      />
-      <path
-        opacity="0.4"
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M19.5113 3.11898C20.0999 3.66189 20.6032 4.29157 20.9995 4.987C21.3964 4.29065 21.9005 3.66022 22.4901 3.11682V26.2959C22.2659 26.4645 22.0336 26.6186 21.769 26.7459C21.5866 26.9583 21.3098 27.0806 21.0034 27.0308C20.9797 27.027 20.9563 27.023 20.9332 27.0189C20.7276 27.0465 20.5368 26.9915 20.3824 26.8822C20.0419 26.7707 19.7625 26.6235 19.5113 26.4552V3.11898Z"
-        fill="#AFAFAF"
-      />
+      {/* Test Case Document - Locked */}
+      <rect x="8" y="2" width="26" height="30" rx="2" fill="#D8D8D8" />
+      <rect x="8" y="2" width="26" height="30" rx="2" stroke="#AFAFAF" strokeWidth="1.5" />
+
+      {/* Document Header */}
+      <rect x="11" y="5" width="20" height="2" rx="1" fill="#AFAFAF" />
+      <rect x="11" y="8" width="14" height="1.5" rx="0.75" fill="#BFBFBF" />
+
+      {/* Checklist Items - Locked (all unchecked) */}
+      <rect x="12" y="13" width="3" height="3" rx="0.5" stroke="#AFAFAF" strokeWidth="1" fill="none" />
+      <rect x="16" y="14" width="12" height="1" rx="0.5" fill="#AFAFAF" />
+
+      <rect x="12" y="18" width="3" height="3" rx="0.5" stroke="#AFAFAF" strokeWidth="1" fill="none" />
+      <rect x="16" y="19" width="10" height="1" rx="0.5" fill="#AFAFAF" />
+
+      <rect x="12" y="23" width="3" height="3" rx="0.5" stroke="#AFAFAF" strokeWidth="1" fill="none" />
+      <rect x="16" y="24" width="11" height="1" rx="0.5" fill="#AFAFAF" />
+
+      <rect x="12" y="28" width="3" height="3" rx="0.5" stroke="#AFAFAF" strokeWidth="1" fill="none" />
+      <rect x="16" y="29" width="9" height="1" rx="0.5" fill="#AFAFAF" />
     </svg>
   );
 };
@@ -338,26 +394,32 @@ export const LockedBookSvg = () => {
 export const ActiveBookSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M19.5113 8.14018C17.6919 6.13294 15.0298 4.86694 12.0641 4.86694H3.72348C1.66706 4.86694 0 6.4901 0 8.49237V25.765C0 27.7673 1.66591 29.3905 3.72233 29.3905H11.5676C15.368 29.3905 16.3025 30.366 17.2063 31.3095C17.9272 32.062 18.6285 32.7942 20.749 32.9948C20.853 33.0046 20.9541 33.0002 21.0509 32.9832C21.1152 32.9865 21.1811 32.984 21.2481 32.9753C22.8488 32.7667 23.5467 32.142 24.2865 31.4799C25.3402 30.5367 26.4787 29.5177 30.4323 29.5177H38.2776C40.3341 29.5177 42 27.8945 42 25.8923V8.49236C42 6.4901 40.3329 4.86694 38.2765 4.86694H29.9359C26.9709 4.86694 24.3095 6.13229 22.4901 8.13863V26.2959C22.2659 26.4645 22.0336 26.6186 21.769 26.7459C21.5866 26.9583 21.3098 27.0806 21.0034 27.0308C20.9797 27.027 20.9563 27.023 20.9332 27.0189C20.7276 27.0465 20.5368 26.9915 20.3824 26.8822C20.0419 26.7707 19.7625 26.6235 19.5113 26.4552V8.14018Z"
-        fill="black"
-        fillOpacity="0.2"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.11316 3.90058C5.11316 2.29877 6.44681 1.00024 8.09194 1.00024H14.0495C17.04 1.00024 19.6446 2.60928 20.9997 4.9867C20.9997 4.9868 20.9996 4.9869 20.9995 4.987C20.6032 4.29157 20.0999 3.66189 19.5113 3.11898V26.4549C19.2475 26.2781 19.0148 26.0781 18.7751 25.8721C17.8556 25.0819 16.8328 24.2029 13.5531 24.2029H8.09083C6.44569 24.2029 5.11316 22.9044 5.11316 21.3026V3.90058ZM21.5861 26.9072C21.6541 26.8626 21.7157 26.8081 21.7691 26.7458C22.2102 26.5336 22.5617 26.247 22.9349 25.9427C23.9252 25.1353 25.0687 24.2029 28.4465 24.2029H33.9087C35.5538 24.2029 36.8864 22.9044 36.8864 21.3026V3.90058C36.8864 2.29877 35.5527 1.00024 33.9076 1.00024H27.95C25.8352 1.00024 23.9135 1.80489 22.4901 3.1169V26.2959C22.2659 26.4645 22.0336 26.6186 21.769 26.7459C21.7156 26.8081 21.6541 26.8626 21.5861 26.9072Z"
-        fill="white"
-      />
-      <path
-        opacity="0.4"
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M19.5113 3.11898C20.0999 3.66189 20.6032 4.29157 20.9995 4.987C21.3964 4.29065 21.9005 3.66022 22.4901 3.11682V26.2959C22.2659 26.4645 22.0336 26.6186 21.769 26.7459C21.5866 26.9583 21.3098 27.0806 21.0034 27.0308C20.9797 27.027 20.9563 27.023 20.9332 27.0189C20.7276 27.0465 20.5368 26.9915 20.3824 26.8822C20.0419 26.7707 19.7625 26.6235 19.5113 26.4552V3.11898Z"
-        fill="white"
-      />
+      {/* Test Case Document - Active */}
+      <rect x="8" y="2" width="26" height="30" rx="2" fill="white" />
+      <rect x="8" y="2" width="26" height="30" rx="2" stroke="#58CC02" strokeWidth="2" />
+
+      {/* Document Header */}
+      <rect x="11" y="5" width="20" height="2" rx="1" fill="#58CC02" />
+      <rect x="11" y="8" width="14" height="1.5" rx="0.75" fill="#89E219" />
+
+      {/* Checklist Items - Active (some checked) */}
+      {/* Item 1 - Checked */}
+      <rect x="12" y="13" width="3" height="3" rx="0.5" fill="#58CC02" />
+      <path d="M12.8 15L13.5 15.7L14.8 14" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="14" width="12" height="1" rx="0.5" fill="#58CC02" />
+
+      {/* Item 2 - Checked */}
+      <rect x="12" y="18" width="3" height="3" rx="0.5" fill="#58CC02" />
+      <path d="M12.8 20L13.5 20.7L14.8 19" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="19" width="10" height="1" rx="0.5" fill="#58CC02" />
+
+      {/* Item 3 - Unchecked */}
+      <rect x="12" y="23" width="3" height="3" rx="0.5" stroke="#58CC02" strokeWidth="1" fill="none" />
+      <rect x="16" y="24" width="11" height="1" rx="0.5" fill="#BFBFBF" />
+
+      {/* Item 4 - Unchecked */}
+      <rect x="12" y="28" width="3" height="3" rx="0.5" stroke="#58CC02" strokeWidth="1" fill="none" />
+      <rect x="16" y="29" width="9" height="1" rx="0.5" fill="#BFBFBF" />
     </svg>
   );
 };
@@ -365,29 +427,38 @@ export const ActiveBookSvg = () => {
 export const GoldenBookSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <path
-        d="M42 8.49241C42 6.49014 40.3329 4.86699 38.2765 4.86699H29.9359C24.4521 4.86699 20.0066 9.19541 20.0066 14.5348V31.8401C20.0066 32.5075 20.5687 33.0638 21.2481 32.9753C25.1291 32.4696 23.7034 29.5177 30.4324 29.5177C32.304 29.5177 36.1107 29.5177 38.2777 29.5177C40.3341 29.5177 42 27.8946 42 25.8923V8.49241Z"
-        fill="#CD7900"
-      />
-      <path
-        d="M0 8.49241C0 6.49015 1.66706 4.86699 3.72348 4.86699H12.0641C17.5479 4.86699 21.9934 9.19541 21.9934 14.5348V31.8401C21.9934 32.5075 21.4313 33.0594 20.749 32.9949C15.97 32.5427 18.3992 29.3905 11.5676 29.3905C9.69604 29.3905 5.88932 29.3905 3.72233 29.3905C1.66591 29.3905 0 27.7674 0 25.7651V8.49241Z"
-        fill="#CD7900"
-      />
-      <path
-        d="M36.8864 3.90056C36.8864 2.29875 35.5528 1.00023 33.9076 1.00023H27.95C23.563 1.00023 20.0066 4.46296 20.0066 8.73446V26.1365C20.0066 26.6704 20.4592 27.1221 20.9949 27.0082C23.3482 26.5078 23.1356 24.2029 28.4465 24.2029C29.9719 24.2029 32.1482 24.2029 33.9087 24.2029C35.5539 24.2029 36.8864 22.9044 36.8864 21.3026V3.90056Z"
-        fill="#FFF1C0"
-      />
-      <path
-        d="M5.11316 3.90056C5.11316 2.29875 6.44681 1.00023 8.09194 1.00023H14.0495C18.4366 1.00023 21.9929 4.46296 21.9929 8.73446V26.1365C21.9929 26.6704 21.5445 27.1184 21.0036 27.0307C18.236 26.5817 18.9484 24.2029 13.5531 24.2029C12.0277 24.2029 9.85141 24.2029 8.09083 24.2029C6.44569 24.2029 5.11316 22.9044 5.11316 21.3026V3.90056Z"
-        fill="#FFF1C0"
-      />
-      <path
-        opacity="0.4"
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M19.5113 3.11903C20.0999 3.66193 20.6032 4.29162 20.9996 4.98705C21.3965 4.2907 21.9005 3.66027 22.4901 3.11687V26.2959C22.2659 26.4645 22.0336 26.6186 21.769 26.7459C21.5866 26.9584 21.3099 27.0806 21.0034 27.0309C20.9797 27.0271 20.9564 27.0231 20.9332 27.019C20.7277 27.0466 20.5368 26.9915 20.3824 26.8822C20.0419 26.7708 19.7625 26.6235 19.5113 26.4552V3.11903Z"
-        fill="#E6A000"
-      />
+      {/* Test Case Document - Golden (All Tests Passed) */}
+      <rect x="8" y="2" width="26" height="30" rx="2" fill="#FFF1C0" />
+      <rect x="8" y="2" width="26" height="30" rx="2" stroke="#FFD600" strokeWidth="2" />
+
+      {/* Document Header */}
+      <rect x="11" y="5" width="20" height="2" rx="1" fill="#FFD600" />
+      <rect x="11" y="8" width="14" height="1.5" rx="0.75" fill="#FFC800" />
+
+      {/* Checklist Items - All Checked */}
+      {/* Item 1 */}
+      <rect x="12" y="13" width="3" height="3" rx="0.5" fill="#FFD600" />
+      <path d="M12.8 15L13.5 15.7L14.8 14" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="14" width="12" height="1" rx="0.5" fill="#FFD600" />
+
+      {/* Item 2 */}
+      <rect x="12" y="18" width="3" height="3" rx="0.5" fill="#FFD600" />
+      <path d="M12.8 20L13.5 20.7L14.8 19" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="19" width="10" height="1" rx="0.5" fill="#FFD600" />
+
+      {/* Item 3 */}
+      <rect x="12" y="23" width="3" height="3" rx="0.5" fill="#FFD600" />
+      <path d="M12.8 25L13.5 25.7L14.8 24" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="24" width="11" height="1" rx="0.5" fill="#FFD600" />
+
+      {/* Item 4 */}
+      <rect x="12" y="28" width="3" height="3" rx="0.5" fill="#FFD600" />
+      <path d="M12.8 30L13.5 30.7L14.8 29" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="29" width="9" height="1" rx="0.5" fill="#FFD600" />
+
+      {/* Success Badge */}
+      <circle cx="30" cy="6" r="3" fill="#FFD600" />
+      <path d="M28.5 6L29.5 7L31.5 5" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 };
@@ -395,97 +466,35 @@ export const GoldenBookSvg = () => {
 export const LockedDumbbellSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <g clipPath="url(#clip0_334_225170)">
-        <line
-          x1="16"
-          y1="20.3246"
-          x2="24.7589"
-          y2="15.2676"
-          stroke="#AFAFAF"
-          strokeWidth={4}
-        />
-        <rect
-          x="17.7635"
-          y="3.66309"
-          width="9.1025"
-          height="26.2961"
-          rx="4.55125"
-          transform="rotate(-30 17.7635 3.66309)"
-          fill="#AFAFAF"
-        />
-        <rect
-          x="2.87354"
-          y="12.2598"
-          width="9.1025"
-          height="26.2961"
-          rx="4.55125"
-          transform="rotate(-30 2.87354 12.2598)"
-          fill="#AFAFAF"
-        />
-        <rect
-          x="25.9183"
-          y="3.62891"
-          width="9.1025"
-          height="18.205"
-          rx="4.55125"
-          transform="rotate(-30 25.9183 3.62891)"
-          fill="#AFAFAF"
-        />
-        <rect
-          x="-1.23499"
-          y="19.3027"
-          width="9.1025"
-          height="18.205"
-          rx="4.55125"
-          transform="rotate(-30 -1.23499 19.3027)"
-          fill="#AFAFAF"
-        />
-        <rect
-          opacity="0.2"
-          x="2.81079"
-          y="20.3145"
-          width="3.03417"
-          height="5.05694"
-          rx="1.51708"
-          transform="rotate(-30 2.81079 20.3145)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="31.1294"
-          y="5.14355"
-          width="3.03417"
-          height="5.05694"
-          rx="1.51708"
-          transform="rotate(-30 31.1294 5.14355)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="6.85596"
-          y="13.2354"
-          width="3.03417"
-          height="6.06833"
-          rx="1.51708"
-          transform="rotate(-30 6.85596 13.2354)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="22.027"
-          y="5.14355"
-          width="3.03417"
-          height="6.06833"
-          rx="1.51708"
-          transform="rotate(-30 22.027 5.14355)"
-          fill="white"
-        />
-      </g>
-      <defs>
-        <clipPath id="clip0_334_225170">
-          <rect width="42" height="34" fill="white" />
-        </clipPath>
-      </defs>
+      {/* Bug Icon - Locked (Gray) */}
+      {/* Bug Body */}
+      <ellipse cx="21" cy="17" rx="8" ry="10" fill="#D8D8D8" stroke="#AFAFAF" strokeWidth="1.5" />
+
+      {/* Bug Head */}
+      <circle cx="21" cy="9" r="4.5" fill="#D8D8D8" stroke="#AFAFAF" strokeWidth="1.5" />
+
+      {/* Antennae */}
+      <path d="M18 7L15 3" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M24 7L27 3" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Eyes */}
+      <circle cx="19" cy="9" r="1" fill="#AFAFAF" />
+      <circle cx="23" cy="9" r="1" fill="#AFAFAF" />
+
+      {/* Legs - Left Side */}
+      <path d="M14 14L9 12" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14 17L8 17" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14 20L9 22" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Legs - Right Side */}
+      <path d="M28 14L33 12" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M28 17L34 17" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M28 20L33 22" stroke="#AFAFAF" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Body Segment Lines */}
+      <path d="M15 15H27" stroke="#AFAFAF" strokeWidth="0.8" opacity="0.5" />
+      <path d="M15 19H27" stroke="#AFAFAF" strokeWidth="0.8" opacity="0.5" />
+      <path d="M15 23H27" stroke="#AFAFAF" strokeWidth="0.8" opacity="0.5" />
     </svg>
   );
 };
@@ -493,73 +502,40 @@ export const LockedDumbbellSvg = () => {
 export const ActiveDumbbellSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <g clipPath="url(#clip0_334_225192)">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M24.8461 15.9274L17.8332 19.9763L16.3162 17.3486L23.329 13.2998L24.8461 15.9274Z"
-          fill="white"
-        />
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M6.8148 9.98445C4.63797 11.2412 3.89214 14.0247 5.14893 16.2016L5.27901 16.4269C4.41076 16.3693 3.51657 16.5597 2.7064 17.0274C0.529574 18.2842 -0.216264 21.0677 1.04053 23.2445L5.59178 31.1275C6.84857 33.3044 9.63207 34.0502 11.8089 32.7934C12.6191 32.3257 13.231 31.6464 13.6153 30.8657L13.7457 31.0917C15.0025 33.2685 17.786 34.0143 19.9629 32.7575C22.1397 31.5008 22.8855 28.7172 21.6287 26.5404L13.0319 11.6503C11.7751 9.47349 8.99163 8.72766 6.8148 9.98445Z"
-          fill="black"
-          fillOpacity="0.3"
-        />
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M21.7049 1.38844C19.5281 2.64523 18.7823 5.42873 20.0391 7.60556L28.6359 22.4957C29.8926 24.6725 32.6761 25.4183 34.853 24.1615C37.0298 22.9047 37.7756 20.1212 36.5188 17.9444L36.3892 17.7198C37.2575 17.7774 38.1519 17.5871 38.9622 17.1193C41.139 15.8625 41.8849 13.079 40.6281 10.9022L36.0768 3.01915C34.82 0.842324 32.0365 0.0964886 29.8597 1.35328C29.0494 1.82111 28.4374 2.50048 28.0531 3.28136L27.922 3.05431C26.6653 0.877481 23.8818 0.131645 21.7049 1.38844Z"
-          fill="black"
-          fillOpacity="0.3"
-        />
-        <rect
-          opacity="0.2"
-          x="2.81067"
-          y="20.3154"
-          width="3.03417"
-          height="5.05694"
-          rx="1.51708"
-          transform="rotate(-30 2.81067 20.3154)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="31.1292"
-          y="5.14355"
-          width="3.03417"
-          height="5.05694"
-          rx="1.51708"
-          transform="rotate(-30 31.1292 5.14355)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="22.0269"
-          y="5.14355"
-          width="3.03417"
-          height="6.06833"
-          rx="1.51708"
-          transform="rotate(-30 22.0269 5.14355)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="6.85583"
-          y="13.2363"
-          width="3.03417"
-          height="6.06833"
-          rx="1.51708"
-          transform="rotate(-30 6.85583 13.2363)"
-          fill="white"
-        />
-      </g>
-      <defs>
-        <clipPath id="clip0_334_225192">
-          <rect width="42" height="34" fill="white" />
-        </clipPath>
-      </defs>
+      {/* Bug Icon - Active (Red - Active Bug) */}
+      {/* Bug Body */}
+      <ellipse cx="21" cy="17" rx="8" ry="10" fill="#FF4B4B" stroke="#CC0000" strokeWidth="1.5" />
+
+      {/* Bug Head */}
+      <circle cx="21" cy="9" r="4.5" fill="#FF4B4B" stroke="#CC0000" strokeWidth="1.5" />
+
+      {/* Antennae */}
+      <path d="M18 7L15 3" stroke="#CC0000" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M24 7L27 3" stroke="#CC0000" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Eyes - Angry/Alert */}
+      <circle cx="19" cy="9" r="1.2" fill="#8B0000" />
+      <circle cx="23" cy="9" r="1.2" fill="#8B0000" />
+
+      {/* Legs - Left Side */}
+      <path d="M14 14L9 12" stroke="#CC0000" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M14 17L8 17" stroke="#CC0000" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M14 20L9 22" stroke="#CC0000" strokeWidth="1.8" strokeLinecap="round" />
+
+      {/* Legs - Right Side */}
+      <path d="M28 14L33 12" stroke="#CC0000" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M28 17L34 17" stroke="#CC0000" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M28 20L33 22" stroke="#CC0000" strokeWidth="1.8" strokeLinecap="round" />
+
+      {/* Body Segment Lines */}
+      <path d="M15 15H27" stroke="#CC0000" strokeWidth="1" opacity="0.6" />
+      <path d="M15 19H27" stroke="#CC0000" strokeWidth="1" opacity="0.6" />
+      <path d="M15 23H27" stroke="#CC0000" strokeWidth="1" opacity="0.6" />
+
+      {/* Alert/Warning Dots on body */}
+      <circle cx="18" cy="17" r="0.8" fill="#8B0000" />
+      <circle cx="24" cy="17" r="0.8" fill="#8B0000" />
+      <circle cx="21" cy="20" r="0.8" fill="#8B0000" />
     </svg>
   );
 };
@@ -567,97 +543,44 @@ export const ActiveDumbbellSvg = () => {
 export const GoldenDumbbellSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <g clipPath="url(#clip0_334_225119)">
-        <line
-          x1="16"
-          y1="20.3246"
-          x2="24.7589"
-          y2="15.2676"
-          stroke="#E6A000"
-          strokeWidth="4"
-        />
-        <rect
-          x="17.7635"
-          y="3.66309"
-          width="9.1025"
-          height="26.2961"
-          rx="4.55125"
-          transform="rotate(-30 17.7635 3.66309)"
-          fill="#CD7900"
-        />
-        <rect
-          x="2.87354"
-          y="12.2598"
-          width="9.1025"
-          height="26.2961"
-          rx="4.55125"
-          transform="rotate(-30 2.87354 12.2598)"
-          fill="#CD7900"
-        />
-        <rect
-          x="25.9184"
-          y="3.62891"
-          width="9.1025"
-          height="18.205"
-          rx="4.55125"
-          transform="rotate(-30 25.9184 3.62891)"
-          fill="#CD7900"
-        />
-        <rect
-          x="-1.23499"
-          y="19.3027"
-          width="9.1025"
-          height="18.205"
-          rx="4.55125"
-          transform="rotate(-30 -1.23499 19.3027)"
-          fill="#CD7900"
-        />
-        <rect
-          opacity="0.2"
-          x="2.81079"
-          y="20.3145"
-          width="3.03417"
-          height="5.05694"
-          rx="1.51708"
-          transform="rotate(-30 2.81079 20.3145)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="31.1294"
-          y="5.14355"
-          width="3.03417"
-          height="5.05694"
-          rx="1.51708"
-          transform="rotate(-30 31.1294 5.14355)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="6.85596"
-          y="13.2354"
-          width="3.03417"
-          height="6.06833"
-          rx="1.51708"
-          transform="rotate(-30 6.85596 13.2354)"
-          fill="white"
-        />
-        <rect
-          opacity="0.2"
-          x="22.0269"
-          y="5.14355"
-          width="3.03417"
-          height="6.06833"
-          rx="1.51708"
-          transform="rotate(-30 22.0269 5.14355)"
-          fill="white"
-        />
+      {/* Bug Icon - Golden (Fixed/Resolved Bug) */}
+      {/* Bug Body */}
+      <ellipse cx="21" cy="17" rx="8" ry="10" fill="#FFF1C0" stroke="#FFD600" strokeWidth="1.5" />
+
+      {/* Bug Head */}
+      <circle cx="21" cy="9" r="4.5" fill="#FFF1C0" stroke="#FFD600" strokeWidth="1.5" />
+
+      {/* Antennae */}
+      <path d="M18 7L15 3" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M24 7L27 3" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Eyes - Happy/Resolved */}
+      <circle cx="19" cy="9" r="1" fill="#CD7900" />
+      <circle cx="23" cy="9" r="1" fill="#CD7900" />
+
+      {/* Legs - Left Side */}
+      <path d="M14 14L9 12" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14 17L8 17" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14 20L9 22" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Legs - Right Side */}
+      <path d="M28 14L33 12" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M28 17L34 17" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M28 20L33 22" stroke="#FFD600" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Body Segment Lines */}
+      <path d="M15 15H27" stroke="#FFD600" strokeWidth="0.8" opacity="0.5" />
+      <path d="M15 19H27" stroke="#FFD600" strokeWidth="0.8" opacity="0.5" />
+      <path d="M15 23H27" stroke="#FFD600" strokeWidth="0.8" opacity="0.5" />
+
+      {/* Large X Mark (Bug Fixed) */}
+      <g opacity="0.9">
+        <path d="M16 12L26 22" stroke="#CD7900" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M26 12L16 22" stroke="#CD7900" strokeWidth="2.5" strokeLinecap="round" />
       </g>
-      <defs>
-        <clipPath id="clip0_334_225119">
-          <rect width="42" height="34" fill="white" />
-        </clipPath>
-      </defs>
+
+      {/* Small shine effect */}
+      <circle cx="25" cy="11" r="1.5" fill="#FFF500" opacity="0.6" />
     </svg>
   );
 };
@@ -727,30 +650,38 @@ export const UpArrowSvg = () => {
 export const FastForwardSvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <g clipPath="url(#clip0_7030_116434)">
+      {/* Fast Forward / Skip Test Icon - QA Theme */}
+      {/* Background Circle */}
+      <circle cx="21" cy="17" r="15" fill="#58CC02" opacity="0.2" />
+
+      {/* Main Fast Forward Arrows (Test Progression) */}
+      <g>
+        {/* First Arrow */}
         <path
           fillRule="evenodd"
           clipRule="evenodd"
-          d="M22.0423 14.9989C23.4698 15.8749 23.4698 17.9491 22.0423 18.825L8.91839 26.8783C7.42288 27.796 5.5 26.7199 5.5 24.9653L5.5 8.85865C5.5 7.10401 7.42288 6.02791 8.9184 6.94562L22.0423 14.9989Z"
-          fill="white"
+          d="M10 12L18 17L10 22V12Z"
+          fill="#58CC02"
         />
+        {/* Second Arrow */}
         <path
           fillRule="evenodd"
           clipRule="evenodd"
-          d="M35.4535 14.9989C36.881 15.8749 36.881 17.9491 35.4535 18.825L22.3296 26.8783C20.8341 27.796 18.9112 26.7199 18.9112 24.9653L18.9112 8.85865C18.9112 7.10401 20.8341 6.02791 22.3296 6.94562L35.4535 14.9989Z"
-          fill="white"
+          d="M19 12L27 17L19 22V12Z"
+          fill="#58CC02"
+        />
+        {/* Third Arrow (Advanced) */}
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M28 12L32 17L28 22V12Z"
+          fill="#89E219"
         />
       </g>
-      <defs>
-        <clipPath id="clip0_7030_116434">
-          <rect
-            width="31"
-            height="30"
-            fill="white"
-            transform="translate(5.5 2)"
-          />
-        </clipPath>
-      </defs>
+
+      {/* Checkpoint Badge */}
+      <circle cx="32" cy="10" r="4" fill="#FFD600" />
+      <text x="32" y="11.5" fontSize="4" fontWeight="bold" fill="#FFF" textAnchor="middle">✓</text>
     </svg>
   );
 };
@@ -758,12 +689,17 @@ export const FastForwardSvg = () => {
 export const LockedTrophySvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M14.0867 0.656357C11.241 -0.566997 7.97179 1.50405 7.97179 4.66166V13.4091C7.97179 19.8104 12.3546 25.1645 18.2181 26.5027C19.2287 26.8827 19.5393 27.3939 19.5793 27.8013V27.8899L19.579 27.8896L19.5793 27.8957V27.9759C19.5687 28.2279 19.4591 28.5701 19.1536 28.8471H15.9409C15.1526 28.8471 14.5136 29.4861 14.5136 30.2744C14.5136 30.435 14.5401 30.5893 14.5889 30.7333H13.0182C12.2272 30.7333 11.5859 31.3746 11.5859 32.1657C11.5859 32.9568 12.2272 33.598 13.0182 33.598H28.7601C29.5512 33.598 30.1925 32.9568 30.1925 32.1657C30.1925 31.3746 29.5512 30.7333 28.7601 30.7333H27.4615C27.5103 30.5893 27.5368 30.435 27.5368 30.2744C27.5368 29.4861 26.8978 28.8471 26.1095 28.8471H22.8507C22.5685 28.6241 22.4241 28.3499 22.3681 28.1133V27.8309C22.4457 27.3726 22.8765 26.805 24.2268 26.4375C29.9533 24.998 34.2011 19.711 34.2011 13.4091V4.66166C34.2011 1.50405 30.9319 -0.566996 28.0862 0.656358C25.4325 1.79713 22.5919 2.84158 21.0864 2.84158C19.581 2.84158 16.7403 1.79713 14.0867 0.656357ZM4.35009 16.3748C2.6223 15.4664 1.68222 13.4485 2.20034 11.4887C2.30684 11.0859 2.71874 10.8494 3.12034 10.9605L3.25989 10.9991C4.46034 11.3312 5.40222 12.1498 5.93 13.1841C6.27824 13.3866 6.50967 13.7663 6.50263 14.1977C6.48629 15.1997 6.65091 16.9075 7.20872 18.6485C7.76885 20.3967 8.68562 22.0565 10.0855 23.122C10.5909 23.5066 10.6887 24.2281 10.3041 24.7335C10.2195 24.8446 10.1187 24.936 10.0075 25.0069C9.05615 26.8441 6.86647 27.7005 4.88711 26.9278C4.50596 26.7791 4.31291 26.3477 4.45591 25.9643L4.57108 25.6556C5.00725 24.4863 5.91081 23.6374 6.98825 23.2401C6.67974 22.8379 6.40435 22.4164 6.15877 21.9847C4.26086 22.3411 2.32119 21.3362 1.55668 19.4685C1.39911 19.0836 1.58132 18.6388 1.96365 18.475L2.11386 18.4107C2.9626 18.0472 3.85995 17.9849 4.68935 18.1762C4.53785 17.5503 4.42727 16.9423 4.35009 16.3748ZM35.6154 13.2459C35.3208 13.4585 35.1315 13.8069 35.1379 14.1977C35.1542 15.1997 34.9896 16.9075 34.4318 18.6485C33.8717 20.3967 32.9549 22.0565 31.555 23.122C31.0496 23.5066 30.9518 24.2281 31.3364 24.7335C31.4351 24.8632 31.556 24.9661 31.6897 25.0408C32.6503 26.8546 34.8252 27.6957 36.7924 26.9278C37.1735 26.7791 37.3666 26.3477 37.2236 25.9643L37.1084 25.6556C36.6681 24.4753 35.7516 23.6214 34.6608 23.229C34.9786 22.8134 35.2612 22.3774 35.5122 21.9309C37.4859 22.4262 39.5623 21.4168 40.3598 19.4685C40.5174 19.0836 40.3352 18.6388 39.9528 18.475L39.8026 18.4107C38.852 18.0035 37.8405 17.9743 36.9317 18.2559C37.0997 17.5756 37.2193 16.9152 37.3 16.3035C39.0398 15.3373 39.9272 13.2427 39.3135 11.2768C39.1894 10.8792 38.7679 10.6618 38.372 10.7911L38.2291 10.8378C37.0073 11.2369 36.0835 12.1414 35.6154 13.2459Z"
-        fill="#AFAFAF"
-      />
+      {/* QA Badge - Locked (Gray Shield) */}
+      {/* Shield Background */}
+      <path d="M21 2L10 6V14C10 20 14 26 21 30C28 26 32 20 32 14V6L21 2Z" fill="#D8D8D8" stroke="#AFAFAF" strokeWidth="1.5" />
+
+      {/* QA Text */}
+      <text x="21" y="16" fontSize="10" fontWeight="bold" fill="#AFAFAF" textAnchor="middle" dominantBaseline="middle">QA</text>
+
+      {/* Decorative Elements */}
+      <circle cx="21" cy="22" r="1.5" fill="#AFAFAF" opacity="0.5" />
+      <circle cx="17" cy="20" r="1" fill="#AFAFAF" opacity="0.5" />
+      <circle cx="25" cy="20" r="1" fill="#AFAFAF" opacity="0.5" />
     </svg>
   );
 };
@@ -771,12 +707,23 @@ export const LockedTrophySvg = () => {
 export const ActiveTrophySvg = () => {
   return (
     <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M14.0867 0.656406C11.241 -0.566948 7.97179 1.5041 7.97179 4.66171V13.4091C7.97179 19.8104 12.3546 25.1645 18.2181 26.5027C19.2287 26.8828 19.5393 27.3939 19.5793 27.8013V27.8899L19.579 27.8896L19.5793 27.8958V27.9759C19.5687 28.2279 19.4591 28.5701 19.1536 28.8471H15.9409C15.1526 28.8471 14.5136 29.4862 14.5136 30.2745C14.5136 30.435 14.5401 30.5894 14.5889 30.7334H13.0182C12.2272 30.7334 11.5859 31.3747 11.5859 32.1657C11.5859 32.9568 12.2272 33.5981 13.0182 33.5981H28.7601C29.5512 33.5981 30.1925 32.9568 30.1925 32.1657C30.1925 31.3747 29.5512 30.7334 28.7601 30.7334H27.4615C27.5103 30.5894 27.5368 30.435 27.5368 30.2745C27.5368 29.4862 26.8978 28.8471 26.1095 28.8471H22.8507C22.5685 28.6242 22.4241 28.35 22.3681 28.1133V27.831C22.4457 27.3727 22.8765 26.805 24.2268 26.4375C29.9533 24.998 34.2011 19.711 34.2011 13.4091V4.66171C34.2011 1.5041 30.9319 -0.566947 28.0862 0.656407C25.4325 1.79718 22.5919 2.84163 21.0864 2.84163C19.581 2.84163 16.7403 1.79718 14.0867 0.656406ZM4.35009 16.3748C2.6223 15.4664 1.68222 13.4485 2.20034 11.4888C2.30684 11.0859 2.71874 10.8494 3.12034 10.9605L3.25989 10.9991C4.46034 11.3312 5.40222 12.1499 5.93 13.1842C6.27824 13.3866 6.50967 13.7664 6.50263 14.1978C6.48629 15.1998 6.65091 16.9075 7.20872 18.6485C7.76885 20.3967 8.68562 22.0566 10.0855 23.122C10.5909 23.5067 10.6887 24.2282 10.3041 24.7336C10.2195 24.8447 10.1187 24.9361 10.0075 25.007C9.05615 26.8441 6.86647 27.7005 4.88711 26.9279C4.50596 26.7791 4.31291 26.3477 4.45591 25.9644L4.57108 25.6556C5.00725 24.4864 5.91081 23.6374 6.98825 23.2401C6.67974 22.8379 6.40435 22.4165 6.15877 21.9847C4.26086 22.3411 2.32119 21.3362 1.55668 19.4686C1.39911 19.0837 1.58132 18.6389 1.96365 18.4751L2.11386 18.4107C2.9626 18.0472 3.85995 17.9849 4.68935 18.1762C4.53785 17.5503 4.42727 16.9424 4.35009 16.3748ZM35.6154 13.2459C35.3208 13.4585 35.1315 13.807 35.1379 14.1978C35.1542 15.1998 34.9896 16.9075 34.4318 18.6485C33.8717 20.3967 32.9549 22.0566 31.555 23.122C31.0496 23.5067 30.9518 24.2282 31.3364 24.7336C31.4351 24.8633 31.556 24.9661 31.6897 25.0409C32.6503 26.8546 34.8252 27.6957 36.7924 26.9279C37.1735 26.7791 37.3666 26.3477 37.2236 25.9644L37.1084 25.6556C36.6681 24.4754 35.7516 23.6215 34.6608 23.229C34.9786 22.8135 35.2612 22.3774 35.5122 21.9309C37.4859 22.4263 39.5623 21.4169 40.3598 19.4686C40.5174 19.0837 40.3352 18.6389 39.9528 18.4751L39.8026 18.4108C38.852 18.0036 37.8405 17.9743 36.9317 18.256C37.0997 17.5757 37.2193 16.9153 37.3 16.3036C39.0398 15.3374 39.9272 13.2427 39.3135 11.2768C39.1894 10.8793 38.7679 10.6618 38.372 10.7912L38.2291 10.8379C37.0073 11.2369 36.0835 12.1415 35.6154 13.2459Z"
-        fill="white"
-      />
+      {/* QA Badge - Active (Green Shield) */}
+      {/* Shield Background */}
+      <path d="M21 2L10 6V14C10 20 14 26 21 30C28 26 32 20 32 14V6L21 2Z" fill="white" stroke="#58CC02" strokeWidth="2" />
+
+      {/* Inner Shield Accent */}
+      <path d="M21 4L12 7.5V14C12 19 15.5 24 21 27.5C26.5 24 30 19 30 14V7.5L21 4Z" fill="#E8F5E9" />
+
+      {/* QA Text */}
+      <text x="21" y="14" fontSize="9" fontWeight="bold" fill="#58CC02" textAnchor="middle" dominantBaseline="middle">QA</text>
+
+      {/* Checkmarks */}
+      <path d="M15 20L17 22L20 19" stroke="#58CC02" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M22 20L24 22L27 19" stroke="#58CC02" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* Star accents */}
+      <circle cx="14" cy="10" r="1" fill="#89E219" />
+      <circle cx="28" cy="10" r="1" fill="#89E219" />
     </svg>
   );
 };
@@ -784,78 +731,50 @@ export const ActiveTrophySvg = () => {
 export const GoldenTrophySvg = () => {
   return (
     <svg width="105" height="89" viewBox="0 0 105 89" fill="none">
-      <ellipse
-        cx="52.5564"
-        cy="67.7784"
-        rx="22.4297"
-        ry="20.3697"
-        fill="#FFB800"
-      />
-      <ellipse
-        cx="52.5564"
-        cy="62.6959"
-        rx="22.4297"
-        ry="20.3697"
-        fill="#FFD600"
-      />
-      <path
-        d="M35.2837 71.8353C37.0692 74.9453 41.8904 78.7941 46.7356 80.0312"
-        stroke="#FFF500"
-        strokeWidth="4.6734"
-        strokeLinecap="round"
-      />
-      <path
-        d="M40.97 69.3791C41.9876 71.1516 44.7353 73.3452 47.4968 74.0502"
-        stroke="#FFF500"
-        strokeWidth="4.6734"
-        strokeLinecap="round"
-      />
-      <path
-        d="M68.2007 64.1053C68.2007 70.8805 61.5298 76.8096 52.7121 76.8096C43.8943 76.8096 37.2235 70.8805 37.2235 64.1053C37.2235 57.3301 43.8943 51.401 52.7121 51.401C61.5298 51.401 68.2007 57.3301 68.2007 64.1053Z"
-        stroke="#FFB800"
-        strokeWidth="3.01241"
-      />
-      <path
-        d="M17.3816 11.4355C17.3816 3.1568 26.1494 -2.27311 33.7815 0.934306C40.8985 3.92521 48.517 6.66357 52.5545 6.66357C56.5921 6.66357 64.2106 3.92521 71.3275 0.934308C78.9597 -2.27311 87.7275 3.1568 87.7275 11.4355V34.3697C87.7275 53.7952 71.98 69.5427 52.5545 69.5427C33.1291 69.5427 17.3816 53.7952 17.3816 34.3697V11.4355Z"
-        fill="#FFB800"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M87.7275 21.0444C86.643 41.5035 69.7102 57.7589 48.9808 57.7589C36.5675 57.7589 25.5156 51.9298 18.4131 42.8596C17.7392 40.1407 17.3816 37.297 17.3816 34.3697V11.4355C17.3816 3.1568 26.1494 -2.27311 33.7815 0.934306C40.8985 3.92521 48.517 6.66357 52.5545 6.66357C56.5921 6.66357 64.2106 3.92521 71.3275 0.934308C78.9597 -2.27311 87.7275 3.1568 87.7275 11.4355V21.0444Z"
-        fill="#FFD600"
-      />
-      <circle cx="29.6788" cy="11.2542" r="6.94978" fill="#FFF500" />
-      <path
-        d="M58.7405 13.872C64.2067 12.9001 67.262 11.6908 71.377 9.41648"
-        stroke="#FFF500"
-        strokeWidth="9.29181"
-        strokeLinecap="round"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M4.26014 26.1716C3.24474 25.897 2.19899 26.4976 1.92438 27.513L1.79236 28.0011C0.251515 33.6987 3.62117 39.5665 9.31868 41.1073L10.0909 41.3162C10.2291 42.5931 10.495 44.0908 10.9274 45.6959C8.28389 44.4473 5.14154 44.2821 2.23252 45.5002L1.16946 45.9454C0.199208 46.3516 -0.257982 47.4675 0.148295 48.4378L0.343623 48.9043C2.62328 54.3484 8.88469 56.9138 14.3289 54.6341L14.8702 54.4075C15.5961 55.4647 16.4218 56.4893 17.3585 57.4489C13.4278 57.8114 9.85 60.3467 8.3477 64.2837L7.93681 65.3604C7.5618 66.3432 8.05448 67.4439 9.03724 67.8189L9.50972 67.9992C15.0241 70.1034 21.2002 67.3389 23.3044 61.8246L23.7153 60.7478C23.9141 60.2269 23.869 59.6728 23.6364 59.2112C23.5574 58.8347 23.3276 58.4909 22.9715 58.2775C19.8938 56.4338 17.6739 53.7916 16.1067 50.9741C15.9303 50.5815 15.733 50.2045 15.5165 49.844C15.354 49.5123 15.2 49.1793 15.0541 48.8461C13.5172 45.3356 12.9251 41.8875 12.8428 39.7864L12.899 39.5787C14.4398 33.8812 11.0702 28.0133 5.37267 26.4725L4.26014 26.1716Z"
-        fill="#FFF500"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M99.0225 25.7233C100.025 25.4034 101.096 25.9563 101.416 26.9583L101.57 27.4401C103.365 33.0626 100.263 39.076 94.6403 40.8713L93.9755 41.0836C93.8396 42.4669 93.5502 44.1295 93.0544 45.9174C95.7851 44.4706 99.1184 44.2137 102.191 45.5004L103.254 45.9456C104.225 46.3518 104.682 47.4677 104.275 48.438L104.08 48.9045C101.801 54.3486 95.5391 56.914 90.0949 54.6343L89.2569 54.2834C88.5047 55.3934 87.6435 56.469 86.6603 57.4731C90.4992 57.9122 93.9664 60.4245 95.439 64.2839L95.8499 65.3606C96.2249 66.3434 95.7323 67.4441 94.7495 67.8191L94.277 67.9994C88.7627 70.1036 82.5866 67.3391 80.4824 61.8248L80.0715 60.748C79.7439 59.8896 80.0784 58.9412 80.8232 58.465C80.8973 58.3952 80.98 58.3322 81.0709 58.2777C84.9149 55.9749 87.4209 52.4263 88.9882 48.8463C90.4535 45.4995 91.0599 42.2096 91.1846 40.0893C91.1718 40.0557 91.1598 40.0215 91.1487 39.9868L90.9949 39.5051C89.1996 33.8826 92.3021 27.8692 97.9246 26.0739L99.0225 25.7233Z"
-        fill="#FFF500"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M4.26014 27.92C3.24474 27.6454 2.19899 28.246 1.92438 29.2614L1.79236 29.7495C0.251515 35.4471 3.62117 41.3149 9.31868 42.8558L10.0909 43.0646C10.2291 44.3415 10.495 45.8392 10.9274 47.4443C8.28389 46.1957 5.14154 46.0305 2.23252 47.2486L1.16946 47.6938C0.199208 48.1001 -0.257982 49.2159 0.148295 50.1862L0.343623 50.6527C2.62328 56.0968 8.88469 58.6622 14.3289 56.3825L14.8702 56.1559C15.5961 57.2131 16.4218 58.2377 17.3585 59.1973C13.4278 59.5598 9.85 62.0951 8.3477 66.0321L7.93681 67.1088C7.5618 68.0916 8.05448 69.1923 9.03724 69.5673L9.50972 69.7476C15.0241 71.8518 21.2002 69.0874 23.3044 63.573L23.7153 62.4962C23.9141 61.9753 23.869 61.4212 23.6364 60.9596C23.5574 60.5831 23.3276 60.2393 22.9715 60.026C19.8939 58.1822 17.6739 55.54 16.1067 52.7225C15.9303 52.3299 15.733 51.9529 15.5165 51.5924C15.354 51.2607 15.2 50.9277 15.0541 50.5945C13.5172 47.084 12.9251 43.6359 12.8428 41.5348L12.899 41.3271C14.4398 35.6296 11.0702 29.7618 5.37267 28.2209L4.26014 27.92Z"
-        fill="#FFD600"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M99.0225 27.4717C100.025 27.1518 101.096 27.7047 101.416 28.7067L101.57 29.1885C103.365 34.811 100.263 40.8244 94.6403 42.6197L93.9755 42.832C93.8396 44.2153 93.5502 45.8779 93.0544 47.6658C95.7851 46.219 99.1184 45.9621 102.191 47.2488L103.254 47.694C104.225 48.1003 104.682 49.2162 104.275 50.1864L104.08 50.6529C101.801 56.0971 95.5391 58.6624 90.0949 56.3827L89.2569 56.0318C88.5047 57.1418 87.6435 58.2174 86.6603 59.2215C90.4992 59.6606 93.9664 62.173 95.439 66.0323L95.8499 67.109C96.2249 68.0918 95.7323 69.1925 94.7495 69.5675L94.277 69.7478C88.7627 71.852 82.5866 69.0876 80.4824 63.5732L80.0715 62.4964C79.7439 61.638 80.0784 60.6896 80.8232 60.2134C80.8973 60.1436 80.9799 60.0806 81.0709 60.0262C84.9149 57.7233 87.4209 54.1747 88.9882 50.5947C90.4535 47.2479 91.0599 43.958 91.1846 41.8377C91.1718 41.8041 91.1598 41.77 91.1487 41.7353L90.9949 41.2535C89.1996 35.631 92.3021 29.6176 97.9246 27.8223L99.0225 27.4717Z"
-        fill="#FFB800"
-      />
+      {/* QA Badge - Golden (Premium Quality Badge) */}
+      {/* Outer Glow Circle */}
+      <circle cx="52.5" cy="44.5" r="35" fill="#FFE700" opacity="0.3" />
+      <circle cx="52.5" cy="44.5" r="28" fill="#FFD600" opacity="0.5" />
+
+      {/* Main Shield */}
+      <path d="M52.5 15L30 23V40C30 55 40 68 52.5 78C65 68 75 55 75 40V23L52.5 15Z" fill="#FFF1C0" stroke="#FFD600" strokeWidth="3" />
+
+      {/* Inner Shield Gradient */}
+      <path d="M52.5 18L33 25V40C33 53 42 64 52.5 73C63 64 72 53 72 40V25L52.5 18Z" fill="url(#goldGradient)" />
+
+      {/* Large QA Text */}
+      <text x="52.5" y="40" fontSize="20" fontWeight="bold" fill="#FFD600" textAnchor="middle" dominantBaseline="middle">QA</text>
+
+      {/* Premium Star on top */}
+      <path d="M52.5 8L54.5 12L59 12.8L55.7 16L56.5 20.5L52.5 18.3L48.5 20.5L49.3 16L46 12.8L50.5 12L52.5 8Z" fill="#FFF500" />
+
+      {/* Quality Checkmarks */}
+      <g stroke="#FFD600" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M38 50L42 54L48 47" />
+        <path d="M57 50L61 54L67 47" />
+      </g>
+
+      {/* Decorative Elements */}
+      <circle cx="35" cy="35" r="2" fill="#FFF500" />
+      <circle cx="70" cy="35" r="2" fill="#FFF500" />
+      <circle cx="42" cy="28" r="1.5" fill="#FFE700" opacity="0.7" />
+      <circle cx="63" cy="28" r="1.5" fill="#FFE700" opacity="0.7" />
+
+      {/* Shine Effect */}
+      <circle cx="45" cy="22" r="3" fill="#FFF500" opacity="0.6" />
+      <circle cx="60" cy="25" r="2" fill="#FFF500" opacity="0.5" />
+
+      {/* Bottom Ribbon */}
+      <rect x="40" y="70" width="25" height="8" rx="2" fill="#FFD600" />
+      <text x="52.5" y="76" fontSize="6" fontWeight="bold" fill="#CD7900" textAnchor="middle" dominantBaseline="middle">MASTER</text>
+
+      <defs>
+        <linearGradient id="goldGradient" x1="52.5" y1="18" x2="52.5" y2="73">
+          <stop offset="0%" stopColor="#FFF500" />
+          <stop offset="50%" stopColor="#FFD600" />
+          <stop offset="100%" stopColor="#FFC800" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 };
@@ -863,158 +782,34 @@ export const GoldenTrophySvg = () => {
 export const LockedTreasureSvg = () => {
   return (
     <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
-      <rect opacity="0.3" y="38" width="80" height="40" rx="4" fill="#AFAFAF" />
-      <path
-        d="M8.28882 39.7366C8.28882 34.2001 12.777 29.7119 18.3135 29.7119H60.7557C66.2922 29.7119 70.7804 34.2001 70.7804 39.7366V66.3203C70.7804 68.5349 68.9851 70.3302 66.7705 70.3302H12.2987C10.0841 70.3302 8.28882 68.5349 8.28882 66.3203V39.7366Z"
-        fill="#9A9A9A"
-      />
-      <path
-        d="M6.12195 25.2274C6.12195 19.6909 10.6102 15.2027 16.1467 15.2027H63.2628C68.7993 15.2027 73.2876 19.6909 73.2876 25.2274V55.051H6.12195V25.2274Z"
-        fill="#9A9A9A"
-      />
-      <rect
-        x="3.10956"
-        y="42.7716"
-        width="73.8089"
-        height="11.5284"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M67.0209 25.477H74.9174C76.0247 25.477 76.9223 26.3746 76.9223 27.4819V45.777H67.0209V25.477Z"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M3.10956 27.4819C3.10956 26.3746 4.0072 25.477 5.1145 25.477H11.5072C12.6145 25.477 13.5122 26.3746 13.5122 27.4819V43.7721C13.5122 44.8794 12.6145 45.777 11.5072 45.777H5.1145C4.0072 45.777 3.10956 44.8794 3.10956 43.7721V27.4819Z"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M6.12195 14.0049C6.12195 12.8976 7.01959 12 8.12689 12H18.6528C19.7601 12 20.6578 12.8976 20.6578 14.0049V34.5027H6.12195V14.0049Z"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M58.7524 14.0049C58.7524 12.8976 59.6501 12 60.7574 12H71.2833C72.3906 12 73.2883 12.8976 73.2883 14.0049V34.5027H58.7524V14.0049Z"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M6.25378 24.1446L20.6019 20.5723V33.2222L6.25378 33.0464V24.1446Z"
-        fill="#EDEDED"
-      />
-      <path
-        d="M6.12195 31.725H20.6578V46.2197H6.12195V31.725Z"
-        fill="#BFBFBF"
-      />
-      <path
-        d="M6.12195 52.5436C6.12195 51.4363 7.01959 50.5386 8.12689 50.5386H18.6528C19.7601 50.5386 20.6578 51.4363 20.6578 52.5436V70.3903C20.6578 71.4976 19.7601 72.3953 18.6528 72.3953H8.12689C7.01959 72.3953 6.12195 71.4976 6.12195 70.3903V52.5436Z"
-        fill="#BFBFBF"
-      />
-      <path
-        d="M57.4348 52.5436C57.4348 51.4363 58.3325 50.5386 59.4398 50.5386H69.9657C71.073 50.5386 71.9707 51.4363 71.9707 52.5436V70.3903C71.9707 71.4976 71.073 72.3953 69.9657 72.3953H59.4398C58.3325 72.3953 57.4348 71.4976 57.4348 70.3903V52.5436Z"
-        fill="#BFBFBF"
-      />
-      <rect
-        x="58.7524"
-        y="31.725"
-        width="14.5358"
-        height="14.4947"
-        fill="#BFBFBF"
-      />
-      <rect
-        x="36.9485"
-        y="49.9128"
-        width="5.51359"
-        height="9.71144"
-        fill="#C4C4C4"
-      />
-      <rect
-        x="6.12195"
-        y="55.3079"
-        width="14.5358"
-        height="4.88705"
-        fill="#9A9A9A"
-      />
-      <rect
-        x="57.4348"
-        y="55.3079"
-        width="14.5358"
-        height="4.88705"
-        fill="#9A9A9A"
-      />
-      <rect
-        x="20.6531"
-        y="63.818"
-        width="36.7782"
-        height="2.63149"
-        fill="#898989"
-      />
-      <rect
-        x="20.6531"
-        y="23.6395"
-        width="38.0939"
-        height="2.63149"
-        fill="#898989"
-      />
-      <rect
-        opacity="0.92"
-        x="20.6531"
-        y="55.3079"
-        width="36.7782"
-        height="4.88705"
-        fill="#888888"
-      />
-      <rect
-        opacity="0.92"
-        x="20.6531"
-        y="35.3047"
-        width="38.0939"
-        height="7.46567"
-        fill="#898989"
-      />
-      <path
-        d="M3.10956 46.2159H76.9185V55.3008C76.9185 56.4081 76.0208 57.3058 74.9135 57.3058H5.1145C4.0072 57.3058 3.10956 56.4081 3.10956 55.3008V46.2159Z"
-        fill="#BFBFBF"
-      />
-      <rect
-        x="28.9253"
-        y="38.383"
-        width="20.9266"
-        height="18.2007"
-        rx="3.00742"
-        fill="#D8D8D8"
-      />
-      <path
-        d="M33.6012 38.383H31.9327C30.2718 38.383 28.9253 39.7294 28.9253 41.3904V53.5763C28.9253 55.2372 30.2718 56.5837 31.9327 56.5837H32.9367C33.4621 56.5837 33.8848 56.1518 33.8735 55.6265L33.6012 42.9729V38.383Z"
-        fill="#EDEDED"
-      />
-      <rect
-        x="28.9253"
-        y="42.8631"
-        width="20.9266"
-        height="17.9407"
-        rx="3.00742"
-        fill="#BFBFBF"
-      />
-      <ellipse
-        cx="39.0436"
-        cy="49.7057"
-        rx="3.94723"
-        ry="3.54472"
-        fill="#8A8A8A"
-      />
-      <path
-        d="M38.147 51.6033C38.5164 50.8645 39.5708 50.8645 39.9402 51.6033L41.7365 55.1957C42.0698 55.8622 41.5852 56.6465 40.8399 56.6465H37.2473C36.5021 56.6465 36.0174 55.8622 36.3507 55.1957L38.147 51.6033Z"
-        fill="#8A8A8A"
-      />
-      <path
-        d="M58.7855 16.3848L73.2562 12.8931V20.8578L58.7855 24.3496V16.3848Z"
-        fill="#EDEDED"
-      />
-      <rect
-        x="20.4848"
-        y="42.358"
-        width="8.44234"
-        height="3.80299"
-        fill="#EDEDED"
-      />
+      {/* Locked Treasure Chest */}
+      {/* Circular Sky Blue Background */}
+      <circle cx="40" cy="55" r="32" fill="#87CEEB" opacity="0.25" />
+      <circle cx="40" cy="55" r="28" fill="#87CEEB" opacity="0.15" />
+
+      {/* Shadow */}
+      <ellipse cx="40" cy="75" rx="28" ry="6" fill="#000" opacity="0.15" />
+
+      {/* Chest Base */}
+      <path d="M15 45 L15 70 Q15 75 20 75 L60 75 Q65 75 65 70 L65 45 Z" fill="#A0A0A0" />
+      <rect x="15" y="43" width="50" height="4" fill="#8A8A8A" />
+
+      {/* Chest Lid */}
+      <path d="M12 35 Q12 30 17 28 L63 28 Q68 30 68 35 L68 45 L12 45 Z" fill="#B8B8B8" />
+      <path d="M12 35 Q12 30 17 28 L63 28 Q68 30 68 35 L68 38 L12 38 Z" fill="#C8C8C8" />
+
+      {/* Lock - Locked State */}
+      <circle cx="40" cy="50" r="8" fill="#5A5A5A" />
+      <circle cx="40" cy="50" r="6" fill="#707070" />
+      <rect x="37" y="50" width="6" height="12" rx="1" fill="#5A5A5A" />
+      <circle cx="40" cy="52" r="2" fill="#3A3A3A" />
+
+      {/* Metal Bands */}
+      <rect x="12" y="40" width="56" height="2" fill="#7A7A7A" />
+      <rect x="12" y="60" width="56" height="2" fill="#7A7A7A" />
+
+      {/* Lock Keyhole */}
+      <circle cx="40" cy="52" r="1.5" fill="#2A2A2A" />
     </svg>
   );
 };
@@ -1022,158 +817,56 @@ export const LockedTreasureSvg = () => {
 export const ActiveTreasureSvg = () => {
   return (
     <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
-      <rect opacity="0.3" y="38" width="80" height="40" rx="4" fill="#AFAFAF" />
-      <path
-        d="M8.43329 39.7366C8.43329 34.2001 12.9215 29.7119 18.458 29.7119H60.9001C66.4366 29.7119 70.9248 34.2001 70.9248 39.7366V66.3203C70.9248 68.5349 69.1296 70.3302 66.915 70.3302H12.4432C10.2286 70.3302 8.43329 68.5349 8.43329 66.3203V39.7366Z"
-        fill="#CE7D03"
-      />
-      <path
-        d="M6.26642 25.2274C6.26642 19.6909 10.7546 15.2027 16.2911 15.2027H63.4073C68.9438 15.2027 73.432 19.6909 73.432 25.2274V55.051H6.26642V25.2274Z"
-        fill="#CE7D03"
-      />
-      <rect
-        x="3.25403"
-        y="42.7716"
-        width="73.8089"
-        height="11.5284"
-        fill="#FEC700"
-      />
-      <path
-        d="M67.1654 25.477H75.0618C76.1691 25.477 77.0668 26.3746 77.0668 27.4819V45.777H67.1654V25.477Z"
-        fill="#FEC700"
-      />
-      <path
-        d="M3.25403 27.4819C3.25403 26.3746 4.15167 25.477 5.25897 25.477H11.6517C12.759 25.477 13.6566 26.3746 13.6566 27.4819V43.7721C13.6566 44.8794 12.759 45.777 11.6517 45.777H5.25897C4.15167 45.777 3.25403 44.8794 3.25403 43.7721V27.4819Z"
-        fill="#FEC700"
-      />
-      <path
-        d="M6.26642 14.0049C6.26642 12.8976 7.16406 12 8.27136 12H18.7973C19.9046 12 20.8023 12.8976 20.8023 14.0049V34.5027H6.26642V14.0049Z"
-        fill="#FEC700"
-      />
-      <path
-        d="M58.8969 14.0049C58.8969 12.8976 59.7946 12 60.9019 12H71.4278C72.5351 12 73.4328 12.8976 73.4328 14.0049V34.5027H58.8969V14.0049Z"
-        fill="#FEC700"
-      />
-      <path
-        d="M6.39819 24.1446L20.7463 20.5723V33.2222L6.39819 33.0464V24.1446Z"
-        fill="#FEF400"
-      />
-      <path
-        d="M6.26642 31.725H20.8023V46.2197H6.26642V31.725Z"
-        fill="#EEAB00"
-      />
-      <path
-        d="M6.26642 52.5436C6.26642 51.4363 7.16406 50.5386 8.27136 50.5386H18.7973C19.9046 50.5386 20.8023 51.4363 20.8023 52.5436V70.3903C20.8023 71.4976 19.9046 72.3953 18.7973 72.3953H8.27136C7.16406 72.3953 6.26642 71.4976 6.26642 70.3903V52.5436Z"
-        fill="#EEAB00"
-      />
-      <path
-        d="M57.5793 52.5436C57.5793 51.4363 58.4769 50.5386 59.5842 50.5386H70.1102C71.2175 50.5386 72.1151 51.4363 72.1151 52.5436V70.3903C72.1151 71.4976 71.2175 72.3953 70.1102 72.3953H59.5842C58.4769 72.3953 57.5793 71.4976 57.5793 70.3903V52.5436Z"
-        fill="#EEAB00"
-      />
-      <rect
-        x="58.8969"
-        y="31.725"
-        width="14.5358"
-        height="14.4947"
-        fill="#EEAB00"
-      />
-      <rect
-        x="37.093"
-        y="49.9128"
-        width="5.51359"
-        height="9.71144"
-        fill="#C4C4C4"
-      />
-      <rect
-        x="6.26642"
-        y="55.3079"
-        width="14.5358"
-        height="4.88705"
-        fill="#BF7402"
-      />
-      <rect
-        x="57.5793"
-        y="55.3079"
-        width="14.5358"
-        height="4.88705"
-        fill="#BF7402"
-      />
-      <rect
-        x="20.7975"
-        y="63.818"
-        width="36.7782"
-        height="2.63149"
-        fill="#B46C00"
-      />
-      <rect
-        x="20.7975"
-        y="23.6395"
-        width="38.0939"
-        height="2.63149"
-        fill="#B46C00"
-      />
-      <rect
-        opacity="0.92"
-        x="20.7975"
-        y="55.3079"
-        width="36.7782"
-        height="4.88705"
-        fill="#8F5702"
-      />
-      <rect
-        opacity="0.92"
-        x="20.7975"
-        y="35.3047"
-        width="38.0939"
-        height="7.46567"
-        fill="#B46C00"
-      />
-      <path
-        d="M3.25403 46.2159H77.063V55.3008C77.063 56.4081 76.1653 57.3058 75.058 57.3058H5.25897C4.15167 57.3058 3.25403 56.4081 3.25403 55.3008V46.2159Z"
-        fill="#EEAB00"
-      />
-      <rect
-        x="29.0696"
-        y="38.383"
-        width="20.9266"
-        height="18.2007"
-        rx="3.00742"
-        fill="#FEC700"
-      />
-      <path
-        d="M33.7456 38.383H32.0771C30.4161 38.383 29.0696 39.7294 29.0696 41.3904V53.5763C29.0696 55.2372 30.4161 56.5837 32.0771 56.5837H33.081C33.6064 56.5837 34.0291 56.1518 34.0178 55.6265L33.7456 42.9729V38.383Z"
-        fill="#FEF400"
-      />
-      <rect
-        x="29.0696"
-        y="42.8631"
-        width="20.9266"
-        height="17.9407"
-        rx="3.00742"
-        fill="#EEAB00"
-      />
-      <ellipse
-        cx="39.1881"
-        cy="49.7057"
-        rx="3.94723"
-        ry="3.54472"
-        fill="#BF7402"
-      />
-      <path
-        d="M38.2915 51.6033C38.6609 50.8645 39.7153 50.8645 40.0847 51.6033L41.881 55.1957C42.2143 55.8622 41.7296 56.6465 40.9844 56.6465H37.3918C36.6465 56.6465 36.1618 55.8622 36.4951 55.1957L38.2915 51.6033Z"
-        fill="#BF7402"
-      />
-      <path
-        d="M58.9299 16.3848L73.4007 12.8931V20.8578L58.9299 24.3496V16.3848Z"
-        fill="#FEF400"
-      />
-      <rect
-        x="20.6292"
-        y="42.358"
-        width="8.44234"
-        height="3.80299"
-        fill="#FEF400"
-      />
+      {/* Active Treasure Chest - Ready to Open! */}
+      {/* Circular Sky Blue Background */}
+      <circle cx="40" cy="50" r="35" fill="#87CEEB" opacity="0.3" />
+      <circle cx="40" cy="50" r="30" fill="#87CEEB" opacity="0.2" />
+
+      {/* Glow Effect */}
+      <circle cx="40" cy="50" r="35" fill="#FFD700" opacity="0.1" />
+      <circle cx="40" cy="50" r="30" fill="#FFD700" opacity="0.15" />
+
+      {/* Shadow */}
+      <ellipse cx="40" cy="75" rx="28" ry="6" fill="#000" opacity="0.2" />
+
+      {/* Chest Base - Wooden */}
+      <path d="M15 45 L15 70 Q15 75 20 75 L60 75 Q65 75 65 70 L65 45 Z" fill="#8B4513" />
+      <rect x="15" y="43" width="50" height="4" fill="#654321" />
+
+      {/* Wood Grain Details */}
+      <path d="M20 50 Q25 52 20 55" stroke="#654321" strokeWidth="1" fill="none" opacity="0.5" />
+      <path d="M60 50 Q55 52 60 55" stroke="#654321" strokeWidth="1" fill="none" opacity="0.5" />
+
+      {/* Chest Lid - Slightly Open */}
+      <path d="M12 35 Q12 30 17 28 L63 28 Q68 30 68 35 L68 45 L12 45 Z" fill="#A0522D" />
+      <path d="M12 35 Q12 30 17 28 L63 28 Q68 30 68 35 L68 38 L12 38 Z" fill="#CD853F" />
+
+      {/* Golden Lock - Unlocked */}
+      <circle cx="40" cy="50" r="8" fill="#FFD700" />
+      <circle cx="40" cy="50" r="6" fill="#FFA500" />
+      <rect x="37" y="50" width="6" height="10" rx="1" fill="#FFD700" />
+
+      {/* Keyhole with Key */}
+      <circle cx="40" cy="52" r="2" fill="#B8860B" />
+      <rect x="39.5" y="54" width="1" height="3" fill="#B8860B" />
+
+      {/* Gold Coins Peeking Out */}
+      <circle cx="30" cy="42" r="3" fill="#FFD700" />
+      <circle cx="35" cy="40" r="3" fill="#FFA500" />
+      <circle cx="45" cy="40" r="3" fill="#FFD700" />
+      <circle cx="50" cy="42" r="3" fill="#FFA500" />
+
+      {/* Sparkles */}
+      <circle cx="25" cy="35" r="1.5" fill="#FFFF00" opacity="0.8" />
+      <circle cx="55" cy="35" r="1.5" fill="#FFFF00" opacity="0.8" />
+      <circle cx="40" cy="25" r="2" fill="#FFFF00" opacity="0.9" />
+
+      {/* Metal Bands */}
+      <rect x="12" y="40" width="56" height="2" fill="#DAA520" />
+      <rect x="12" y="60" width="56" height="2" fill="#DAA520" />
+
+      {/* Click indicator */}
+      <text x="40" y="20" fontSize="8" fontWeight="bold" fill="#FFD700" textAnchor="middle">!</text>
     </svg>
   );
 };
@@ -1181,135 +874,74 @@ export const ActiveTreasureSvg = () => {
 export const GoldenTreasureSvg = () => {
   return (
     <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
-      <rect opacity="0.3" y="49" width="80" height="40" rx="4" fill="#AFAFAF" />
-      <path
-        d="M9.43689 49.1673C9.43689 43.6308 13.9251 39.1426 19.4616 39.1426H61.9037C67.4402 39.1426 71.9284 43.6308 71.9284 49.1673V75.7509C71.9284 77.9655 70.1332 79.7608 67.9186 79.7608H13.4468C11.2322 79.7608 9.43689 77.9655 9.43689 75.7509V49.1673Z"
-        fill="#CE7D03"
-      />
-      <path
-        d="M7.26642 34.6581C7.26642 29.1216 11.7546 24.6334 17.2911 24.6334H63.3456C68.8821 24.6334 73.3703 29.1216 73.3703 34.6581V64.4816H7.26642V34.6581Z"
-        fill="#CE7D03"
-      />
-      <path
-        d="M7.26642 61.9743C7.26642 60.867 8.16406 59.9693 9.27136 59.9693H19.7973C20.9046 59.9693 21.8023 60.867 21.8023 61.9743V79.821C21.8023 80.9283 20.9046 81.826 19.7973 81.826H9.27136C8.16406 81.826 7.26642 80.9283 7.26642 79.821V61.9743Z"
-        fill="#EEAB00"
-      />
-      <path
-        d="M58.5792 61.9743C58.5792 60.867 59.4769 59.9693 60.5842 59.9693H71.1101C72.2174 59.9693 73.1151 60.867 73.1151 61.9743V79.821C73.1151 80.9283 72.2174 81.826 71.1101 81.826H60.5842C59.4769 81.826 58.5792 80.9283 58.5792 79.821V61.9743Z"
-        fill="#EEAB00"
-      />
-      <rect
-        x="21.8011"
-        y="73.2487"
-        width="36.7782"
-        height="2.63149"
-        fill="#B46C00"
-      />
-      <rect
-        x="7.26642"
-        y="24.6334"
-        width="66.1039"
-        height="41.8457"
-        fill="#724500"
-      />
-      <rect
-        x="7.26642"
-        y="3.0307"
-        width="65.8487"
-        height="25.6729"
-        fill="#CE7D03"
-      />
-      <rect
-        x="7.26642"
-        y="60.9063"
-        width="66.1039"
-        height="5.57271"
-        fill="#FEC700"
-      />
-      <rect
-        x="73.3703"
-        y="23.3889"
-        width="42.3453"
-        height="5.57271"
-        transform="rotate(90 73.3703 23.3889)"
-        fill="#FEC700"
-      />
-      <rect
-        x="12.8409"
-        y="23.3889"
-        width="42.3453"
-        height="5.57271"
-        transform="rotate(90 12.8409 23.3889)"
-        fill="#FEC700"
-      />
-      <rect
-        x="7.26642"
-        y="32.6273"
-        width="5.57271"
-        height="8.53299"
-        fill="#EEAB00"
-      />
-      <rect
-        x="67.7993"
-        y="32.6273"
-        width="5.57271"
-        height="8.53299"
-        fill="#EEAB00"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.26641 2.00494C7.26641 0.897644 8.16405 0 9.27135 0H19.7973C20.9046 0 21.8022 0.897644 21.8022 2.00494V18.0889L59.271 18.0889V2.00494C59.271 0.897644 60.1686 0 61.2759 0H71.8019C72.9092 0 73.8068 0.897644 73.8068 2.00494V18.0889H74.6741C75.7814 18.0889 76.6791 18.9865 76.6791 20.0938V30.6198C76.6791 31.7271 75.7814 32.6247 74.6741 32.6247L5.54334 32.6247C4.43604 32.6247 3.53839 31.7271 3.53839 30.6198L3.53839 20.0938C3.53839 18.9865 4.43604 18.0889 5.54333 18.0889H7.26641V2.00494Z"
-        fill="#FEC700"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M76.4615 19.1845L30.164 32.6247H5.54334C4.43604 32.6247 3.53839 31.7271 3.53839 30.6198V20.0938C3.53839 18.9865 4.43604 18.0889 5.54333 18.0889H7.26641V15.0871L21.8022 10.8673V18.0889L59.271 18.0889V2.00494C59.271 0.897644 60.1686 0 61.2759 0H71.8019C72.9092 0 73.8068 0.897644 73.8068 2.00494V18.0889H74.6741C75.4541 18.0889 76.13 18.5342 76.4615 19.1845Z"
-        fill="#FEF400"
-      />
-      <rect
-        opacity="0.3"
-        x="12.8409"
-        y="45.936"
-        width="54.9585"
-        height="14.974"
-        fill="#CE7D03"
-      />
-      <rect
-        x="30.7248"
-        y="15.3657"
-        width="20.9266"
-        height="19.5457"
-        rx="3.00742"
-        fill="#FEC700"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M51.6514 22.6388L30.7248 28.7138V18.3731C30.7248 16.7121 32.0713 15.3657 33.7322 15.3657H48.644C50.3049 15.3657 51.6514 16.7121 51.6514 18.3731V22.6388Z"
-        fill="#FEF400"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M42.7647 26.1885C44.1615 25.6425 45.1381 24.392 45.1381 22.9367C45.1381 20.979 43.3709 19.392 41.1909 19.392C39.0109 19.392 37.2437 20.979 37.2437 22.9367C37.2437 24.392 38.2203 25.6425 39.6171 26.1885L38.498 28.4266C38.1647 29.0932 38.6493 29.8774 39.3946 29.8774H42.9872C43.7324 29.8774 44.2171 29.0932 43.8838 28.4266L42.7647 26.1885Z"
-        fill="#BF7402"
-      />
-      <rect
-        x="59.2802"
-        y="16.1855"
-        width="14.4799"
-        height="1.87404"
-        fill="#FEC700"
-      />
-      <rect
-        x="7.26642"
-        y="16.1855"
-        width="14.4799"
-        height="1.87404"
-        fill="#FEC700"
-      />
+      {/* Golden Treasure Chest - Opened & Complete! */}
+      <defs>
+        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFD700" />
+          <stop offset="50%" stopColor="#FFA500" />
+          <stop offset="100%" stopColor="#FF8C00" />
+        </linearGradient>
+        <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFFF00" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#FFD700" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* Circular Sky Blue Background */}
+      <circle cx="40" cy="45" r="38" fill="#87CEEB" opacity="0.3" />
+      <circle cx="40" cy="45" r="34" fill="#87CEEB" opacity="0.2" />
+
+      {/* Glow Effect - Stronger */}
+      <circle cx="40" cy="45" r="38" fill="url(#glowGradient)" />
+      <circle cx="40" cy="45" r="32" fill="#FFD700" opacity="0.2" />
+
+      {/* Shadow */}
+      <ellipse cx="40" cy="75" rx="30" ry="7" fill="#000" opacity="0.25" />
+
+      {/* Chest Base - Golden Wood */}
+      <path d="M15 45 L15 70 Q15 75 20 75 L60 75 Q65 75 65 70 L65 45 Z" fill="url(#goldGradient)" />
+      <rect x="15" y="43" width="50" height="4" fill="#B8860B" />
+
+      {/* Chest Lid - Wide Open */}
+      <path d="M10 22 Q10 18 14 16 L66 16 Q70 18 70 22 L68 35 L12 35 Z" fill="#DAA520" />
+      <path d="M10 22 Q10 18 14 16 L66 16 Q70 18 70 22 L68 25 L12 25 Z" fill="#FFD700" />
+
+      {/* Treasure Inside - Coins & Gems */}
+      <circle cx="30" cy="38" r="4" fill="#FFD700" />
+      <circle cx="38" cy="36" r="4" fill="#FFA500" />
+      <circle cx="42" cy="36" r="4" fill="#FFD700" />
+      <circle cx="50" cy="38" r="4" fill="#FF8C00" />
+      <circle cx="34" cy="42" r="3.5" fill="#FFD700" />
+      <circle cx="46" cy="42" r="3.5" fill="#FFA500" />
+
+      {/* Gems/Jewels */}
+      <polygon points="25,44 27,40 29,44 27,45" fill="#00CED1" />
+      <polygon points="40,40 42,36 44,40 42,42" fill="#FF1493" />
+      <polygon points="55,44 57,40 59,44 57,45" fill="#00FF00" />
+
+      {/* Golden Lock - Open */}
+      <circle cx="40" cy="52" r="8" fill="#FFD700" />
+      <circle cx="40" cy="52" r="6" fill="#DAA520" />
+      <path d="M36 52 Q36 48 40 48 Q44 48 44 52" stroke="#B8860B" strokeWidth="2" fill="none" />
+
+      {/* Sparkles - Abundant */}
+      <circle cx="20" cy="30" r="2" fill="#FFFF00" opacity="0.9" />
+      <circle cx="60" cy="30" r="2" fill="#FFFF00" opacity="0.9" />
+      <circle cx="40" cy="15" r="2.5" fill="#FFFF00" />
+      <circle cx="15" cy="45" r="1.5" fill="#FFD700" opacity="0.8" />
+      <circle cx="65" cy="45" r="1.5" fill="#FFD700" opacity="0.8" />
+      <circle cx="25" cy="20" r="1.5" fill="#FFA500" opacity="0.8" />
+      <circle cx="55" cy="20" r="1.5" fill="#FFA500" opacity="0.8" />
+
+      {/* Star Sparkles */}
+      <path d="M70 25 L71 27 L73 27 L71.5 28.5 L72 30.5 L70 29 L68 30.5 L68.5 28.5 L67 27 L69 27 Z" fill="#FFFF00" />
+      <path d="M10 25 L11 27 L13 27 L11.5 28.5 L12 30.5 L10 29 L8 30.5 L8.5 28.5 L7 27 L9 27 Z" fill="#FFFF00" />
+
+      {/* Metal Bands - Golden */}
+      <rect x="12" y="40" width="56" height="2.5" fill="#B8860B" />
+      <rect x="12" y="60" width="56" height="2.5" fill="#B8860B" />
+      <rect x="12" y="42.5" width="56" height="0.5" fill="#FFD700" />
+      <rect x="12" y="62.5" width="56" height="0.5" fill="#FFD700" />
     </svg>
   );
 };
