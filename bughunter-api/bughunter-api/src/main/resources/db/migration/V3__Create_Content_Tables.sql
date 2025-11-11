@@ -71,7 +71,7 @@ CREATE TABLE problems (
                                   ON DELETE CASCADE,
 
                           CONSTRAINT chk_problem_type
-                              CHECK (type IN ('INFO', 'SELECT_1_OF_3', 'FILL_IN_THE_BLANK', 'MATCH_PAIRS', 'CODE_CHALLENGE'))
+                              CHECK (type IN ('INFO', 'SELECT_1_OF_3', 'FILL_IN_THE_BLANK', 'MULTIPLE_CHOICE', 'CODE_CHALLENGE'))
 );
 
 COMMENT ON TABLE problems IS 'Contenido específico de cada lección (problemas/pantallas)';

@@ -23,13 +23,18 @@ type XpByDate = Record<DateString, number>;
 
 export type XpSlice = {
   xpByDate: XpByDate;
+  totalXp: number;
   increaseXp: (by: number) => void;
   xpToday: () => number;
   xpThisWeek: () => number;
+  setTotalXp: (value: number) => void;
+  setXpToday: (value: number) => void;
+  setXpThisWeek: (value: number) => void;
 };
 
 export const createXpSlice: BoundStateCreator<XpSlice> = (set, get) => ({
   xpByDate: {},
+  totalXp: 0,
   increaseXp: (by: number) => set({ xpByDate: addXpToday(get().xpByDate, by) }),
   xpToday: () => xpAt(get().xpByDate, dayjs()),
   xpThisWeek: () => {
@@ -38,5 +43,14 @@ export const createXpSlice: BoundStateCreator<XpSlice> = (set, get) => ({
         xpAt(get().xpByDate, dayjs().add(-daysBack)),
       ),
     );
+  },
+  setTotalXp: (value: number) => set({ totalXp: value }),
+  setXpToday: (value: number) => {
+    const today = toDateString(dayjs());
+    set({ xpByDate: { ...get().xpByDate, [today]: value } });
+  },
+  setXpThisWeek: (value: number) => {
+    // Este método se mantiene por compatibilidad pero no modifica xpByDate
+    // ya que xpThisWeek se calcula dinámicamente
   },
 });

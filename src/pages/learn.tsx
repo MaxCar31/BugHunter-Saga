@@ -1,31 +1,7 @@
 import { type NextPage } from "next";
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActiveBookSvg,
-  LockedBookSvg,
-  CheckmarkSvg,
-  LockedDumbbellSvg,
-  FastForwardSvg,
-  GoldenBookSvg,
-  GoldenDumbbellSvg,
-  GoldenTreasureSvg,
-  GoldenTrophySvg,
-  GuidebookSvg,
-  LessonCompletionSvg0,
-  LessonCompletionSvg1,
-  LessonCompletionSvg2,
-  LessonCompletionSvg3,
-  LockSvg,
-  StarSvg,
-  LockedTreasureSvg,
-  LockedTrophySvg,
-  UpArrowSvg,
-  ActiveTreasureSvg,
-  ActiveTrophySvg,
-  ActiveDumbbellSvg,
-  PracticeExerciseSvg,
-} from "~/components/Svgs";
+import { UpArrowSvg, PracticeExerciseSvg } from "~/components/Svgs";
 import { TopBar } from "~/components/TopBar";
 import { BottomBar } from "~/components/BottomBar";
 import { RightBar } from "~/components/RightBar";
@@ -33,130 +9,62 @@ import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
-import { apiBase } from "~/utils/config";
+import { fetchModuleUnits } from "~/utils/units";
 import { useRouter } from "next/router";
+import { claimTreasure } from "~/services/userService";
+import { TreasureCelebration } from "~/components/learn/TreasureCelebration";
+import { TileIcon } from "~/components/learn/TileIcon";
+import { HoverLabel } from "~/components/learn/HoverLabel";
+import { UnitHeader } from "~/components/learn/UnitHeader";
+import { LessonCompletionIcon } from "~/components/learn/LessonCompletionIcon";
+import { getTileLeftClassName, getTileTooltipLeftOffset } from "~/utils/tilePositions";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
 
-const TileIcon = ({
-  tileType,
-  status,
-}: {
-  tileType: TileType;
-  status: TileStatus;
-}): JSX.Element => {
-  switch (tileType) {
-    case "star":
-      return status === "COMPLETE" ? (
-        <CheckmarkSvg />
-      ) : status === "ACTIVE" ? (
-        <StarSvg />
-      ) : (
-        <LockSvg />
-      );
-    case "book":
-      return status === "COMPLETE" ? (
-        <GoldenBookSvg />
-      ) : status === "ACTIVE" ? (
-        <ActiveBookSvg />
-      ) : (
-        <LockedBookSvg />
-      );
-    case "dumbbell":
-      return status === "COMPLETE" ? (
-        <GoldenDumbbellSvg />
-      ) : status === "ACTIVE" ? (
-        <ActiveDumbbellSvg />
-      ) : (
-        <LockedDumbbellSvg />
-      );
-    case "fast-forward":
-      return status === "COMPLETE" ? (
-        <CheckmarkSvg />
-      ) : status === "ACTIVE" ? (
-        <StarSvg />
-      ) : (
-        <FastForwardSvg />
-      );
-    case "treasure":
-      return status === "COMPLETE" ? (
-        <GoldenTreasureSvg />
-      ) : status === "ACTIVE" ? (
-        <ActiveTreasureSvg />
-      ) : (
-        <LockedTreasureSvg />
-      );
-    case "trophy":
-      return status === "COMPLETE" ? (
-        <GoldenTrophySvg />
-      ) : status === "ACTIVE" ? (
-        <ActiveTrophySvg />
-      ) : (
-        <LockedTrophySvg />
-      );
-  }
-};
-
-const tileLeftClassNames = [
-  "left-0",
-  "left-[-45px]",
-  "left-[-70px]",
-  "left-[-45px]",
-  "left-0",
-  "left-[45px]",
-  "left-[70px]",
-  "left-[45px]",
-] as const;
-
-type TileLeftClassName = (typeof tileLeftClassNames)[number];
-
-const getTileLeftClassName = ({
-  index,
-  unitNumber,
-  tilesLength,
-}: {
-  index: number;
-  unitNumber: number;
-  tilesLength: number;
-}): TileLeftClassName => {
-  if (index >= tilesLength - 1) {
-    return "left-0";
+// Nueva función: Calcula el estado de un tile basado en el progreso real
+const calculateTileStatus = (
+  tile: Tile,
+  unit: Unit,
+  allUnits: Unit[],
+  completedLessons: Set<number>
+): TileStatus => {
+  // 1. Si la lección ya está completada
+  if (completedLessons.has(tile.lessonId)) {
+    return "COMPLETE";
   }
 
-  const classNames =
-    unitNumber % 2 === 1
-      ? tileLeftClassNames
-      : [...tileLeftClassNames.slice(4), ...tileLeftClassNames.slice(0, 4)];
+  // 2. Verificar si todas las unidades anteriores están completas
+  const currentUnitIndex = allUnits.findIndex(u => u.unitNumber === unit.unitNumber);
 
-  return classNames[index % classNames.length] ?? "left-0";
-};
+  for (let i = 0; i < currentUnitIndex; i++) {
+    const previousUnit = allUnits[i];
+    if (!previousUnit) continue; // TypeScript safety check
+    const allTilesCompleted = previousUnit.tiles.every(t => completedLessons.has(t.lessonId));
 
-const tileTooltipLeftOffsets = [140, 95, 70, 95, 140, 185, 210, 185] as const;
-
-type TileTooltipLeftOffset = (typeof tileTooltipLeftOffsets)[number];
-
-const getTileTooltipLeftOffset = ({
-  index,
-  unitNumber,
-  tilesLength,
-}: {
-  index: number;
-  unitNumber: number;
-  tilesLength: number;
-}): TileTooltipLeftOffset => {
-  if (index >= tilesLength - 1) {
-    return tileTooltipLeftOffsets[0];
+    if (!allTilesCompleted) {
+      // Si hay una unidad anterior incompleta, este tile está bloqueado
+      return "LOCKED";
+    }
   }
 
-  const offsets =
-    unitNumber % 2 === 1
-      ? tileTooltipLeftOffsets
-      : [
-          ...tileTooltipLeftOffsets.slice(4),
-          ...tileTooltipLeftOffsets.slice(0, 4),
-        ];
+  // 3. Dentro de la unidad actual, verificar si el tile anterior está completo
+  const tileIndex = unit.tiles.findIndex(t => t.lessonId === tile.lessonId);
 
-  return offsets[index % offsets.length] ?? tileTooltipLeftOffsets[0];
+  // Primera lección de la unidad
+  if (tileIndex === 0) {
+    return "ACTIVE";
+  }
+
+  // Verificar si todas las lecciones anteriores en esta unidad están completas
+  for (let i = 0; i < tileIndex; i++) {
+    const previousTile = unit.tiles[i];
+    if (!previousTile) continue; // TypeScript safety check
+    if (!completedLessons.has(previousTile.lessonId)) {
+      return "LOCKED";
+    }
+  }
+
+  return "ACTIVE";
 };
 
 const getTileColors = ({
@@ -186,6 +94,7 @@ const TileTooltip = ({
   description,
   status,
   closeTooltip,
+  tile,
 }: {
   selectedTile: number | null;
   index: number;
@@ -193,6 +102,7 @@ const TileTooltip = ({
   description: string;
   status: TileStatus;
   closeTooltip: () => void;
+  tile: Tile;
 }) => {
   const tileTooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -214,33 +124,25 @@ const TileTooltip = ({
 
   return (
     <div
-      className={[
-        "relative h-0 w-full",
-        index === selectedTile ? "" : "invisible",
-      ].join(" ")}
+      className={`relative h-0 w-full ${index === selectedTile ? "" : "invisible"}`}
       ref={tileTooltipRef}
     >
       <div
-        className={[
-          "absolute z-30 flex w-[300px] flex-col gap-4 rounded-xl p-4 font-bold transition-all duration-300",
-          status === "ACTIVE"
-            ? activeBackgroundColor
-            : status === "LOCKED"
-              ? "border-2 border-gray-200 bg-gray-100"
-              : "bg-yellow-400",
-          index === selectedTile ? "top-4 scale-100" : "-top-14 scale-0",
-        ].join(" ")}
-        style={{ left: "calc(50% - 150px)" }}
+        className={`absolute z-30 flex w-[280px] flex-col gap-4 rounded-xl p-4 font-bold transition-all duration-300 sm:w-[300px] ${status === "ACTIVE"
+          ? activeBackgroundColor
+          : status === "LOCKED"
+            ? "border-2 border-gray-200 bg-gray-100"
+            : "bg-yellow-400"
+          } ${index === selectedTile ? "top-4 scale-100 opacity-100" : "-top-14 scale-0 opacity-0"}`}
+        style={{ left: "calc(50% - 140px)" }}
       >
         <div
-          className={[
-            "absolute left-[140px] top-[-8px] h-4 w-4 rotate-45",
-            status === "ACTIVE"
-              ? activeBackgroundColor
-              : status === "LOCKED"
-                ? "border-l-2 border-t-2 border-gray-200 bg-gray-100"
-                : "bg-yellow-400",
-          ].join(" ")}
+          className={`absolute left-[140px] top-[-8px] h-4 w-4 rotate-45 ${status === "ACTIVE"
+            ? activeBackgroundColor
+            : status === "LOCKED"
+              ? "border-l-2 border-t-2 border-gray-200 bg-gray-100"
+              : "bg-yellow-400"
+            }`}
           style={{
             left: getTileTooltipLeftOffset({
               index,
@@ -250,38 +152,33 @@ const TileTooltip = ({
           }}
         ></div>
         <div
-          className={[
-            "text-lg",
-            status === "ACTIVE"
-              ? "text-white"
-              : status === "LOCKED"
-                ? "text-gray-400"
-                : "text-yellow-600",
-          ].join(" ")}
+          className={`text-base sm:text-lg ${status === "ACTIVE"
+            ? "text-white"
+            : status === "LOCKED"
+              ? "text-gray-400"
+              : "text-yellow-600"
+            }`}
         >
           {description}
         </div>
         {status === "ACTIVE" ? (
           <Link
-            href="/lesson"
-            className={[
-              "flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase",
-              unit.textColor,
-            ].join(" ")}
+            href={`/lesson?lessonId=${tile.lessonId}`}
+            className="flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 text-sm font-bold uppercase text-blue-600 transition-colors hover:bg-gray-50 sm:text-base"
           >
             Iniciar +10 XP
           </Link>
         ) : status === "LOCKED" ? (
           <button
-            className="w-full rounded-xl bg-gray-200 p-3 uppercase text-gray-400"
+            className="w-full rounded-xl bg-gray-200 p-3 text-sm uppercase text-gray-400 sm:text-base"
             disabled
           >
             Bloqueado
           </button>
         ) : (
           <Link
-            href="/lesson"
-            className="flex w-full items-center justify-center rounded-xl border-b-4 border-yellow-200 bg-white p-3 uppercase text-yellow-400"
+            href={`/lesson?lessonId=${tile.lessonId}&practice=true`}
+            className="flex w-full items-center justify-center rounded-xl border-b-4 border-yellow-200 bg-white p-3 text-sm uppercase text-yellow-400 sm:text-base"
           >
             Practicar +5 XP
           </Link>
@@ -291,7 +188,17 @@ const TileTooltip = ({
   );
 };
 
-const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
+const UnitSection = ({
+  unit,
+  allUnits,
+  onClaimTreasure,
+  isClaimingTreasure,
+}: {
+  unit: Unit | null;
+  allUnits: Unit[];
+  onClaimTreasure: (lessonId: number) => void;
+  isClaimingTreasure: boolean;
+}): JSX.Element => {
   const [selectedTile, setSelectedTile] = useState<null | number>(null);
 
   useEffect(() => {
@@ -303,18 +210,17 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
   const closeTooltip = useCallback(() => setSelectedTile(null), []);
 
   const currentModule = useBoundStore((x) => x.module);
-  const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  const increaseLessonsCompleted = useBoundStore((x) => x.increaseLessonsCompleted);
-  const increaseLingots = useBoundStore((x) => x.increaseLingots);
+  const getCompletedLessons = useBoundStore((x) => x.getCompletedLessons);
+  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
 
-  const lessonsCompleted = getLessonsCompletedForModule(currentModule.code);
+  const completedLessons = getCompletedLessons(currentModule?.code || '');
 
   // Mostrar skeleton mientras se carga
-  if (!unit) {
+  if (!unit || !unit.tiles || unit.tiles.length === 0) {
     return (
-      <div className="flex max-w-2xl flex-col items-center gap-8">
-        <div className="h-32 w-full animate-pulse rounded-xl bg-gray-200"></div>
-        <div className="h-64 w-full animate-pulse rounded-xl bg-gray-200"></div>
+      <div className="flex w-full flex-col items-center gap-6 py-4 px-4 sm:px-0">
+        <div className="h-24 w-full max-w-xl animate-pulse rounded-xl bg-gray-200"></div>
+        <div className="h-48 w-full max-w-xl animate-pulse rounded-xl bg-gray-200"></div>
       </div>
     );
   }
@@ -326,12 +232,13 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
         description={unit.description}
         backgroundColor={unit.backgroundColor}
         borderColor={unit.borderColor}
+        moduleCode={currentModule?.code || ''}
       />
-      <div className="relative mb-8 mt-[67px] flex max-w-2xl flex-col items-center gap-4">
+      <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 px-4 sm:gap-6 sm:px-0">
         {unit.tiles.map((tile, i): JSX.Element => {
-          // Ahora usamos el status que viene de la API
-          const status = tile.status;
-          
+          // Calcular el estado real basado en el progreso del usuario
+          const status = calculateTileStatus(tile, unit, allUnits, completedLessons);
+
           return (
             <Fragment key={i}>
               {(() => {
@@ -353,42 +260,34 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                     }
                     return (
                       <div
-                        className={[
-                          "relative -mb-4 h-[93px] w-[98px]",
-                          getTileLeftClassName({
-                            index: i,
-                            unitNumber: unit.unitNumber,
-                            tilesLength: unit.tiles.length,
-                          }),
-                        ].join(" ")}
+                        className={`relative h-[93px] w-[98px] ${getTileLeftClassName({
+                          index: i,
+                          unitNumber: unit.unitNumber,
+                          tilesLength: unit.tiles.length,
+                        })}`}
                       >
                         {tile.type === "fast-forward" && status === "LOCKED" ? (
                           <HoverLabel
                             text="Jump here?"
-                            textColor={unit.textColor}
+                            textColor="text-gray-700"
                           />
                         ) : selectedTile !== i && status === "ACTIVE" ? (
-                          <HoverLabel text="Start" textColor={unit.textColor} />
+                          <HoverLabel text="Start" textColor="text-gray-700" />
                         ) : null}
-                        <LessonCompletionSvg
-                          lessonsCompleted={lessonsCompleted}
-                          status={status}
-                        />
                         <button
-                          className={[
-                            "absolute m-3 rounded-full border-b-8 p-4",
-                            getTileColors({
-                              tileType: tile.type,
-                              status,
-                              defaultColors: `${unit.borderColor} ${unit.backgroundColor}`,
-                            }),
-                          ].join(" ")}
+                          className={`absolute m-3 rounded-full border-b-8 p-4 transition-all ${getTileColors({
+                            tileType: tile.type,
+                            status,
+                            defaultColors: `${unit.borderColor} ${unit.backgroundColor}` as `border-${string} bg-${string}`,
+                          })}`}
                           onClick={() => {
                             if (
                               tile.type === "fast-forward" &&
                               status === "LOCKED"
                             ) {
-                              increaseLessonsCompleted(currentModule.code, i * 4);
+                              // TODO: Implementar fast-forward con el nuevo sistema de progreso
+                              // Por ahora deshabilitado
+                              console.warn("Fast-forward temporalmente deshabilitado");
                               return;
                             }
                             setSelectedTile(i);
@@ -402,18 +301,14 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                   case "treasure":
                     return (
                       <div
-                        className={[
-                          "relative -mb-4",
-                          getTileLeftClassName({
-                            index: i,
-                            unitNumber: unit.unitNumber,
-                            tilesLength: unit.tiles.length,
-                          }),
-                        ].join(" ")}
+                        className={`relative ${getTileLeftClassName({
+                          index: i,
+                          unitNumber: unit.unitNumber,
+                          tilesLength: unit.tiles.length,
+                        })}`}
                         onClick={() => {
-                          if (status === "ACTIVE") {
-                            increaseLessonsCompleted(currentModule.code, 4);
-                            increaseLingots(1);
+                          if (status === "ACTIVE" && !isClaimingTreasure) {
+                            onClaimTreasure(tile.lessonId);
                           }
                         }}
                         role="button"
@@ -451,6 +346,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                 })()}
                 status={status}
                 closeTooltip={closeTooltip}
+                tile={tile}
               />
             </Fragment>
           );
@@ -464,75 +360,111 @@ const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
   const router = useRouter();
-  console.log(currentModule);
-  // --- CARGA DINÁMICA DE LA UNIDAD ---
-  const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
+
+  // --- CARGA DINÁMICA DE LAS UNIDADES ---
+  const [units, setUnits] = useState<Unit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+  const [claimingTreasure, setClaimingTreasure] = useState(false);
+  const [treasureCelebration, setTreasureCelebration] = useState<{
+    show: boolean;
+    lingotsEarned: number;
+  }>({ show: false, lingotsEarned: 0 });
 
-  if (!currentModule) {
-    // Si no hay módulo, mostramos un loader o redirigimos
-    useEffect(() => {
-      // Si después de cargar sigue sin haber módulo, redirige a la selección
-      if (!isLoading && !currentModule) {
-        router.push('/register');
-      }
-    }, [isLoading, currentModule, router]);
+  // Zustand stores
+  const setLingots = useBoundStore((x) => x.setLingots);
+  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
 
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-xl">Cargando módulo...</p>
-      </div>
-    );
-  }
+  // Hook para cargar las unidades
   useEffect(() => {
-    const fetchUnit = async () => {
+    const loadUnits = async () => {
+      // Si no hay módulo, no intentar cargar
       if (!currentModule?.code) {
         setIsLoading(false);
-        setError("No se ha seleccionado ningún módulo.");
         return;
       }
 
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("bh_token");
-      
-      try {
-        const response = await fetch(
-          `${apiBase}/api/content/modules/${currentModule.code}/unit`,
-          {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`Error ${response.status} cargando la unidad`);
-        }
 
-        const data: Unit = await response.json();
-        setCurrentUnit(data);
+      try {
+        const token = localStorage.getItem("bh_token");
+        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
+        console.log("🔍 Units loaded:", loadedUnits);
+        setUnits(loadedUnits);
       } catch (err) {
+        console.error("❌ Error loading units:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchUnit();
+    void loadUnits();
   }, [currentModule?.code]);
 
-  // Verificar si hay módulo seleccionado
-  if (!currentModule || !currentModule.code) {
+  // Hook para scroll
+  useEffect(() => {
+    const updateScrollY = () => setScrollY(globalThis.scrollY ?? scrollY);
+    updateScrollY();
+    document.addEventListener("scroll", updateScrollY);
+    return () => document.removeEventListener("scroll", updateScrollY);
+  }, [scrollY]);
+
+  // Handler para reclamar tesoros
+  const handleClaimTreasure = async (lessonId: number) => {
+    // Prevenir múltiples claims simultáneos
+    if (claimingTreasure) return;
+
+    setClaimingTreasure(true);
+
+    try {
+      const reward = await claimTreasure(lessonId);
+
+      // Actualizar lingots en el store
+      setLingots(reward.totalLingots);
+
+      // Marcar el tesoro como completado en el store local
+      if (currentModule?.code) {
+        markLessonAsCompleted(currentModule.code, lessonId);
+      }
+
+      // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
+      if (currentModule?.code) {
+        const token = localStorage.getItem("bh_token");
+        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
+        setUnits(loadedUnits);
+      }
+
+      // Mostrar celebración
+      setTreasureCelebration({
+        show: true,
+        lingotsEarned: reward.lingotsEarned,
+      });
+
+      console.log(`🎉 Tesoro reclamado! +${reward.lingotsEarned} Puntos QA`);
+    } catch (err) {
+      console.error("❌ Error al reclamar tesoro:", err);
+      const errorMessage = err instanceof Error ? err.message : "Error al reclamar el tesoro";
+      alert(errorMessage);
+    } finally {
+      setClaimingTreasure(false);
+    }
+  };
+
+  // Early returns después de todos los hooks
+  if (!currentModule?.code) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">No se ha seleccionado un módulo</h1>
-          <p className="text-gray-600 mb-6">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
+          <h1 className="mb-4 text-xl font-bold text-gray-800 sm:text-2xl">No se ha seleccionado un módulo</h1>
+          <p className="mb-6 text-sm text-gray-600 sm:text-base">
             Por favor, selecciona un módulo para continuar aprendiendo.
           </p>
           <Link
             href="/register"
-            className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
+            className="inline-block rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 text-sm font-bold uppercase text-white transition hover:brightness-110 sm:text-base"
           >
             Seleccionar Módulo
           </Link>
@@ -541,49 +473,83 @@ const Learn: NextPage = () => {
     );
   }
 
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const updateScrollY = () => setScrollY(globalThis.scrollY ?? scrollY);
-    updateScrollY();
-    document.addEventListener("scroll", updateScrollY);
-    return () => document.removeEventListener("scroll", updateScrollY);
-  }, [scrollY]);
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <div className="rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
+          <h1 className="mb-6 text-lg font-bold text-gray-800 sm:text-xl">Cargando módulo...</h1>
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-b-4 border-blue-500 sm:h-12 sm:w-12"></div>
+        </div>
+      </div>
+    );
+  }
 
-  console.log("Current Unit:", currentUnit);
-  console.log("Current Module:", currentModule);
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
+          <h1 className="mb-4 text-lg font-bold text-red-600 sm:text-xl">Error al cargar</h1>
+          <p className="mb-6 text-sm text-gray-600 sm:text-base">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 text-sm font-bold uppercase text-white transition hover:brightness-110 sm:text-base"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const topBarColors = {
-      backgroundColor: currentModule.uiConfig?.backgroundColor,
-      borderColor: currentModule.uiConfig?.borderColor,
-    };
+  const moduleBackgroundColor = (currentModule?.uiConfig?.backgroundColor || 'bg-blue-500') as `bg-${string}`;
+  const moduleBorderColor = (currentModule?.uiConfig?.borderColor || 'border-blue-700') as `border-${string}`;
 
   return (
     <>
       <TopBar
-        backgroundColor={topBarColors.backgroundColor}
-        borderColor={topBarColors.borderColor}
+        backgroundColor={moduleBackgroundColor}
+        borderColor={moduleBorderColor}
       />
       <LeftBar selectedTab="Aprender" />
 
-      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
-        <div className="flex max-w-2xl grow flex-col">
-          {isLoading && <UnitSection unit={null} />}
-          {error && <p className="text-center text-red-500">{error}</p>}
-          {!isLoading && !error && currentUnit && (
-            <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
+      <div className="flex justify-center gap-3 pt-14 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-8 min-h-screen bg-gray-50">
+        <div className="flex w-full max-w-2xl grow flex-col pb-20 sm:pb-24">
+          {isLoading && (
+            <UnitSection
+              unit={null}
+              allUnits={[]}
+              onClaimTreasure={handleClaimTreasure}
+              isClaimingTreasure={claimingTreasure}
+            />
           )}
-          
-          <div className="sticky bottom-28 left-0 right-0 flex items-end justify-between">
+          {error && (
+            <div className="flex justify-center py-8 px-4">
+              <p className="text-center text-red-500 bg-red-50 px-4 py-3 rounded-lg border border-red-200">
+                {error}
+              </p>
+            </div>
+          )}
+          {!isLoading && !error && units.map((unit) => (
+            <UnitSection
+              unit={unit}
+              allUnits={units}
+              key={unit.unitNumber}
+              onClaimTreasure={handleClaimTreasure}
+              isClaimingTreasure={claimingTreasure}
+            />
+          ))}
+
+          <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between px-4 sm:px-0 sm:bottom-24">
             <Link
               href="/lesson?practice"
-              className="absolute left-4 flex h-16 w-16 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white transition hover:bg-gray-50 hover:brightness-90 md:left-0"
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16"
             >
               <span className="sr-only">Practice exercise</span>
-              <PracticeExerciseSvg className="h-8 w-8" />
+              <PracticeExerciseSvg className="h-7 w-7 sm:h-8 sm:w-8" />
             </Link>
             {scrollY > 100 && (
               <button
-                className="absolute right-4 flex h-14 w-14 items-center justify-center self-end rounded-2xl border-2 border-b-4 border-gray-200 bg-white transition hover:bg-gray-50 hover:brightness-90 md:right-0"
+                className="flex h-12 w-12 items-center justify-center self-end rounded-2xl border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-14 sm:w-14"
                 onClick={() => scrollTo(0, 0)}
               >
                 <span className="sr-only">Jump to top</span>
@@ -595,113 +561,21 @@ const Learn: NextPage = () => {
         <RightBar />
       </div>
 
-      <div className="pt-[90px]"></div>
-
       <BottomBar selectedTab="Aprender" />
       <LoginScreen
         loginScreenState={loginScreenState}
         setLoginScreenState={setLoginScreenState}
       />
+
+      {/* Celebración de tesoro reclamado */}
+      {treasureCelebration.show && (
+        <TreasureCelebration
+          lingotsEarned={treasureCelebration.lingotsEarned}
+          onClose={() => setTreasureCelebration({ show: false, lingotsEarned: 0 })}
+        />
+      )}
     </>
   );
 };
 
 export default Learn;
-
-const LessonCompletionSvg = ({
-  lessonsCompleted,
-  status,
-  style = {},
-}: {
-  lessonsCompleted: number;
-  status: TileStatus;
-  style?: React.HTMLAttributes<SVGElement>["style"];
-}) => {
-  if (status !== "ACTIVE") {
-    return null;
-  }
-  switch (lessonsCompleted % 4) {
-    case 0:
-      return <LessonCompletionSvg0 style={style} />;
-    case 1:
-      return <LessonCompletionSvg1 style={style} />;
-    case 2:
-      return <LessonCompletionSvg2 style={style} />;
-    case 3:
-      return <LessonCompletionSvg3 style={style} />;
-    default:
-      return null;
-  }
-};
-
-const HoverLabel = ({
-  text,
-  textColor,
-}: {
-  text: string;
-  textColor: `text-${string}`;
-}) => {
-  const hoverElement = useRef<HTMLDivElement | null>(null);
-  const [width, setWidth] = useState(72);
-
-  useEffect(() => {
-    setWidth(hoverElement.current?.clientWidth ?? width);
-  }, [hoverElement.current?.clientWidth, width]);
-
-  return (
-    <div
-      className={`absolute z-10 w-max animate-bounce rounded-lg border-2 border-gray-200 bg-white px-3 py-2 font-bold uppercase ${textColor}`}
-      style={{
-        top: "-25%",
-        left: `calc(50% - ${width / 2}px)`,
-      }}
-      ref={hoverElement}
-    >
-      {text}
-      <div
-        className="absolute h-3 w-3 rotate-45 border-b-2 border-r-2 border-gray-200 bg-white"
-        style={{ left: "calc(50% - 8px)", bottom: "-8px" }}
-      ></div>
-    </div>
-  );
-};
-
-const UnitHeader = ({
-  unitNumber,
-  description,
-  backgroundColor,
-  borderColor,
-}: {
-  unitNumber: number;
-  description: string;
-  backgroundColor: `bg-${string}`;
-  borderColor: `border-${string}`;
-}) => {
-  const currentModule = useBoundStore((x) => x.module);
-  return (
-    <article
-      className={["max-w-2xl text-white sm:rounded-xl", backgroundColor].join(
-        " ",
-      )}
-    >
-      <header className="flex items-center justify-between gap-4 p-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold">Unidad {unitNumber}</h2>
-          <p className="text-lg">{description}</p>
-        </div>
-        <Link
-          href={`/guidebook/${currentModule.code}/${unitNumber}`}
-          className={[
-            "flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 transition hover:text-gray-100",
-            borderColor,
-          ].join(" ")}
-        >
-          <GuidebookSvg />
-          <span className="sr-only font-bold uppercase lg:not-sr-only">
-            Guía
-          </span>
-        </Link>
-      </header>
-    </article>
-  );
-};

@@ -17,8 +17,77 @@ import { Flag } from "~/components/Flag";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { getUserProfile } from "~/services/userService";
+import dayjs from "dayjs";
 
 const Profile: NextPage = () => {
+  const router = useRouter();
+  const loggedIn = useBoundStore((x) => x.loggedIn);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Feature 1: Cargar el perfil del usuario al montar el componente
+  useEffect(() => {
+    if (!loggedIn) {
+      void router.push("/");
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const profile = await getUserProfile();
+
+        // Actualizar el store con los datos del perfil
+        useBoundStore.setState({
+          name: profile.name,
+          username: profile.username,
+          email: profile.email,
+          joinedAt: dayjs(profile.joinedAt),
+          lingots: profile.lingots,
+          goalXp: profile.dailyXpGoal as 1 | 10 | 20 | 30 | 50,
+          soundEffects: profile.soundEffectsEnabled,
+        });
+
+      } catch (err) {
+        console.error("Error loading profile:", err);
+        setError(err instanceof Error ? err.message : "Error al cargar el perfil");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadProfile();
+  }, [loggedIn, router]);
+
+  if (isLoading) {
+    return (
+      <div>
+        <ProfileTopBar />
+        <LeftBar selectedTab="Perfil" />
+        <div className="flex justify-center items-center pt-20 min-h-screen">
+          <div className="text-gray-500">Cargando perfil...</div>
+        </div>
+        <BottomBar selectedTab="Perfil" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <ProfileTopBar />
+        <LeftBar selectedTab="Perfil" />
+        <div className="flex justify-center items-center pt-20 min-h-screen">
+          <div className="text-red-500">{error}</div>
+        </div>
+        <BottomBar selectedTab="Perfil" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <ProfileTopBar />
@@ -30,7 +99,7 @@ const Profile: NextPage = () => {
         </div>
       </div>
       <div className="pt-[90px]"></div>
-      <BottomBar selectedTab="Profile" />
+      <BottomBar selectedTab="Perfil" />
     </div>
   );
 };

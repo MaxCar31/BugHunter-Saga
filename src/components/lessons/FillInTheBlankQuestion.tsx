@@ -7,8 +7,8 @@ import type { ModuleLesson } from "~/utils/lessons";
 
 export const FillInTheBlankQuestion = ({
     problem,
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     selectedAnswers,
     setSelectedAnswers,
     quitMessageShown,
@@ -21,8 +21,8 @@ export const FillInTheBlankQuestion = ({
     hearts,
 }: {
     problem: ModuleLesson;
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     selectedAnswers: number[];
     setSelectedAnswers: React.Dispatch<React.SetStateAction<number[]>>;
     correctAnswerShown: boolean;
@@ -46,8 +46,8 @@ export const FillInTheBlankQuestion = ({
             <div className="flex grow flex-col items-center gap-5">
                 <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
                     <ProgressBar
-                        correctAnswerCount={correctAnswerCount}
-                        totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+                        answeredQuestionsCount={answeredQuestionsCount}
+                        totalQuestionsCount={totalQuestionsCount}
                         setQuitMessageShown={setQuitMessageShown}
                         hearts={hearts}
                     />
@@ -61,7 +61,7 @@ export const FillInTheBlankQuestion = ({
                         <div className="flex items-center gap-2 px-2">
                             <Image src="/logo.svg" alt="" width={92} height={115} />
                             <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
-                                {question}
+                                {question || "Pregunta no disponible"}
                                 <div
                                     className="absolute h-4 w-4 rotate-45 border-b-2 border-l-2 border-gray-200 bg-white"
                                     style={{
@@ -84,14 +84,14 @@ export const FillInTheBlankQuestion = ({
                                             });
                                         }}
                                     >
-                                        {answerTiles[i]}
+                                        {answerTiles?.[i] || ""}
                                     </button>
                                 );
                             })}
                         </div>
                     </div>
                     <div className="flex flex-wrap justify-center gap-1">
-                        {answerTiles.map((answerTile, i) => {
+                        {answerTiles?.map((answerTile, i) => {
                             return (
                                 <button
                                     key={i}
@@ -113,13 +113,21 @@ export const FillInTheBlankQuestion = ({
                                     {answerTile}
                                 </button>
                             );
-                        })}
+                        }) || (
+                                <div className="text-center text-gray-500">
+                                    No hay opciones disponibles
+                                </div>
+                            )}
                     </div>
                 </section>
             </div>
 
             <CheckAnswer
-                correctAnswer={correctAnswerIndices.map((i) => answerTiles[i]).join(" ")}
+                correctAnswer={
+                    correctAnswerIndices && answerTiles
+                        ? correctAnswerIndices.map((i) => answerTiles[i]).join(" ")
+                        : ""
+                }
                 correctAnswerShown={correctAnswerShown}
                 isAnswerCorrect={isAnswerCorrect}
                 isAnswerSelected={selectedAnswers.length > 0}

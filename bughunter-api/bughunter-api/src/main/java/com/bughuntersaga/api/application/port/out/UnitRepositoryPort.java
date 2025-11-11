@@ -23,14 +23,7 @@ public interface UnitRepositoryPort {
      * @param moduleCode Código del módulo
      * @return Lista de unidades
      */
-    List<Unit> findUnitsByModuleCode(String moduleCode);
+    List<Unit> findAllUnitsByModuleCode(String moduleCode);
 
-    /**
-     * Obtiene una unidad por su ID, incluyendo sus lecciones.
-     *
-     * @param unitId ID de la unidad
-     * @return Unidad con sus lecciones
-     */
-    Optional<Unit> findByIdWithLessons(Integer unitId);
 
 }
