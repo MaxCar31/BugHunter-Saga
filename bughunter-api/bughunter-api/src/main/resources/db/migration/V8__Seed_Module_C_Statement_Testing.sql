@@ -16,7 +16,9 @@ INSERT INTO modules (code, name, description, ui_config) VALUES
   "textColor": "text-white"
 }');
 
+-- ============================================================================
 -- 2. CREAR UNIDADES (3)
+-- ============================================================================
 INSERT INTO units (module_id, unit_number, description) VALUES
 ((SELECT id FROM modules WHERE code = 'moduleC'), 1, 'Introducción y Cobertura de Sentencia'),
 ((SELECT id FROM modules WHERE code = 'moduleC'), 2, 'Cobertura de Decisión y Condición'),
@@ -25,7 +27,6 @@ INSERT INTO units (module_id, unit_number, description) VALUES
 -- ============================================================================
 -- 3. CREAR LECCIONES (4 por unidad: book, star, trophy, treasure)
 -- ============================================================================
-
 -- UNIT 1
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1), 'book', '¿Qué es la Cobertura de Sentencia?', 1),
@@ -52,33 +53,36 @@ INSERT INTO lessons (unit_id, type, description, position) VALUES
 -- ============================================================================
 
 -- ========== UNIT 1 ==========
-
 -- BOOK
 INSERT INTO problems (lesson_id, type, content, position) VALUES
 ((SELECT id FROM lessons WHERE description = '¿Qué es la Cobertura de Sentencia?'), 'INFO', '{
-  "title": "Introducción a la Cobertura de Sentencia",
-  "content": "La cobertura de sentencia mide el porcentaje de líneas de código ejecutadas al menos una vez. Es una métrica esencial en las pruebas de caja blanca.",
-  "example": "Si un programa tiene 100 líneas y 80 se ejecutan, la cobertura es 80%."
+  "type": "INFO",
+  "moduleTitle": "Módulo C",
+  "introduction": "La cobertura de sentencia mide el porcentaje de líneas de código ejecutadas al menos una vez.",
+  "objectives": ["Comprender el concepto de cobertura de sentencia", "Calcular cobertura básica mediante ejemplos"]
 }', 1),
 ((SELECT id FROM lessons WHERE description = '¿Qué es la Cobertura de Sentencia?'), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "La cobertura de sentencia evalúa qué porcentaje de ___ de código se ejecutan al menos una vez.",
-  "tiles": ["decisiones", "líneas", "casos de prueba", "funciones"],
-  "correctIndices": [1]
+  "answerTiles": ["decisiones", "líneas", "casos de prueba", "funciones"],
+  "correctAnswerIndices": [1]
 }', 2),
 ((SELECT id FROM lessons WHERE description = '¿Qué es la Cobertura de Sentencia?'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Qué busca asegurar la cobertura de sentencia?",
-  "options": [
-    "Que cada línea de código se ejecute al menos una vez.",
-    "Que todas las condiciones sean verdaderas.",
-    "Que no existan errores de compilación."
+  "answers": [
+    {"name": "Que cada línea de código se ejecute al menos una vez."},
+    {"name": "Que todas las condiciones sean verdaderas."},
+    {"name": "Que no existan errores de compilación."}
   ],
   "correctAnswer": 0
 }', 3),
 ((SELECT id FROM lessons WHERE description = '¿Qué es la Cobertura de Sentencia?'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Puede un programa con 100% de cobertura de sentencia seguir teniendo errores?",
-  "options": [
-    "Sí, porque no garantiza que la lógica sea correcta.",
-    "No, porque 100% de cobertura significa software perfecto."
+  "answers": [
+    {"name": "Sí, porque no garantiza que la lógica sea correcta."},
+    {"name": "No, porque 100% de cobertura significa software perfecto."}
   ],
   "correctAnswer": 0
 }', 4);
@@ -86,30 +90,35 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
 -- STAR
 INSERT INTO problems (lesson_id, type, content, position) VALUES
 ((SELECT id FROM lessons WHERE description = 'Ejecutando Cobertura de Sentencia'), 'INFO', '{
-  "title": "Ejecutando Cobertura de Sentencia",
-  "content": "Para calcular cobertura: Cobertura = (Sentencias ejecutadas / Sentencias totales) * 100."
+  "type": "INFO",
+  "moduleTitle": "Módulo C",
+  "introduction": "Aprende a calcular cobertura de sentencia mediante ejemplos y herramientas prácticas.",
+  "objectives": ["Aplicar la fórmula de cobertura de sentencia", "Interpretar resultados de ejecución"]
 }', 1),
 ((SELECT id FROM lessons WHERE description = 'Ejecutando Cobertura de Sentencia'), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "Si un programa tiene 200 líneas y se ejecutan 150, la cobertura de sentencia es ___%.",
-  "tiles": ["50", "75", "100", "150"],
-  "correctIndices": [1]
+  "answerTiles": ["50", "75", "100", "150"],
+  "correctAnswerIndices": [1]
 }', 2),
 ((SELECT id FROM lessons WHERE description = 'Ejecutando Cobertura de Sentencia'), 'MULTIPLE_CHOICE', '{
-  "question": "¿Qué herramienta suele medirse para obtener cobertura de sentencia?",
-  "options": [
-    "JUnit",
-    "Jacoco o Istanbul",
-    "Postman"
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué herramienta se utiliza para medir la cobertura de sentencia?",
+  "answers": [
+    {"name": "JUnit"},
+    {"name": "JaCoCo o Istanbul"},
+    {"name": "Postman"}
   ],
   "correctAnswer": 1
 }', 3),
 ((SELECT id FROM lessons WHERE description = 'Ejecutando Cobertura de Sentencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Qué representa una cobertura del 60%?",
-  "options": [
-    "Que el 60% del código fue ejecutado al menos una vez.",
-    "Que el sistema tiene 60% menos errores."
+  "answers": [
+    {"name": "Que el 60% del código fue ejecutado al menos una vez."},
+    {"name": "Que el sistema tiene 60% menos errores."}
   ],
   "correctAnswer": 0
 }', 4);
 
--- (continúa igual para cada lección siguiente de UNIT 1, UNIT 2 y UNIT 3)
+-- (continúa igual estructura para trophy y treasure de cada unidad, siguiendo mismo JSON unificado)

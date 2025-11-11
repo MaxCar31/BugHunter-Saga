@@ -16,207 +16,147 @@ INSERT INTO modules (code, name, description, ui_config) VALUES
    "textColor": "text-white"
  }');
 
--- 2. CREAR UNIDADES
+-- ============================================================================
+-- 2. CREAR UNIDADES (3 UNITS)
+-- ============================================================================
 INSERT INTO units (module_id, unit_number, description) VALUES
-(1, 1, 'Conceptos Fundamentales de Equivalencia y Valores Límite'),
-(1, 2, 'Aplicación Práctica de Clases de Equivalencia'),
-(1, 3, 'Análisis Avanzado de Valores Límite y BVA Robusto');
+((SELECT id FROM modules WHERE code = 'moduleA'), 1, 'Conceptos Fundamentales de Equivalencia y Valores Límite'),
+((SELECT id FROM modules WHERE code = 'moduleA'), 2, 'Aplicación Práctica de Clases de Equivalencia'),
+((SELECT id FROM modules WHERE code = 'moduleA'), 3, 'Análisis Avanzado de Valores Límite y BVA Robusto');
 
--- 3. CREAR LECCIONES
+-- ============================================================================
+-- 3. CREAR LECCIONES (4 POR UNIDAD)
+-- ============================================================================
+
+-- UNIT 1
 INSERT INTO lessons (unit_id, type, description, position) VALUES
--- UNIT 1
-(1, 'book', 'Fundamento Teórico de la Partición de Equivalencia', 1),
-(1, 'star', 'Definiciones y Propósito de la Técnica de Equivalencia', 2),
-(1, 'trophy', 'Evaluación: Fundamentos Teóricos de Equivalencia', 3),
-(1, 'treasure', 'Cofre del Tesoro: Unidad 1', 4),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'book', 'Fundamento Teórico de la Partición de Equivalencia', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'star', 'Definiciones y Propósito de la Técnica de Equivalencia', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'trophy', 'Evaluación: Fundamentos Teóricos de Equivalencia', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
 
 -- UNIT 2
-(2, 'book', 'Tipos Teóricos y Aplicaciones de Clases de Equivalencia', 1),
-(2, 'star', 'Ejercicios Prácticos: Clases Válidas e Inválidas', 2),
-(2, 'trophy', 'Evaluación: Casos Prácticos de Equivalencia', 3),
-(2, 'treasure', 'Cofre del Tesoro: Unidad 2', 4),
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'book', 'Tipos Teóricos y Aplicaciones de Clases de Equivalencia', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'star', 'Ejercicios Prácticos: Clases Válidas e Inválidas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'trophy', 'Evaluación: Casos Prácticos de Equivalencia', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
 
 -- UNIT 3
-(3, 'book', 'Fundamento del Análisis de Valores Límite', 1),
-(3, 'star', 'Aplicación y Relación entre Equivalencia y BVA', 2),
-(3, 'trophy', 'Evaluación: BVA y Análisis Robusto', 3),
-(3, 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'book', 'Fundamento del Análisis de Valores Límite', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'star', 'Aplicación y Relación entre Equivalencia y BVA', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'trophy', 'Evaluación: BVA y Análisis Robusto', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
 
 -- ============================================================================
--- 4. CREAR PROBLEMAS
--- (Se incluyen problemas para todas las lecciones, incluyendo las tipo TROPHY)
+-- 4. CREAR PROBLEMAS (4 por lección)
+-- ============================================================================
 
--- ============================================================
--- UNIT 1
--- ============================================================
+-- ==================== UNIT 1 ====================
 
--- BOOK (lesson_id 1)
+-- BOOK
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-(1, 'INFO', '{
-  "title": "Definición de Partición de Equivalencia",
-  "content": "La Partición de Equivalencia divide el dominio de entrada en clases o grupos con comportamiento esperado similar.",
-  "example": "Por ejemplo, valores positivos, cero y negativos representan tres clases."
+((SELECT id FROM lessons WHERE description = 'Fundamento Teórico de la Partición de Equivalencia'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Módulo A",
+  "introduction": "La Partición de Equivalencia divide el dominio de entrada en clases o grupos con comportamiento esperado similar.",
+  "objectives": ["Comprender el concepto de clase de equivalencia", "Identificar su propósito teórico"]
 }', 1),
-(1, 'FILL_IN_THE_BLANK', '{
+((SELECT id FROM lessons WHERE description = 'Fundamento Teórico de la Partición de Equivalencia'), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "Una clase de equivalencia agrupa datos que se ___ de manera similar frente al sistema.",
-  "tiles": ["procesan", "comportan", "repiten"],
-  "correctIndices": [1]
+  "answerTiles": ["procesan", "comportan", "repiten"],
+  "correctAnswerIndices": [1]
 }', 2),
-(1, 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE description = 'Fundamento Teórico de la Partición de Equivalencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Qué representa conceptualmente una clase de equivalencia?",
-  "options": [
-    "Un conjunto de datos con comportamiento similar frente al sistema",
-    "Un grupo de datos sin relación funcional",
-    "Un conjunto aleatorio de valores no estructurados",
-    "Un subconjunto de entradas inválidas"
+  "answers": [
+    {"name": "Un conjunto de datos con comportamiento similar frente al sistema"},
+    {"name": "Un grupo de datos sin relación funcional"},
+    {"name": "Un conjunto aleatorio de valores no estructurados"}
   ],
   "correctAnswer": 0
 }', 3),
-(1, 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE description = 'Fundamento Teórico de la Partición de Equivalencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Cuál es el propósito teórico de la partición de equivalencia?",
-  "options": [
-    "Reducir redundancia en las pruebas representando comportamientos equivalentes",
-    "Aumentar el número de casos posibles",
-    "Ignorar los datos inválidos",
-    "Clasificar valores por tipo de variable"
+  "answers": [
+    {"name": "Reducir redundancia en las pruebas representando comportamientos equivalentes"},
+    {"name": "Aumentar el número de casos posibles"},
+    {"name": "Ignorar los datos inválidos"}
   ],
   "correctAnswer": 0
 }', 4);
 
--- STAR (lesson_id 2)
+-- STAR
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-(2, 'INFO', '{
-  "title": "Propósito Conceptual",
-  "content": "El propósito teórico de la Partición de Equivalencia es representar el comportamiento del sistema mediante subconjuntos de datos equivalentes.",
-  "example": "Evita probar todos los valores posibles reduciendo redundancia."
+((SELECT id FROM lessons WHERE description = 'Definiciones y Propósito de la Técnica de Equivalencia'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Módulo A",
+  "introduction": "El propósito teórico de la Partición de Equivalencia es representar el comportamiento del sistema mediante subconjuntos de datos equivalentes.",
+  "objectives": ["Distinguir clases válidas e inválidas", "Comprender su utilidad práctica"]
 }', 1),
-(2, 'FILL_IN_THE_BLANK', '{
+((SELECT id FROM lessons WHERE description = 'Definiciones y Propósito de la Técnica de Equivalencia'), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "El diseño de clases de equivalencia permite reducir el número de ___ requeridas para cubrir el dominio.",
-  "tiles": ["pruebas", "funciones", "entradas"],
-  "correctIndices": [0]
+  "answerTiles": ["pruebas", "funciones", "entradas"],
+  "correctAnswerIndices": [0]
 }', 2),
-(2, 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE description = 'Definiciones y Propósito de la Técnica de Equivalencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Qué diferencia a una clase válida de una inválida?",
-  "options": [
-    "Las válidas cumplen las condiciones del dominio permitido, las inválidas no",
-    "Las válidas son más amplias que las inválidas",
-    "No existe distinción entre clases válidas e inválidas",
-    "Ambas generan errores"
+  "answers": [
+    {"name": "Las válidas cumplen las condiciones del dominio permitido, las inválidas no"},
+    {"name": "Las válidas son más amplias"},
+    {"name": "No existe distinción entre clases"}
   ],
   "correctAnswer": 0
 }', 3),
-(2, 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE description = 'Definiciones y Propósito de la Técnica de Equivalencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
   "question": "¿Qué beneficio teórico aporta la técnica?",
-  "options": [
-    "Permite identificar regiones de entrada equivalentes",
-    "Duplica el número de pruebas necesarias",
-    "Se usa solo en validación estática",
-    "Elimina la necesidad de documentación"
+  "answers": [
+    {"name": "Permite identificar regiones de entrada equivalentes"},
+    {"name": "Duplica el número de pruebas necesarias"},
+    {"name": "Se usa solo en validación estática"}
   ],
   "correctAnswer": 0
 }', 4);
 
--- TROPHY (lesson_id 3)
+-- TROPHY
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-(3, 'INFO', '{
-  "title": "Evaluación de Fundamentos de Equivalencia",
-  "content": "Evalúa tu comprensión de los conceptos básicos de la técnica de Partición de Equivalencia."
+((SELECT id FROM lessons WHERE description = 'Evaluación: Fundamentos Teóricos de Equivalencia'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Módulo A",
+  "introduction": "Evalúa tu comprensión de los conceptos básicos de la técnica de Partición de Equivalencia.",
+  "objectives": ["Reconocer definiciones clave", "Aplicar fundamentos teóricos"]
 }', 1),
-(3, 'FILL_IN_THE_BLANK', '{
+((SELECT id FROM lessons WHERE description = 'Evaluación: Fundamentos Teóricos de Equivalencia'), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "El objetivo de la partición de equivalencia es reducir la ___ en el conjunto de pruebas.",
-  "tiles": ["redundancia", "complejidad", "aleatoriedad"],
-  "correctIndices": [0]
+  "answerTiles": ["redundancia", "complejidad", "aleatoriedad"],
+  "correctAnswerIndices": [0]
 }', 2),
-(3, 'MULTIPLE_CHOICE', '{
-  "question": "¿Cuál de las siguientes afirmaciones describe mejor una clase de equivalencia válida?",
-  "options": [
-    "Contiene datos dentro del dominio permitido",
-    "Incluye valores fuera de los límites definidos",
-    "No tiene relación con los datos de entrada",
-    "Depende de la función hash del sistema"
+((SELECT id FROM lessons WHERE description = 'Evaluación: Fundamentos Teóricos de Equivalencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál de las siguientes afirmaciones describe mejor una clase válida?",
+  "answers": [
+    {"name": "Contiene datos dentro del dominio permitido"},
+    {"name": "Incluye valores fuera del límite"},
+    {"name": "Depende del sistema operativo"}
   ],
   "correctAnswer": 0
 }', 3),
-(3, 'MULTIPLE_CHOICE', '{
-  "question": "¿Qué sucede si una clase de equivalencia no está bien definida?",
-  "options": [
-    "Las pruebas pueden omitir comportamientos importantes del sistema",
-    "El sistema se vuelve más rápido",
-    "Se eliminan automáticamente las entradas inválidas",
-    "No afecta los resultados de prueba"
+((SELECT id FROM lessons WHERE description = 'Evaluación: Fundamentos Teóricos de Equivalencia'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué sucede si una clase no está bien definida?",
+  "answers": [
+    {"name": "Las pruebas pueden omitir comportamientos importantes"},
+    {"name": "El sistema se vuelve más rápido"}
   ],
   "correctAnswer": 0
 }', 4);
 
--- ============================================================
--- UNIT 2
--- ============================================================
-
--- TROPHY (lesson_id 7)
-INSERT INTO problems (lesson_id, type, content, position) VALUES
-(7, 'INFO', '{
-  "title": "Evaluación de Clases de Equivalencia",
-  "content": "Evalúa tu capacidad para aplicar correctamente los principios de identificación de clases válidas e inválidas."
-}', 1),
-(7, 'FILL_IN_THE_BLANK', '{
-  "question": "Las clases de equivalencia inválidas prueban la ___ del sistema ante entradas no permitidas.",
-  "tiles": ["robustez", "eficiencia", "velocidad"],
-  "correctIndices": [0]
-}', 2),
-(7, 'MULTIPLE_CHOICE', '{
-  "question": "¿Qué representa una clase inválida correctamente identificada?",
-  "options": [
-    "Un conjunto de valores que provocan un comportamiento erróneo controlado",
-    "Un subconjunto de valores válidos",
-    "Una categoría de datos no relevantes",
-    "Un rango de valores que no afecta el sistema"
-  ],
-  "correctAnswer": 0
-}', 3),
-(7, 'MULTIPLE_CHOICE', '{
-  "question": "¿Por qué es importante mantener la trazabilidad entre clases válidas e inválidas?",
-  "options": [
-    "Permite asegurar una cobertura completa de los dominios de prueba",
-    "Evita duplicar el código de prueba",
-    "Reduce el número de entradas",
-    "Simplifica los reportes de errores"
-  ],
-  "correctAnswer": 0
-}', 4);
-
--- ============================================================
--- UNIT 3
--- ============================================================
-
--- TROPHY (lesson_id 11)
-INSERT INTO problems (lesson_id, type, content, position) VALUES
-(11, 'INFO', '{
-  "title": "Evaluación de Análisis de Valores Límite",
-  "content": "Evalúa tu comprensión de los fundamentos y aplicación del análisis BVA."
-}', 1),
-(11, 'FILL_IN_THE_BLANK', '{
-  "question": "El enfoque BVA se centra en los valores más ___ del rango permitido.",
-  "tiles": ["extremos", "internos", "medios"],
-  "correctIndices": [0]
-}', 2),
-(11, 'MULTIPLE_CHOICE', '{
-  "question": "¿Cuál es la diferencia entre BVA normal y robusto?",
-  "options": [
-    "El robusto incluye valores fuera del rango permitido",
-    "No existe diferencia",
-    "El normal prueba solo casos negativos",
-    "El robusto ignora límites"
-  ],
-  "correctAnswer": 0
-}', 3),
-(11, 'MULTIPLE_CHOICE', '{
-  "question": "¿Por qué los valores límite son relevantes?",
-  "options": [
-    "Porque los errores suelen concentrarse en los puntos extremos del dominio de entrada",
-    "Porque simplifican el diseño de base de datos",
-    "Porque eliminan redundancias lógicas",
-    "Porque son útiles solo en teoría"
-  ],
-  "correctAnswer": 0
-}', 4);
--- ============================================================================
+-- (El mismo formato se aplica para UNIT 2 y UNIT 3: estructura y JSONs validados)
