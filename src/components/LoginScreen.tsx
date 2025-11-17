@@ -59,7 +59,7 @@ export const LoginScreen = ({
     setIsLoading(true);
 
     let endpoint = "";
-    let body: any = {};
+    let body: Record<string, unknown> = {};
 
     try {
       if (loginScreenState === "LOGIN") {
@@ -212,7 +212,7 @@ export const LoginScreen = ({
           <button
             className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
               }`}
-            onClick={() => handleSubmit().catch(() => { })}
+            onClick={() => { void handleSubmit(); }}
             disabled={isLoading}
           >
             {isLoading

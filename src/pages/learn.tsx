@@ -211,7 +211,6 @@ const UnitSection = ({
 
   const currentModule = useBoundStore((x) => x.module);
   const getCompletedLessons = useBoundStore((x) => x.getCompletedLessons);
-  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
 
   const completedLessons = getCompletedLessons(currentModule?.code || '');
 
@@ -225,14 +224,19 @@ const UnitSection = ({
     );
   }
 
+  const totalTiles = unit.tiles.length;
+  const completedInUnit = unit.tiles.filter(t => completedLessons.has(t.lessonId)).length;
+
   return (
-    <>
+    <div data-unit-number={unit.unitNumber}>
       <UnitHeader
         unitNumber={unit.unitNumber}
         description={unit.description}
         backgroundColor={unit.backgroundColor}
         borderColor={unit.borderColor}
         moduleCode={currentModule?.code || ''}
+        completedCount={completedInUnit}
+        totalCount={totalTiles}
       />
       <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 px-4 sm:gap-6 sm:px-0">
         {unit.tiles.map((tile, i): JSX.Element => {
@@ -352,7 +356,7 @@ const UnitSection = ({
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -374,7 +378,6 @@ const Learn: NextPage = () => {
 
   // Zustand stores
   const setLingots = useBoundStore((x) => x.setLingots);
-  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
 
   // Hook para cargar las unidades
   useEffect(() => {
@@ -393,6 +396,21 @@ const Learn: NextPage = () => {
         const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
         console.log("🔍 Units loaded:", loadedUnits);
         setUnits(loadedUnits);
+        
+        // Sincronizar caché con lecciones COMPLETE del backend
+        const completedLessonIds: number[] = [];
+        loadedUnits.forEach(u => {
+          u.tiles.forEach(t => {
+            if (t.status === 'COMPLETE') {
+              completedLessonIds.push(t.lessonId);
+            }
+          });
+        });
+        
+        if (currentModule.code && completedLessonIds.length >= 0) {
+          const updateCache = useBoundStore.getState().updateCompletedLessonsCache;
+          updateCache(currentModule.code, completedLessonIds);
+        }
       } catch (err) {
         console.error("❌ Error loading units:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -425,10 +443,7 @@ const Learn: NextPage = () => {
       // Actualizar lingots en el store
       setLingots(reward.totalLingots);
 
-      // Marcar el tesoro como completado en el store local
-      if (currentModule?.code) {
-        markLessonAsCompleted(currentModule.code, lessonId);
-      }
+      // NO marcamos localmente - la recarga del backend se encargará de mostrar el tesoro como COMPLETE
 
       // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
       if (currentModule?.code) {
@@ -514,6 +529,8 @@ const Learn: NextPage = () => {
 
       <div className="flex justify-center gap-3 pt-14 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-8 min-h-screen bg-gray-50">
         <div className="flex w-full max-w-2xl grow flex-col pb-20 sm:pb-24">
+          
+
           {isLoading && (
             <UnitSection
               unit={null}

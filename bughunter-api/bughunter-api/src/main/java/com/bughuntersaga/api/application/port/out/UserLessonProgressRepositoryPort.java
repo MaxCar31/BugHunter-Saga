@@ -22,4 +22,21 @@ public interface UserLessonProgressRepositoryPort {
      * Guarda un nuevo registro de progreso de lección.
      */
     UserLessonProgress save(UserLessonProgress progress);
+
+    /**
+     * Cuenta el número de completaciones exitosas de una lección por un usuario.
+     * Para permitir repetir lecciones con recompensas decrecientes.
+     */
+    int countCompletionsByUserIdAndLessonId(UUID userId, Integer lessonId);
+
+    /**
+     * Obtiene el número del siguiente intento para una lección específica.
+     */
+    int getNextAttemptNumber(UUID userId, Integer lessonId);
+
+    /**
+     * Elimina el progreso existente de una lección para permitir repetirla.
+     * (Opcional - solo usar si necesitas resetear completamente una lección)
+     */
+    void deleteByUserIdAndLessonId(UUID userId, Integer lessonId);
 }

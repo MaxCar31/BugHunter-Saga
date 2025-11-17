@@ -5,6 +5,8 @@ export interface LessonCompletionRequest {
   lessonId: number;
   correctAnswerCount: number;
   incorrectAnswerCount: number;
+  // Nota en porcentaje 0-100
+  score?: number;
   timeTakenMs: number;
   isPractice: boolean;
 }
@@ -39,5 +41,6 @@ export const completeLessonAPI = async (
     throw new Error(`Failed to complete lesson: ${errorText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  return data as LessonCompletionResponse;
 };
