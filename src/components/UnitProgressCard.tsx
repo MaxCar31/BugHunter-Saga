@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useBoundStore } from '~/hooks/useBoundStore';
+import { apiBase } from '~/utils/config';
 
 interface UnitProgress {
   unitId: number;
@@ -26,13 +27,13 @@ const UnitProgressCard = ({ unitId, className = "" }: UnitProgressCardProps) => 
       try {
         setLoading(true);
         const token = localStorage.getItem('bh_token');
-        
+
         if (!token) {
           setError('No se encontró token de autenticación');
           return;
         }
 
-        const response = await fetch(`http://localhost:8080/api/progress/unit/${unitId}`, {
+        const response = await fetch(`${apiBase}/api/progress/unit/${unitId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -100,14 +101,14 @@ const UnitProgressCard = ({ unitId, className = "" }: UnitProgressCardProps) => 
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="w-full bg-gray-200 rounded-full h-3">
-            <div 
+            <div
               className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${Math.min(unitProgress.progressPercentage, 100)}%` }}
             >
               <div className="h-full rounded-full bg-white/20 animate-pulse"></div>
             </div>
           </div>
-          
+
           <div className="flex justify-between text-xs text-gray-600">
             <span>{Math.round(unitProgress.progressPercentage)}% completado</span>
             <span>{unitProgress.completedLessons}/{unitProgress.totalLessons} lecciones</span>
@@ -124,7 +125,7 @@ const UnitProgressCard = ({ unitId, className = "" }: UnitProgressCardProps) => 
               Próximo nivel: {unitProgress.totalXpNeeded - unitProgress.currentXp} XP
             </span>
           </div>
-          
+
           {unitProgress.progressPercentage >= 100 && (
             <div className="flex items-center space-x-1 text-green-600">
               <span>🎉</span>
