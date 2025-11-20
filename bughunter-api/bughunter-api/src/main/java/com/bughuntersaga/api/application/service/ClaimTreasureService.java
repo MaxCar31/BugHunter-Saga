@@ -67,10 +67,12 @@ public class ClaimTreasureService implements ClaimTreasureUseCase {
         userProfileRepositoryPort.save(userProfile); // Guardar el perfil actualizado
 
         // 5. Marcar como reclamado (Lógica de Negocio)
+        int attemptNumber = userLessonProgressRepositoryPort.getNextAttemptNumber(currentUser.getId(), lessonId);
         UserLessonProgress progress = UserLessonProgress.builder()
                 .userId(currentUser.getId())
                 .lessonId(lessonId)
                 .completedAt(ZonedDateTime.now())
+                .attemptNumber(attemptNumber)
                 .build();
 
         userLessonProgressRepositoryPort.save(progress);

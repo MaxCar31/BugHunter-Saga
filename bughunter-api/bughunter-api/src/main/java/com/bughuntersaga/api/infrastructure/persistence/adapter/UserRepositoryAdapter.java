@@ -46,6 +46,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findByUsernameOrEmail(username, email)
                 .map(userPersistenceMapper::toUserDomain);
     }
+
     @Override
     public boolean existsByUsernameAndIdNot(String username, UUID userId) {
         return userJpaRepository.existsByUsernameAndIdNot(username, userId);

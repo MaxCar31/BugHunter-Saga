@@ -7,9 +7,23 @@ import type {
 } from "~/types/lesson";
 import { mapBackendProblemToFrontend } from "~/utils/lesson-helpers";
 
-/**
- * Service para gestionar lecciones y problemas
- */
+// Tipos basados en tu contrato
+export interface LessonCompletionRequest {
+  lessonId: number;
+  correctAnswerCount: number;
+  incorrectAnswerCount: number;
+  // Nota en porcentaje 0-100
+  score?: number;
+  timeTakenMs: number;
+  isPractice: boolean;
+}
+
+export interface LessonCompletionResponse {
+  xpEarned: number;
+  lingotsEarned: number;
+  newTotalLingots: number;
+  newStreak: number;
+}
 
 const createAuthHeaders = (token?: string) => ({
   accept: "*/*",
@@ -93,5 +107,6 @@ export const completeLessonAPI = async (
     throw new Error(`Failed to complete lesson: ${errorText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  return data as LessonCompletionResponse;
 };

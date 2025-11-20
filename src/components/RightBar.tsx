@@ -2,23 +2,14 @@ import Link from "next/link";
 import type { ComponentProps } from "react";
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import {
-  BronzeLeagueSvg,
-  EmptyFireSvg,
-  EmptyGemSvg,
-  FireSvg,
-  GemSvg,
-  LightningProgressSvg,
-  LingotsTreasureChestSvg,
-  TreasureProgressSvg,
-} from "./Svgs";
-import { Calendar } from "./Calendar";
+import { BronzeLeagueSvg, LightningProgressSvg } from "./Svgs";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { ModuleIcon } from "./ModuleIcon";
 import type { LoginScreenState } from "./LoginScreen";
 import { LoginScreen } from "./LoginScreen";
 import { useLeaderboardRank } from "~/hooks/useLeaderboard";
 import { getUserStats } from "~/services/userService";
+import UnitProgressCard from "./UnitProgressCard";
 
 export const RightBar = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
@@ -39,9 +30,6 @@ export const RightBar = () => {
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
 
   const [modulesShown, setModulesShown] = useState(false);
-  const [streakShown, setStreakShown] = useState(false);
-  const [now, setNow] = useState(dayjs());
-  const [gemsShown, setGemsShown] = useState(false);
   const [loginScreenState, setLoginScreenState] = useState<LoginScreenState>("HIDDEN");
 
   // ✅ Cargar estadísticas del usuario al montar el componente
@@ -63,7 +51,7 @@ export const RightBar = () => {
       }
     };
 
-    loadStats();
+    void loadStats();
   }, [loggedIn, setLingots, setStreak, setTotalXp, setXpToday, setActiveDays, setLeagueRank]);
 
   return (
@@ -182,6 +170,7 @@ export const RightBar = () => {
         ) : loggedIn && totalLessonsCompleted >= 10 ? (
           <LeaderboardRankSection />
         ) : null}
+        <UnitProgressSection />
         <DailyQuestsSection />
         <XpProgressSection />
         {!loggedIn && (
@@ -291,6 +280,53 @@ const TreasureClosedSvg = (props: ComponentProps<"svg">) => {
       <circle cx="28" cy="26" r="3" fill="#6B7280" />
       <rect x="20" y="0" width="16" height="16" rx="8" stroke="#E5E7EB" strokeWidth="4" fill="none" />
     </svg>
+  );
+};
+
+const UnitProgressSection = () => {
+  const loggedIn = useBoundStore((x) => x.loggedIn);
+  const [currentUnitId, setCurrentUnitId] = useState<number>(1);
+
+  // Detectar la unidad actual basado en el scroll o la URL
+  useEffect(() => {
+    const detectCurrentUnit = () => {
+      // Buscar todas las secciones de unidad en la página
+      const unitSections = document.querySelectorAll('[data-unit-number]');
+      const scrollY = window.scrollY + 200; // Offset para detectar mejor
+
+      for (const section of Array.from(unitSections)) {
+        const sectionTop = (section as HTMLElement).offsetTop;
+        const sectionBottom = sectionTop + (section as HTMLElement).offsetHeight;
+        
+        if (scrollY >= sectionTop && scrollY <= sectionBottom) {
+          const unitNumber = parseInt((section as HTMLElement).dataset.unitNumber || '1');
+          setCurrentUnitId(unitNumber);
+          break;
+        }
+      }
+    };
+
+    // Detectar unidad al cargar
+    detectCurrentUnit();
+
+    // Detectar unidad al hacer scroll
+    const handleScroll = () => {
+      detectCurrentUnit();
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!loggedIn) {
+    return null;
+  }
+
+  return (
+    <UnitProgressCard 
+      unitId={currentUnitId} 
+      className="w-full"
+    />
   );
 };
 

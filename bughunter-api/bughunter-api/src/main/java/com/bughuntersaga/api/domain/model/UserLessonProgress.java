@@ -18,7 +18,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserLessonProgress {
+    private Long id;
     private UUID userId;
     private Integer lessonId;
     private ZonedDateTime completedAt;
+    private Integer score;
+    private Integer attemptNumber;
 }
