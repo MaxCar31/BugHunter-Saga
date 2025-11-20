@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
-import modules from "~/utils/modules";
+// TODO: Reemplazar con datos dinámicos de fetchModules
+// import modules from "~/utils/modules";
 import { ModuleIcon } from "./ModuleIcon";
+
+// Temporal: array vacío hasta implementar carga dinámica
+const modules: any[] = [];
 
 export const ModuleDropDown = () => {
   const currentModule = useBoundStore((x) => x.module);

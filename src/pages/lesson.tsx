@@ -14,7 +14,7 @@ import {
 } from "~/components/Svgs";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
-import { type ModuleLesson } from "~/utils/lessons";
+import type { ModuleLesson } from "~/types/lesson";
 import { completeLessonAPI, type LessonCompletionRequest } from "~/services/lessonService";
 
 // Importar componentes refactorizados

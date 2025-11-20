@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ProgressBar } from "./ProgressBar";
 import { QuitMessage } from "./QuitMessage";
 import { CheckAnswer } from "./CheckAnswer";
-import type { ModuleLesson } from "~/utils/lessons";
+import type { ModuleLesson } from "~/types/lesson";
 
 export const FillInTheBlankQuestion = ({
     problem,

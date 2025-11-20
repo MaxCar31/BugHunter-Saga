@@ -1,10 +1,10 @@
-import type { Module } from "~/utils/modules";
+import type { ModuleWithTypedUI } from "~/types/module";
 
 export const ModuleIcon = ({
   module,
   width = 82,
 }: {
-  module: Module | null;
+  module: ModuleWithTypedUI | null;
   width?: number;
 }) => {
   const getModuleIcon = (moduleCode: string) => {
