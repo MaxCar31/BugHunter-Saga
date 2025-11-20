@@ -1,0 +1,353 @@
+{
+    "frontend-react-components": [
+        "./src/components/BottomBar.tsx",
+        "./src/components/Calendar.tsx",
+        "./src/components/Flag.tsx",
+        "./src/components/LeftBar.tsx",
+        "./src/components/LoginScreen.tsx",
+        "./src/components/ModuleCarousel.tsx",
+        "./src/components/ModuleDropDown.tsx",
+        "./src/components/ModuleHeader.tsx",
+        "./src/components/ModuleIcon.tsx",
+        "./src/components/RightBar.tsx",
+        "./src/components/SettingsRightNav.tsx",
+        "./src/components/Svgs.tsx",
+        "./src/components/TopBar.tsx",
+        "./src/components/TopBarNew.tsx"
+    ],
+    "frontend-lesson-components": [
+        "./src/components/lessons/CheckAnswer.tsx",
+        "./src/components/lessons/FillInTheBlankQuestion.tsx",
+        "./src/components/lessons/MultipleChoiceQuestion.tsx",
+        "./src/components/lessons/ProblemInfo.tsx",
+        "./src/components/lessons/ProgressBar.tsx",
+        "./src/components/lessons/QuitMessage.tsx",
+        "./src/components/lessons/ReviewLesson.tsx"
+    ],
+    "frontend-learn-components": [
+        "./src/components/learn/HoverLabel.tsx",
+        "./src/components/learn/LessonCompletionIcon.tsx",
+        "./src/components/learn/TileIcon.tsx",
+        "./src/components/learn/TreasureCelebration.tsx",
+        "./src/components/learn/UnitHeader.tsx"
+    ],
+    "frontend-pages": [
+        "./src/pages/_app.tsx",
+        "./src/pages/index.tsx",
+        "./src/pages/forgot-password.tsx",
+        "./src/pages/leaderboard.tsx",
+        "./src/pages/learn.tsx",
+        "./src/pages/lesson.tsx",
+        "./src/pages/profile.tsx",
+        "./src/pages/register.tsx",
+        "./src/pages/shop.tsx",
+        "./src/pages/settings/account.tsx",
+        "./src/pages/settings/coach.tsx",
+        "./src/pages/settings/sound.tsx"
+    ],
+    "frontend-hooks": [
+        "./src/hooks/useBoundStore.ts",
+        "./src/hooks/useLeaderboard.ts"
+    ],
+    "frontend-state-management": [
+        "./src/stores/createGoalXpStore.ts",
+        "./src/stores/createLeagueStore.ts",
+        "./src/stores/createLessonStore.ts",
+        "./src/stores/createLingotStore.ts",
+        "./src/stores/createModuleStore.ts",
+        "./src/stores/createQuestionsSlice.ts",
+        "./src/stores/createSoundSettingsStore.ts",
+        "./src/stores/createStreakStore.ts",
+        "./src/stores/createUserStore.ts",
+        "./src/stores/createXpStore.ts"
+    ],
+    "frontend-services": [
+        "./src/services/lessonService.ts",
+        "./src/services/moduleService.ts",
+        "./src/services/unitService.ts",
+        "./src/services/userService.ts"
+    ],
+    "frontend-utils": [
+        "./src/utils/array-utils.ts",
+        "./src/utils/config.ts",
+        "./src/utils/dateString.ts",
+        "./src/utils/lesson-helpers.ts",
+        "./src/utils/module-helpers.ts",
+        "./src/utils/unit-helpers.ts",
+        "./src/utils/tilePositions.ts"
+    ],
+    "frontend-utils-deprecated": [
+        "./src/utils/lessons.ts",
+        "./src/utils/modules.ts",
+        "./src/utils/units.ts"
+    ],
+    "frontend-types": [
+        "./src/types/user.ts",
+        "./src/types/lesson.ts",
+        "./src/types/module.ts",
+        "./src/types/unit.ts",
+        "./src/svg.d.ts"
+    ],
+    "frontend-styles": [
+        "./src/styles/globals.css"
+    ],
+    "backend-controllers": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/controller/AuthController.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/controller/ContentController.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/controller/GamificationController.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/controller/ProgressController.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/controller/UserController.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/controller/SwaggerRedirectController.java"
+    ],
+    "backend-web-dtos": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/AuthResponseDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/ErrorDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/ForgotPasswordDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/LeaderboardDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/LeaderboardEntryDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/LessonCompletionResponseDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/LessonResultDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/LessonTileDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/ModuleResponseDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/ProblemDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/ShopItemDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UnitDetailDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserAccountUpdateDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserInfoDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserLoginDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserProfileDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserRegistrationDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserSettingsUpdateDTO.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/dto/UserStatsDTO.java"
+    ],
+    "backend-web-mappers": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/mapper/AuthApiMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/mapper/ContentApiMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/mapper/GamificationApiMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/mapper/ProgressApiMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/mapper/UserApiMapper.java"
+    ],
+    "backend-exception-handlers": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/web/exception/GlobalApiExceptionHandler.java"
+    ],
+    "backend-application-services": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/ClaimTreasureService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/CompleteLessonService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/ForgotPasswordService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetLeaderboardService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetLessonProblemsService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetModuleProblemsService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetModulesService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetModuleUnitService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetShopItemsService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetUserProfileService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/GetUserStatsService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/LoginUserService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/PurchaseItemService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/RegisterUserService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/UpdateUserAccountService.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/service/UpdateUserSettingsService.java"
+    ],
+    "backend-use-case-ports": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/ClaimTreasureUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/CompleteLessonUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/ForgotPasswordUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetLeaderboardUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetLessonProblemsUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetModuleProblemsUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetModulesUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetModuleUnitUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetShopItemsUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetUserProfileUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/GetUserStatsUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/LoginUserUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/PurchaseItemUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/RegisterUserUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/UpdateUserAccountUseCase.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/UpdateUserSettingsUseCase.java"
+    ],
+    "backend-use-case-results": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/ClaimTreasureResult.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/CompleteLessonResult.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/in/UserStatsResult.java"
+    ],
+    "backend-application-commands": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/dto/CompleteLessonCommand.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/dto/ForgotPasswordCommand.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/dto/LoginUserCommand.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/dto/RegisterUserCommand.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/dto/UpdateUserAccountCommand.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/dto/UpdateUserSettingsCommand.java"
+    ],
+    "backend-repository-ports": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/LeaderboardRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/LessonRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/ModuleRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/ProblemRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/ShopItemRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UnitRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UserInventoryRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UserLessonProgressRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UserProfileRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UserRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UserStreakRepositoryPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/UserXpHistoryRepositoryPort.java"
+    ],
+    "backend-infrastructure-ports": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/EmailSenderPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/PasswordEncoderPort.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/TokenGeneratorPort.java"
+    ],
+    "backend-port-data-models": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/application/port/out/LeaderboardData.java"
+    ],
+    "backend-domain-models": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/AuthToken.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/FullUserProfile.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/Leaderboard.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/LeaderboardEntry.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/Lesson.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/Module.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/Problem.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/ShopItem.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/Unit.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/User.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/UserInventory.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/UserLessonProgress.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/UserProfile.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/UserStreak.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/model/UserXpHistory.java"
+    ],
+    "backend-domain-exceptions": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/EmailAlreadyExistsException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/InsufficientFundsException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/InvalidCredentialsException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/LessonAlreadyCompletedException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/LessonNotFoundException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/ModuleNotFoundException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/ResourceNotFoundException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/TreasureAlreadyClaimedException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/UsernameAlreadyExistsException.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/domain/exception/UserNotFoundException.java"
+    ],
+    "backend-jpa-entities": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/LeagueEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/LessonEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/ModuleEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/ProblemEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/ShopItemEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UnitEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserInventoryEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserLessonProgressEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserLessonProgressId.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserProfileEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserStreakEntity.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserStreakId.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/entity/UserXpHistoryEntity.java"
+    ],
+    "backend-jpa-repositories": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/LessonJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/ModuleJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/ProblemJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/ShopItemJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UnitJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UserInventoryJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UserJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UserLessonProgressJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UserProfileJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UserStreakJpaRepository.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/UserXpHistoryJpaRepository.java"
+    ],
+    "backend-jpa-projections": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/repository/projections/LeaderboardProjection.java"
+    ],
+    "backend-persistence-adapters": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/LeaderboardRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/LessonRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/ModuleRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/ProblemRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/ShopItemRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UnitRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UserInventoryRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UserLessonProgressRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UserProfileRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UserRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UserStreakRepositoryAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/adapter/UserXpHistoryRepositoryAdapter.java"
+    ],
+    "backend-persistence-mappers": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/mapper/ContentPersistenceMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/mapper/GamificationPersistenceMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/mapper/ProgressPersistenceMapper.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/persistence/mapper/UserPersistenceMapper.java"
+    ],
+    "backend-security-adapters": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/security/adapter/JwtTokenGeneratorAdapter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/security/adapter/SpringPasswordEncoderAdapter.java"
+    ],
+    "backend-security-config": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/security/config/SecurityConfiguration.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/security/filter/JwtAuthenticationFilter.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/security/jwt/JwtUtil.java"
+    ],
+    "backend-infrastructure-config": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/config/BeanConfiguration.java",
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/config/OpenAPIConfig.java"
+    ],
+    "backend-infrastructure-adapters": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/infrastructure/adapters/email/ConsoleEmailSenderAdapter.java"
+    ],
+    "backend-application-entry": [
+        "./bughunter-api/bughunter-api/src/main/java/com/bughuntersaga/api/BugHunterSagaApiApplication.java"
+    ],
+    "backend-test-integration": [
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/BugHunterSagaApiApplicationTests.java",
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/PlayerJourneyE2ETest.java",
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/BaseIntegrationTest.java",
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/ProgressControllerTest.java"
+    ],
+    "backend-test-unit": [
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/RegisterUserServiceTest.java"
+    ],
+    "backend-test-persistence": [
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/UserXpHistoryJpaRepositoryTest.java",
+        "./bughunter-api/bughunter-api/src/test/java/com/bughuntersaga/api/BaseDataJpaTest.java"
+    ],
+    "config-files": [
+        "./package.json",
+        "./tsconfig.json",
+        "./next.config.mjs",
+        "./tailwind.config.ts",
+        "./postcss.config.cjs",
+        "./prettier.config.cjs",
+        "./pnpm-lock.yaml",
+        "./next-env.d.ts",
+        "./bughunter-api/bughunter-api/build.gradle",
+        "./bughunter-api/bughunter-api/settings.gradle",
+        "./bughunter-api/bughunter-api/gradle/wrapper/gradle-wrapper.properties"
+    ],
+    "environment-config": [
+        "./src/env.mjs",
+        "./bughunter-api/bughunter-api/src/main/resources/application.properties",
+        "./bughunter-api/bughunter-api/src/main/resources/application-dev.properties"
+    ],
+    "database-migrations": [
+        "./bughunter-api/bughunter-api/src/main/resources/db/migration/"
+    ],
+    "deployment-config": [
+        "./bughunter-api/bughunter-api/Dockerfile",
+        "./bughunter-api/bughunter-api/docker-compose.yml"
+    ],
+    "documentation": [
+        "./README.md",
+        "./LICENSE",
+        "./FASE5_CAMBIOS.md",
+        "./FASE5_EJEMPLOS.md",
+        "./FASE5_GESTION_PERFIL.md",
+        "./FIX_UPDATE_USER.md"
+    ],
+    "public-assets": [
+        "./public/app.webmanifest"
+    ]
+}

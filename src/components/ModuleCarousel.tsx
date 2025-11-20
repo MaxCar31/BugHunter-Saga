@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ChevronLeftSvg, ChevronRightSvg } from "./Svgs";
 import React, { useRef } from "react";
-import modules from "~/utils/modules";
+// TODO: Reemplazar con datos dinámicos de fetchModules
+// import modules from "~/utils/modules";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { ModuleIcon } from "./ModuleIcon";
+
+// Temporal: array vacío hasta implementar carga dinámica
+const modules: any[] = [];
 
 declare global {
   interface Element {
@@ -84,7 +88,7 @@ export const ModuleCarousel = () => {
   const startIndexRef = useRef(0);
   const modulesContainer = useRef<null | HTMLDivElement>(null);
   const lastModuleIndex = 2; // Solo tenemos 3 módulos (índices 0, 1, 2)
-  
+
   return (
     <article className="absolute bottom-0 left-0 right-0 hidden h-20 items-center justify-center bg-[#0a4a82] text-white md:flex">
       <div className="flex w-full max-w-5xl justify-between">

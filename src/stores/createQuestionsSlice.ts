@@ -1,6 +1,6 @@
 import type { StateCreator } from "zustand";
-import type { ModuleLesson } from "~/utils/lessons";
-import { fetchModuleProblems, fetchLessonProblems } from "~/utils/lessons";
+import type { ModuleLesson } from "~/types/lesson";
+import { fetchModuleProblems, fetchLessonProblems } from "~/services/lessonService";
 export interface QuestionsSlice {
   questions: Record<string, ModuleLesson[]>;
   problems: ModuleLesson[]; // Problemas de la lección actual

@@ -16,7 +16,7 @@ import {
   LockedTrophySvg,
   GoldenTrophySvg,
 } from "~/components/Svgs";
-import type { TileType } from "~/utils/units";
+import type { TileType } from "~/types/unit";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
 
