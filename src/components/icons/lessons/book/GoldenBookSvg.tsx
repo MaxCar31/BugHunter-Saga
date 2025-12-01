@@ -1,38 +1,25 @@
 export const GoldenBookSvg = () => {
   return (
-    <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      {/* Test Case Document - Golden (All Tests Passed) */}
-      <rect x="8" y="2" width="26" height="30" rx="2" fill="#FFF1C0" />
-      <rect x="8" y="2" width="26" height="30" rx="2" stroke="#FFD600" strokeWidth="2" />
+    <svg width="42" height="38" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="goldenGlow" x1="0%" y1="0%" x2="100%" y2="80%">
+          <stop offset="0%" stopColor="#FFD600" />
+          <stop offset="50%" stopColor="#FFC800" />
+          <stop offset="100%" stopColor="#CD7900" />
+        </linearGradient>
+      </defs>
 
-      {/* Document Header */}
-      <rect x="11" y="5" width="20" height="2" rx="1" fill="#FFD600" />
-      <rect x="11" y="8" width="14" height="1.5" rx="0.75" fill="#FFC800" />
-
-      {/* Checklist Items - All Checked */}
-      {/* Item 1 */}
-      <rect x="12" y="13" width="3" height="3" rx="0.5" fill="#FFD600" />
-      <path d="M12.8 15L13.5 15.7L14.8 14" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="14" width="12" height="1" rx="0.5" fill="#FFD600" />
-
-      {/* Item 2 */}
-      <rect x="12" y="18" width="3" height="3" rx="0.5" fill="#FFD600" />
-      <path d="M12.8 20L13.5 20.7L14.8 19" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="19" width="10" height="1" rx="0.5" fill="#FFD600" />
-
-      {/* Item 3 */}
-      <rect x="12" y="23" width="3" height="3" rx="0.5" fill="#FFD600" />
-      <path d="M12.8 25L13.5 25.7L14.8 24" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="24" width="11" height="1" rx="0.5" fill="#FFD600" />
-
-      {/* Item 4 */}
-      <rect x="12" y="28" width="3" height="3" rx="0.5" fill="#FFD600" />
-      <path d="M12.8 30L13.5 30.7L14.8 29" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="29" width="9" height="1" rx="0.5" fill="#FFD600" />
-
-      {/* Success Badge */}
-      <circle cx="30" cy="6" r="3" fill="#FFD600" />
-      <path d="M28.5 6L29.5 7L31.5 5" stroke="#CD7900" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="22" cy="22" r="14" fill="#CD7900" opacity="0.3" />
+      <circle cx="21" cy="21" r="13" fill="#FFF9E6" stroke="url(#goldenGlow)" strokeWidth="3" />
+      <circle cx="21" cy="21" r="10" fill="#FFFFFF" stroke="#FFD600" strokeWidth="1.5" />
+      <circle cx="21" cy="21" r="5" fill="#FFD600" />
+      <path d="M18.5 21L20 22.5L23.5 19" stroke="#CD7900" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M30 30L38 38" stroke="url(#goldenGlow)" strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M30 30L38 38" stroke="#CD7900" strokeWidth="2.5" strokeLinecap="round" />
+      <ellipse cx="17" cy="17" rx="3.5" ry="2" fill="#FFFFFF" opacity="0.6" />
+      <circle cx="9" cy="13" r="1.5" fill="#FFD600" opacity="0.9" />
+      <circle cx="33" cy="9" r="1.2" fill="#FFC800" opacity="0.8" />
+      <circle cx="11" cy="31" r="1" fill="#FFD600" opacity="0.7" />
     </svg>
   );
 };

@@ -237,7 +237,7 @@ const UnitSection = ({
         completedCount={completedInUnit}
         totalCount={totalTiles}
       />
-      <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 px-4 sm:gap-6 sm:px-0">
+      <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 sm:gap-6">
         {unit.tiles.map((tile, i): JSX.Element => {
           // Calcular el estado real basado en el progreso del usuario
           const status = calculateTileStatus(tile, unit, allUnits, completedLessons);
@@ -246,21 +246,10 @@ const UnitSection = ({
             <Fragment key={i}>
               {(() => {
                 switch (tile.type) {
-                  case "star":
                   case "book":
                   case "dumbbell":
                   case "trophy":
                   case "fast-forward":
-                    if (tile.type === "trophy" && status === "COMPLETE") {
-                      return (
-                        <div className="relative">
-                          <TileIcon tileType={tile.type} status={status} />
-                          <div className="absolute left-0 right-0 top-6 flex justify-center text-lg font-bold text-yellow-700">
-                            {unit.unitNumber}
-                          </div>
-                        </div>
-                      );
-                    }
                     return (
                       <div
                         className={`relative h-[93px] w-[98px] ${getTileLeftClassName({
@@ -297,6 +286,11 @@ const UnitSection = ({
                           }}
                         >
                           <TileIcon tileType={tile.type} status={status} />
+                          {tile.type === "trophy" && status === "COMPLETE" && (
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-yellow-700">
+                              {unit.unitNumber}
+                            </div>
+                          )}
                           <span className="sr-only">Show lesson</span>
                         </button>
                       </div>
@@ -335,7 +329,6 @@ const UnitSection = ({
                   switch (tile.type) {
                     case "book":
                     case "dumbbell":
-                    case "star":
                       return tile.description;
                     case "fast-forward":
                       return status === "LOCKED"
@@ -542,8 +535,8 @@ const Learn: NextPage = () => {
       />
       <LeftBar selectedTab="Aprender" />
 
-      <div className="flex justify-center gap-3 pt-14 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-8 min-h-screen bg-gray-50">
-        <div className="flex w-full max-w-2xl grow flex-col pb-20 sm:pb-24">
+      <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2 min-h-screen bg-gray-50">
+        <div className="flex w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] grow flex-col pb-20 sm:pb-24">
 
 
           {isLoading && (
@@ -571,10 +564,10 @@ const Learn: NextPage = () => {
             />
           ))}
 
-          <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between px-4 sm:px-0 sm:bottom-24">
+          <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between sm:bottom-24">
             <Link
               href="/lesson?practice"
-              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16"
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16">
             >
               <span className="sr-only">Practice exercise</span>
               <PracticeExerciseSvg className="h-7 w-7 sm:h-8 sm:w-8" />

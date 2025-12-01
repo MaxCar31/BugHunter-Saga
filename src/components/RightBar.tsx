@@ -53,7 +53,7 @@ export const RightBar = () => {
 
   return (
     <>
-      <aside className="sticky top-0 hidden w-96 flex-col gap-6 self-start sm:flex">
+      <aside className="sticky top-0 hidden w-80 lg:w-84 xl:w-[360px] 2xl:w-[380px] flex-col gap-6 self-start flex-shrink-0 sm:flex">
         <article className="my-6 flex justify-between gap-4">
           <div
             className="relative flex cursor-default items-center gap-2 rounded-xl p-3 font-bold uppercase text-gray-500 hover:bg-gray-100"

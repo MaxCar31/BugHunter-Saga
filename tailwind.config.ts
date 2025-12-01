@@ -24,7 +24,11 @@ export default {
     'text-gray-700',
   ],
   theme: {
-    extend: {},
+    extend: {
+      width: {
+        '84': '21rem', // 336px - entre w-80 (320px) y w-96 (384px)
+      },
+    },
   },
   plugins: [],
 } satisfies Config;

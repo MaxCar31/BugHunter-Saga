@@ -49,7 +49,7 @@ CREATE TABLE lessons (
                                  ON DELETE CASCADE,
 
                          CONSTRAINT chk_lesson_type
-                             CHECK (type IN ('star', 'book', 'trophy', 'treasure', 'fast-forward'))
+                             CHECK (type IN ('dumbbell', 'book', 'trophy', 'treasure', 'fast-forward'))
 );
 
 COMMENT ON TABLE lessons IS 'Lecciones individuales (tiles) en el camino de aprendizaje';

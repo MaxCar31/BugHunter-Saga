@@ -7,6 +7,7 @@ import type { LoginScreenState } from "./LoginScreen";
 import { LoginScreen } from "./LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import Image from "next/image";
+import { LogoutIconSvg } from "./icons/navigation";
 
 export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
   const router = useRouter();
@@ -20,19 +21,19 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 top-0 hidden flex-col gap-5 border-r-2 border-[#e5e5e5] bg-white p-3 md:flex lg:w-64 lg:p-5">
-    <Link
-      href="/learn"
-      className="ml-2 hidden lg:block"
-    >
-      <Image
-        src="/Logotipo.svg"
-        alt="BugHunter Saga"
-        width={160}
-        height={60}
-        className="text-[#58cc02]"
-      />
-    </Link>
+      <nav className="fixed bottom-0 left-0 top-0 hidden flex-col gap-5 border-r-2 border-[#e5e5e5] bg-white p-3 md:flex md:w-24 lg:w-64 lg:p-5">
+        <Link
+          href="/learn"
+          className="ml-2 hidden lg:block"
+        >
+          <Image
+            src="/Logotipo.svg"
+            alt="BugHunter Saga"
+            width={160}
+            height={60}
+            className="text-[#58cc02]"
+          />
+        </Link>
         <ul className="flex flex-col items-stretch gap-3">
           {bottomBarItems.map((item) => {
             return (
@@ -59,15 +60,16 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
           })}
           {loggedIn && (
             <button
-              className="flex items-center gap-3 rounded-xl px-2 py-1 font-bold uppercase text-red-600 hover:bg-red-50"
+              className="flex items-center gap-3 rounded-xl px-2 py-1 font-bold uppercase text-red-600 hover:bg-red-50 transition-colors"
               onClick={() => {
                 logOut();
                 localStorage.removeItem("bh_token");
                 void router.push("/?login");
               }}
+              aria-label="Cerrar sesión"
             >
-              <span className="hidden lg:inline">Cerrar sesión</span>
-              <span className="lg:hidden">🚪</span>
+              <LogoutIconSvg />
+              <span className="sr-only lg:not-sr-only">Salir</span>
             </button>
           )}
         </ul>

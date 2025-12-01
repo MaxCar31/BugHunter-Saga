@@ -30,21 +30,21 @@ INSERT INTO units (module_id, unit_number, description) VALUES
 -- UNIT 1
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'book', 'Introducción a las Tablas de Decisión', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'star', 'Construyendo tu Primera Tabla', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'dumbbell', 'Construyendo tu Primera Tabla', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'trophy', 'Evaluación: Conceptos Fundamentales', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
 
 -- UNIT 2
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'book', 'Simplificación de Tablas Complejas', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'star', 'Uso del Símbolo “-” y Reglas Reducidas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'dumbbell', 'Uso del Símbolo “-” y Reglas Reducidas', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'trophy', 'Evaluación: Tablas de Decisión Avanzadas', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
 
 -- UNIT 3
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'book', 'Casos de Uso Reales con Tablas de Decisión', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'star', 'Ejercicio: Resolver un Caso de Negocio', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'dumbbell', 'Ejercicio: Resolver un Caso de Negocio', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'trophy', 'Evaluación: Casos y Buenas Prácticas', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
 

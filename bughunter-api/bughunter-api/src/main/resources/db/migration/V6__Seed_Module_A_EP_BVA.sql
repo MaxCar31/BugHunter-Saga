@@ -31,21 +31,21 @@ INSERT INTO units (module_id, unit_number, description) VALUES
 -- UNIT 1 (MODIFICADA CON NUEVOS TÍTULOS)
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'book', 'Fundamentos del Dominio y su Rol en Particiones & Valores Frontera', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'star', 'Construcción Conceptual de Particiones de Equivalencia', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'dumbbell', 'Construcción Conceptual de Particiones de Equivalencia', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'trophy', 'Principios del Análisis de Valores Frontera en el Diseño de Pruebas', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
 
 -- UNIT 2 (SIN CAMBIOS)
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'book', 'Tipos Teóricos y Aplicaciones de Clases de Equivalencia', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'star', 'Ejercicios Prácticos: Clases Válidas e Inválidas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'dumbbell', 'Ejercicios Prácticos: Clases Válidas e Inválidas', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'trophy', 'Evaluación: Casos Prácticos de Equivalencia', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
 
 -- UNIT 3 (SIN CAMBIOS)
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'book', 'Fundamento del Análisis de Valores Límite', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'star', 'Aplicación y Relación entre Equivalencia y BVA', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'dumbbell', 'Aplicación y Relación entre Equivalencia y BVA', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'trophy', 'Evaluación: BVA y Análisis Robusto', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
 
@@ -76,8 +76,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 2),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de los siguientes elementos pueden formar parte de un dominio de entrada en un sistema? (Selecciona todas las que apliquen)",
   "answers": [
     {"name": "Tipos de archivo permitidos"},
@@ -109,8 +109,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 5),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de los siguientes serían ejemplos válidos de clases de equivalencia? (Selecciona todas las que apliquen)",
   "answers": [
     {"name": "Todos los archivos que pueden previsualizarse"},
@@ -142,8 +142,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 8),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de los siguientes casos representan valores frontera? (Selecciona todas las que apliquen)",
   "answers": [
     {"name": "Cambiar un documento de Pendiente a Aprobado"},
@@ -154,10 +154,10 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswers": [0, 1, 2]
 }', 9);
 
--- ==================== UNIT 1 - LESSON 2 (STAR) ====================
+-- ==================== UNIT 1 - LESSON 2 (dumbbell) ====================
 -- Subtítulo 1: Distinción entre clases válidas e inválidas
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Construcción Conceptual de Particiones de Equivalencia",
   "introduction": "Las clases válidas contienen valores que cumplen las reglas de entrada; las clases inválidas contienen valores que no cumplen dichas reglas.",
@@ -165,7 +165,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "objectives": ["Diferenciar clases válidas de inválidas", "Identificar violaciones de reglas de entrada"]
 }', 1),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Qué determina que una clase sea inválida?",
   "answers": [
@@ -177,8 +177,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 2),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de los siguientes son ejemplos de clases inválidas? (Selecciona todas las que apliquen)",
   "answers": [
     {"name": "Archivos GIF en un sistema que permite solo PNG/JPG/SVG"},
@@ -190,7 +190,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
 }', 3),
 
 -- Subtítulo 2: Característica estructural de una clase
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Construcción Conceptual de Particiones de Equivalencia",
   "introduction": "Una clase de equivalencia reúne valores que producen exactamente el mismo resultado esperado, sin importar sus diferencias superficiales.",
@@ -198,7 +198,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "objectives": ["Reconocer comportamientos compartidos", "Identificar características estructurales de clases"]
 }', 4),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Qué característica permite agrupar valores dentro de una misma clase?",
   "answers": [
@@ -210,8 +210,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 5),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles opciones representan criterios válidos para definir una clase funcional? (Selecciona todas)",
   "answers": [
     {"name": "Que generen permisos idénticos"},
@@ -223,7 +223,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
 }', 6),
 
 -- Subtítulo 3: Representación de un comportamiento
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Construcción Conceptual de Particiones de Equivalencia",
   "introduction": "Un valor representativo permite evaluar una clase completa, evitando probar cada valor individual sin perder cobertura.",
@@ -231,7 +231,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "objectives": ["Seleccionar valores representativos", "Optimizar cobertura de pruebas sin redundancia"]
 }', 7),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Para qué se utiliza un valor representativo?",
   "answers": [
@@ -243,8 +243,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 0
 }', 8),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Qué criterios permiten seleccionar un valor representativo? (Selecciona todas)",
   "answers": [
     {"name": "Que sea fácil de obtener"},
@@ -256,7 +256,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
 }', 9),
 
 -- Subtítulo 4: Identificación de clases dentro del dominio
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Construcción Conceptual de Particiones de Equivalencia",
   "introduction": "El número de clases depende directamente del número de comportamientos diferentes definidos en el dominio funcional.",
@@ -264,7 +264,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "objectives": ["Contar clases según comportamientos", "Mapear dominio funcional correctamente"]
 }', 10),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Cuál factor determina cuántas clases deben definirse?",
   "answers": [
@@ -276,8 +276,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 11),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "Son ejemplos de clases distintas dentro de un dominio: (Selecciona todas)",
   "answers": [
     {"name": "Estados de un flujo con reglas diferentes"},
@@ -289,7 +289,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
 }', 12),
 
 -- Subtítulo 5: Verificación de consistencia en la partición
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Construcción Conceptual de Particiones de Equivalencia",
   "introduction": "Una clase mal definida puede mezclar valores que producen comportamientos diferentes, causando pruebas incorrectas.",
@@ -297,7 +297,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "objectives": ["Detectar inconsistencias en particiones", "Validar definiciones de clases correctamente"]
 }', 13),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Cuál es una señal de que una clase está mal definida?",
   "answers": [
@@ -309,8 +309,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 14),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'star' AND position = 2), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de las siguientes situaciones indican inconsistencia en una clase? (Selecciona todas)",
   "answers": [
     {"name": "Agrupa estados que activan reglas distintas"},
@@ -344,8 +344,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 1
 }', 2),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de los siguientes ejemplos representan límites? (Selecciona todas)",
   "answers": [
     {"name": "Cambio de Pendiente a Aprobado"},
@@ -370,15 +370,15 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "question": "¿Qué caracteriza a un valor adyacente?",
   "answers": [
     {"name": "Ser un valor usado con frecuencia"},
-    {"name": "Estar justo antes o después del límite"},
+    {"name": "Edumbbell justo antes o después del límite"},
     {"name": "Ser un valor aislado"},
-    {"name": "Estar almacenado en la base de datos"}
+    {"name": "Edumbbell almacenado en la base de datos"}
   ],
   "correctAnswer": 1
 }', 5),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "¿Cuáles de los siguientes escenarios representan adyacencia funcional? (Selecciona todas)",
   "answers": [
     {"name": "Antes del evento que autoriza un pago"},
@@ -410,8 +410,8 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 2
 }', 8),
 
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_SELECT', '{
-  "type": "MULTIPLE_SELECT",
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
   "question": "Son ejemplos de valores frontera: (Selecciona todas)",
   "answers": [
     {"name": "La acción que cambia un documento a Publicado"},
@@ -464,21 +464,21 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 0
 }', 4);
 
--- ==================== UNIT 2 - STAR (position=2) ====================
+-- ==================== UNIT 2 - dumbbell (position=2) ====================
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Módulo A",
   "introduction": "Practica identificando clases de equivalencia en escenarios reales.",
   "objectives": ["Identificar clases en ejemplos", "Justificar clasificación"]
 }', 1),
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'star' AND position = 2), 'FILL_IN_THE_BLANK', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
   "type": "FILL_IN_THE_BLANK",
   "question": "Para un campo de edad (18-65), el rango 18-65 es una clase ___.",
   "answerTiles": ["válida", "inválida", "mixta"],
   "correctAnswerIndices": [0]
 }', 2),
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Qué valor pertenece a una clase inválida para edad (18-65)?",
   "answers": [
@@ -488,7 +488,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   ],
   "correctAnswer": 0
 }', 3),
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Cuántas clases de equivalencia tiene un campo booleano?",
   "answers": [
@@ -569,21 +569,21 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   "correctAnswer": 0
 }', 4);
 
--- ==================== UNIT 3 - STAR (position=2) ====================
+-- ==================== UNIT 3 - dumbbell (position=2) ====================
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'star' AND position = 2), 'INFO', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'INFO', '{
   "type": "INFO",
   "moduleTitle": "Módulo A",
   "introduction": "BVA se combina con Partición de Equivalencia para maximizar la cobertura de pruebas.",
   "objectives": ["Aplicar BVA en conjunto con EP", "Identificar valores críticos"]
 }', 1),
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'star' AND position = 2), 'FILL_IN_THE_BLANK', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
   "type": "FILL_IN_THE_BLANK",
   "question": "BVA complementa EP probando los ___ de cada clase.",
   "answerTiles": ["bordes", "centros", "extremos internos"],
   "correctAnswerIndices": [0]
 }', 2),
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Qué es BVA robusto?",
   "answers": [
@@ -593,7 +593,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
   ],
   "correctAnswer": 0
 }', 3),
-((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'star' AND position = 2), 'MULTIPLE_CHOICE', '{
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
   "type": "MULTIPLE_CHOICE",
   "question": "¿Cuál es el objetivo de BVA robusto?",
   "answers": [

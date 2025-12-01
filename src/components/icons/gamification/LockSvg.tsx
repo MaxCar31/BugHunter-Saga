@@ -1,12 +1,53 @@
 export const LockSvg = () => {
   return (
-    <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
+    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lockGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#E0E0E0" />
+          <stop offset="100%" stopColor="#AFAFAF" />
+        </linearGradient>
+      </defs>
+
+      {/* Sombra 3D */}
+      <ellipse cx="22" cy="35" rx="10" ry="2" fill="#000000" opacity="0.15" />
+
+      {/* Arco del candado (parte superior) */}
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M20.8731 4.53816C16.9449 4.53816 13.7604 7.52403 13.7604 11.2073V13.483C13.7604 13.5386 13.7612 13.5941 13.7626 13.6493H13.7049C11.854 13.6493 10.3535 15.1498 10.3535 17.0007V25.9418C10.3535 27.7927 11.854 29.2932 13.7049 29.2932H28.0455C29.8965 29.2932 31.397 27.7927 31.397 25.9418V17.0008C31.397 15.1498 29.8965 13.6493 28.0455 13.6493H27.9837C27.9851 13.5941 27.9858 13.5386 27.9858 13.483V11.2073C27.9858 7.52402 24.8014 4.53816 20.8731 4.53816ZM24.4812 13.6493C24.484 13.5942 24.4855 13.5388 24.4855 13.483V11.2073C24.4855 9.33665 22.8682 7.82022 20.8731 7.82022C18.8781 7.82022 17.2608 9.33665 17.2608 11.2073V13.483C17.2608 13.5388 17.2622 13.5942 17.2651 13.6493H24.4812Z"
-        fill="#AFAFAF"
+        d="M15 18 V13 C15 9.5 17.5 7 21 7 C24.5 7 27 9.5 27 13 V18"
+        stroke="url(#lockGradient)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
       />
+
+      {/* Cuerpo del candado con degradado */}
+      <rect
+        x="13"
+        y="18"
+        width="16"
+        height="13"
+        rx="2"
+        fill="url(#lockGradient)"
+      />
+
+      {/* Borde del cuerpo más oscuro */}
+      <rect
+        x="13"
+        y="18"
+        width="16"
+        height="13"
+        rx="2"
+        stroke="#8F8F8F"
+        strokeWidth="1"
+        fill="none"
+      />
+
+      {/* Ojo de cerradura */}
+      <circle cx="21" cy="24" r="2" fill="#6F6F6F" />
+      <rect x="20" y="24" width="2" height="4" rx="1" fill="#6F6F6F" />
+
+      {/* Brillo superior */}
+      <ellipse cx="18" cy="20" rx="2" ry="1" fill="#FFFFFF" opacity="0.4" />
     </svg>
   );
 };

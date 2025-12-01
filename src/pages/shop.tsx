@@ -166,8 +166,8 @@ const Shop: NextPage = () => {
       <div>
         <TopBar />
         <LeftBar selectedTab="Tienda" />
-        <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
-          <div className="px-4 pb-20">
+        <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2">
+          <div className="w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] pb-20">
             <p className="py-7 text-center text-gray-600">Cargando tienda...</p>
           </div>
           <RightBar />
@@ -182,8 +182,8 @@ const Shop: NextPage = () => {
       <div>
         <TopBar />
         <LeftBar selectedTab="Tienda" />
-        <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
-          <div className="px-4 pb-20">
+        <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2">
+          <div className="w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] pb-20">
             <div className="py-7">
               <div className="rounded-xl bg-red-100 p-6 text-center">
                 <p className="font-bold text-red-800">Error al cargar la tienda</p>
@@ -202,13 +202,13 @@ const Shop: NextPage = () => {
     <div>
       <TopBar />
       <LeftBar selectedTab="Tienda" />
-      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
-        <div className="px-4 pb-20">
+      <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2">
+        <div className="w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] pb-20">
           {purchaseMessage && (
             <div
               className={`mb-4 rounded-xl p-4 text-center font-bold ${purchaseMessage.includes("exitosamente")
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
                 }`}
             >
               {purchaseMessage}
@@ -229,8 +229,8 @@ const Shop: NextPage = () => {
                     <p className="text-sm text-gray-500">{item.description}</p>
                     <button
                       className={`flex w-fit items-center gap-1 rounded-2xl border-2 ${purchasingItemId === item.itemId || lingots < item.cost
-                          ? "cursor-not-allowed border-gray-300 bg-white px-4 py-2 text-sm font-bold uppercase text-gray-300"
-                          : "border-b-4 border-green-600 bg-green-500 px-4 py-3 text-sm font-bold uppercase text-white hover:brightness-110"
+                        ? "cursor-not-allowed border-gray-300 bg-white px-4 py-2 text-sm font-bold uppercase text-gray-300"
+                        : "border-b-4 border-green-600 bg-green-500 px-4 py-3 text-sm font-bold uppercase text-white hover:brightness-110"
                         }`}
                       onClick={() => handlePurchase(item)}
                       disabled={
@@ -269,8 +269,8 @@ const Shop: NextPage = () => {
                     <p className="text-sm text-gray-500">{item.description}</p>
                     <button
                       className={`flex w-fit items-center gap-1 rounded-2xl border-2 ${purchasingItemId === item.itemId || lingots < item.cost
-                          ? "cursor-not-allowed border-gray-300 bg-white px-4 py-2 text-sm font-bold uppercase text-gray-300"
-                          : "border-b-4 border-blue-600 bg-blue-500 px-4 py-3 text-sm font-bold uppercase text-white hover:brightness-110"
+                        ? "cursor-not-allowed border-gray-300 bg-white px-4 py-2 text-sm font-bold uppercase text-gray-300"
+                        : "border-b-4 border-blue-600 bg-blue-500 px-4 py-3 text-sm font-bold uppercase text-white hover:brightness-110"
                         }`}
                       onClick={() => handlePurchase(item)}
                       disabled={

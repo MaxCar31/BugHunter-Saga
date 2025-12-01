@@ -30,21 +30,21 @@ INSERT INTO units (module_id, unit_number, description) VALUES
 -- UNIT 1
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1), 'book', '¿Qué es la Cobertura de Sentencia?', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1), 'star', 'Ejecutando Cobertura de Sentencia', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1), 'dumbbell', 'Ejecutando Cobertura de Sentencia', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1), 'trophy', 'Evaluación: Cobertura de Sentencia', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
 
 -- UNIT 2
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2), 'book', 'Cobertura de Decisión y Condición', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2), 'star', 'Analizando Condiciones Compuestas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2), 'dumbbell', 'Analizando Condiciones Compuestas', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2), 'trophy', 'Evaluación: Cobertura de Decisión y Condición', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
 
 -- UNIT 3
 INSERT INTO lessons (unit_id, type, description, position) VALUES
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3), 'book', 'Cobertura de Camino y Complejidad', 1),
-((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3), 'star', 'Ejemplo Práctico: Análisis de Caminos', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3), 'dumbbell', 'Ejemplo Práctico: Análisis de Caminos', 2),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3), 'trophy', 'Evaluación: Cobertura Completa de Código', 3),
 ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
 

@@ -3,13 +3,14 @@ import { BottomBar } from "~/components/BottomBar";
 import { LeftBar } from "~/components/LeftBar";
 import { BronzeLeagueSvg } from "~/components/icons/league";
 import { EditPencilSvg, SettingsGearSvg } from "~/components/icons/ui";
-import { LightningProgressSvg, GemSvg } from "~/components/icons/gamification";
-import { ProfileTimeJoinedSvg } from "~/components/icons/profile";
+import { LightningProgressSvg, GemSvg, FireSvg, EmptyFireSvg } from "~/components/icons/gamification";
+import { ProfileTimeJoinedSvg, QATesterRobotSvg } from "~/components/icons/profile";
 import Link from "next/link";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getUserProfile } from "~/services/userService";
+import { getUserProfile, getUserStats } from "~/services/userService";
+import type { UserStatsDTO } from "~/types/user";
 import dayjs from "dayjs";
 
 const Profile: NextPage = () => {
@@ -17,20 +18,25 @@ const Profile: NextPage = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userStats, setUserStats] = useState<UserStatsDTO | null>(null);
 
-  // Feature 1: Cargar el perfil del usuario al montar el componente
+  // Feature 1: Cargar el perfil y estadísticas del usuario al montar el componente
   useEffect(() => {
     if (!loggedIn) {
       void router.push("/");
       return;
     }
 
-    const loadProfile = async () => {
+    const loadProfileAndStats = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const profile = await getUserProfile();
+        // Cargar perfil y estadísticas en paralelo
+        const [profile, stats] = await Promise.all([
+          getUserProfile(),
+          getUserStats(),
+        ]);
 
         // Actualizar el store con los datos del perfil
         useBoundStore.setState({
@@ -43,6 +49,9 @@ const Profile: NextPage = () => {
           soundEffects: profile.soundEffectsEnabled,
         });
 
+        // Guardar estadísticas en el estado local
+        setUserStats(stats);
+
       } catch (err) {
         console.error("Error loading profile:", err);
         setError(err instanceof Error ? err.message : "Error al cargar el perfil");
@@ -51,7 +60,7 @@ const Profile: NextPage = () => {
       }
     };
 
-    void loadProfile();
+    void loadProfileAndStats();
   }, [loggedIn, router]);
 
   if (isLoading) {
@@ -87,7 +96,7 @@ const Profile: NextPage = () => {
       <div className="flex justify-center gap-3 pt-14 md:ml-24 lg:ml-64 lg:gap-12">
         <div className="flex w-full max-w-4xl flex-col gap-5 p-5">
           <ProfileTopSection />
-          <ProfileStatsSection />
+          {userStats && <ProfileStatsSection stats={userStats} />}
         </div>
       </div>
       <div className="pt-[90px]"></div>
@@ -126,10 +135,35 @@ const ProfileTopSection = () => {
     }
   }, [loggedIn, router]);
 
+  // Función para generar color consistente basado en el username
+  const getAvatarColor = (username: string): string => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500',
+      'bg-purple-500',
+      'bg-pink-500',
+      'bg-orange-500',
+      'bg-red-500',
+      'bg-teal-500',
+      'bg-indigo-500',
+    ];
+
+    const charCode = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const index = charCode % colors.length;
+
+    return colors[index] ?? 'bg-gray-500';
+  };
+
+  const avatarColor = getAvatarColor(username);
+
   return (
     <section className="flex flex-row-reverse border-b-2 border-gray-200 pb-8 md:flex-row md:gap-8">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-gray-400 text-3xl font-bold text-gray-400 md:h-44 md:w-44 md:text-7xl">
-        {username.charAt(0).toUpperCase()}
+      {/* Avatar: QA Testing Robot */}
+      <div
+        className={`flex h-20 w-20 items-center justify-center rounded-full ${avatarColor} border-4 border-white shadow-lg md:h-44 md:w-44`}
+        title={`QA Tester Bot - ${username}`}
+      >
+        <QATesterRobotSvg />
       </div>
       <div className="flex grow flex-col justify-between gap-3">
         <div className="flex flex-col gap-2">
@@ -155,20 +189,37 @@ const ProfileTopSection = () => {
   );
 };
 
-const ProfileStatsSection = () => {
+const ProfileStatsSection = ({ stats }: { stats: UserStatsDTO }) => {
   const lingots = useBoundStore((x) => x.lingots);
-  const totalXp = 125;
-  const league = "Bronze";
+
+  // Determinar la liga basándose en el ranking (si existe)
+  const getLeagueName = (rank: number | null): string => {
+    if (rank === null) return "Sin Liga";
+    if (rank <= 10) return "Bronze";
+    if (rank <= 50) return "Silver";
+    return "Gold";
+  };
+
+  const league = getLeagueName(stats.leagueRank);
 
   return (
     <section>
-      <h2 className="mb-5 text-2xl font-bold">Statistics</h2>
+      <h2 className="mb-5 text-2xl font-bold">Estadísticas</h2>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex gap-2 rounded-2xl border-2 border-gray-200 p-2 md:gap-3 md:px-6 md:py-4">
           <LightningProgressSvg size={35} />
           <div className="flex flex-col">
-            <span className="text-xl font-bold">{totalXp}</span>
+            <span className="text-xl font-bold">{stats.totalXp}</span>
             <span className="text-sm text-gray-400 md:text-base">Total XP</span>
+          </div>
+        </div>
+        <div className="flex gap-2 rounded-2xl border-2 border-gray-200 p-2 md:gap-3 md:px-6 md:py-4">
+          <div className="flex items-center justify-center w-[35px]">
+            {stats.currentStreak > 0 ? <FireSvg /> : <EmptyFireSvg />}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold">{stats.currentStreak}</span>
+            <span className="text-sm text-gray-400 md:text-base">Racha (días)</span>
           </div>
         </div>
         <div className="flex gap-2 rounded-2xl border-2 border-gray-200 p-2 md:gap-3 md:px-6 md:py-4">
@@ -176,14 +227,14 @@ const ProfileStatsSection = () => {
           <div className="flex flex-col">
             <span className="text-xl font-bold">{league}</span>
             <span className="text-sm text-gray-400 md:text-base">
-              Current league
+              Liga actual
             </span>
           </div>
         </div>
         <div className="col-span-2 flex gap-3 rounded-2xl border-2 border-[#f2a445] bg-[#fff7e6] p-3 md:gap-4 md:px-6 md:py-5">
           <GemSvg />
           <div className="flex flex-col justify-center gap-0.5">
-            <span className="text-2xl font-bold text-[#f2a445] md:text-3xl">{lingots}</span>
+            <span className="text-2xl font-bold text-[#f2a445] md:text-3xl">{stats.totalLingots}</span>
             <span className="text-sm font-medium text-gray-600 md:text-base">Puntos QA</span>
           </div>
         </div>

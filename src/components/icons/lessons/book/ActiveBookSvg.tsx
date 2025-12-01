@@ -1,32 +1,40 @@
 export const ActiveBookSvg = () => {
   return (
-    <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      {/* Test Case Document - Active */}
-      <rect x="8" y="2" width="26" height="30" rx="2" fill="white" />
-      <rect x="8" y="2" width="26" height="30" rx="2" stroke="#58CC02" strokeWidth="2" />
+    <svg width="42" height="38" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="magnifierGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#89E219" />
+          <stop offset="50%" stopColor="#58CC02" />
+          <stop offset="100%" stopColor="#46A302" />
+        </linearGradient>
+      </defs>
 
-      {/* Document Header */}
-      <rect x="11" y="5" width="20" height="2" rx="1" fill="#58CC02" />
-      <rect x="11" y="8" width="14" height="1.5" rx="0.75" fill="#89E219" />
+      {/* Sombra 3D */}
+      <circle cx="22" cy="22" r="14" fill="#46A302" opacity="0.3" />
 
-      {/* Checklist Items - Active (some checked) */}
-      {/* Item 1 - Checked */}
-      <rect x="12" y="13" width="3" height="3" rx="0.5" fill="#58CC02" />
-      <path d="M12.8 15L13.5 15.7L14.8 14" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="14" width="12" height="1" rx="0.5" fill="#58CC02" />
+      {/* Lupa - Círculo principal */}
+      <circle cx="21" cy="21" r="13" fill="#FFF9E6" stroke="url(#magnifierGlow)" strokeWidth="3" />
 
-      {/* Item 2 - Checked */}
-      <rect x="12" y="18" width="3" height="3" rx="0.5" fill="#58CC02" />
-      <path d="M12.8 20L13.5 20.7L14.8 19" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="19" width="10" height="1" rx="0.5" fill="#58CC02" />
+      {/* Lente interior */}
+      <circle cx="21" cy="21" r="10" fill="#FFFFFF" stroke="#58CC02" strokeWidth="1.5" />
 
-      {/* Item 3 - Unchecked */}
-      <rect x="12" y="23" width="3" height="3" rx="0.5" stroke="#58CC02" strokeWidth="1" fill="none" />
-      <rect x="16" y="24" width="11" height="1" rx="0.5" fill="#BFBFBF" />
+      {/* Bug dentro de la lupa */}
+      <circle cx="21" cy="21" r="4" fill="#E74C3C" />
+      <line x1="19" y1="18" x2="18" y2="16" stroke="#C0392B" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="23" y1="18" x2="24" y2="16" stroke="#C0392B" strokeWidth="1.2" strokeLinecap="round" />
+      <ellipse cx="19.5" cy="20" rx="0.8" ry="0.5" fill="#8B0000" />
+      <ellipse cx="22.5" cy="20" rx="0.8" ry="0.5" fill="#8B0000" />
 
-      {/* Item 4 - Unchecked */}
-      <rect x="12" y="28" width="3" height="3" rx="0.5" stroke="#58CC02" strokeWidth="1" fill="none" />
-      <rect x="16" y="29" width="9" height="1" rx="0.5" fill="#BFBFBF" />
+      {/* Mango de la lupa */}
+      <path d="M30 30L38 38" stroke="url(#magnifierGlow)" strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M30 30L38 38" stroke="#46A302" strokeWidth="2.5" strokeLinecap="round" />
+
+      {/* Brillo en el cristal */}
+      <ellipse cx="17" cy="17" rx="3.5" ry="2" fill="#FFFFFF" opacity="0.6" />
+
+      {/* Destellos de inspección */}
+      <circle cx="9" cy="13" r="1.5" fill="#89E219" opacity="0.8" />
+      <circle cx="33" cy="9" r="1.2" fill="#58CC02" opacity="0.7" />
     </svg>
   );
 };

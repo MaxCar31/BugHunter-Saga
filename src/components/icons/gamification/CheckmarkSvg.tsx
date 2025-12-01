@@ -1,37 +1,54 @@
+/**
+ * 🔍 Explicación:
+ * Icono de checkmark (marca de verificación) mejorado para el roadmap/mapa de aprendizaje.
+ * Diseño minimalista y ligero que representa lecciones completadas.
+ * Usado en: TileIcon.tsx para mostrar el estado de completitud de lecciones.
+ * 
+ * Características:
+ * - Estilo flat design limpio
+ * - Círculo verde suave (color de éxito)
+ * - Checkmark blanco prominente
+ * - Sin efectos pesados (optimizado para rendimiento)
+ * - Tamaño: 42x42 para consistencia con otros iconos del roadmap
+ */
+
 export const CheckmarkSvg = () => {
   return (
-    <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <defs>
-        <linearGradient id="checkGrad" x1="21" y1="8" x2="21" y2="26">
-          <stop offset="0%" stopColor="#58CC02" />
-          <stop offset="100%" stopColor="#46A302" />
-        </linearGradient>
-      </defs>
+    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Círculo exterior verde claro (borde suave) */}
+      <circle
+        cx="21"
+        cy="21"
+        r="20"
+        fill="#E8F5E9"
+      />
 
-      {/* Circular Sky Blue Background */}
-      <circle cx="21" cy="17" r="16" fill="#87CEEB" opacity="0.3" />
-      <circle cx="21" cy="17" r="14" fill="#87CEEB" opacity="0.2" />
+      {/* Círculo principal verde */}
+      <circle
+        cx="21"
+        cy="21"
+        r="17"
+        fill="#58CC02"
+      />
 
-      {/* Success Circle Background */}
-      <circle cx="21" cy="17" r="12" fill="url(#checkGrad)" />
-      <circle cx="21" cy="17" r="11" fill="#58CC02" opacity="0.3" />
-
-      {/* Checkmark - Bold and Clear */}
+      {/* Checkmark blanco (forma de "V" rotada) */}
       <path
-        d="M16 17.5 L19.5 21.5 L27 13"
-        stroke="#FFF"
-        strokeWidth="3"
+        d="M 14 21 L 18.5 25.5 L 28 16"
+        stroke="#FFFFFF"
+        strokeWidth="3.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
 
-      {/* Shine effect */}
-      <circle cx="17" cy="13" r="1.5" fill="#FFF" opacity="0.6" />
-      <circle cx="25" cy="15" r="1" fill="#FFF" opacity="0.5" />
-
-      {/* Outer glow */}
-      <circle cx="21" cy="17" r="13" stroke="#58CC02" strokeWidth="0.5" opacity="0.4" fill="none" />
+      {/* Brillo sutil superior izquierdo */}
+      <circle
+        cx="17"
+        cy="17"
+        r="2"
+        fill="#FFFFFF"
+        opacity="0.3"
+      />
     </svg>
   );
 };

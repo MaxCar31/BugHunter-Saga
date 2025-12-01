@@ -1,33 +1,122 @@
-export const GemSvg = () => {
+import type { ComponentProps } from "react";
+
+export const GemSvg = (props: ComponentProps<"svg">) => {
     return (
-        <svg width="24px" height="30px" viewBox="0 0 24 30">
-            <g
-                id="Page-1"
-                stroke="none"
-                strokeWidth={1}
+        <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-[50px] w-[50px]"
+            {...props}
+        >
+            {/* Círculo exterior con borde tech */}
+            <circle
+                cx="23"
+                cy="23"
+                r="18"
+                fill="url(#coinGradient)"
+                stroke="url(#coinBorder)"
+                strokeWidth="2.5"
+            />
+
+            {/* Anillo interior grueso */}
+            <circle
+                cx="23"
+                cy="23"
+                r="15"
                 fill="none"
-                fillRule="evenodd"
-            >
-                <g
-                    id="lingot"
-                    transform="translate(1.000000, 1.000000)"
-                    fillRule="nonzero"
-                >
-                    <path
-                        d="M2.12,5.36 L8.595,1.452 C9.9891922,0.61047923 11.7348078,0.61047923 13.129,1.452 L19.604,5.359 C20.9201138,6.15339332 21.7243996,7.57872448 21.7240001,9.116 L21.7240001,18.782 C21.7240001,20.3189192 20.9198086,21.7437908 19.604,22.538 L13.129,26.445 C11.7348078,27.2865208 9.9891922,27.2865208 8.595,26.445 L2.12,22.538 C0.804191377,21.7437908 0,20.3189192 0,18.782 L0,9.116 C0,7.578 0.804,6.154 2.12,5.359 L2.12,5.36 Z"
-                        id="Path"
-                        stroke="#FFFFFF"
-                        strokeWidth={2}
-                        fill="#FC4848"
-                    />
-                    <path
-                        d="M10.89,5.273 L10.89,8.438 C10.89,8.816 10.692,9.166 10.37,9.362 L7.422,11.145 C7.05578595,11.3664376 6.59336378,11.350749 6.243,11.105 L3.857,9.433 C3.55901568,9.22418286 3.38621247,8.87935269 3.39729469,8.51565441 C3.40837691,8.15195613 3.60185462,7.81828687 3.912,7.628 L9.245,4.352 C9.57820431,4.14746267 9.99593499,4.1389799 10.3371682,4.32982156 C10.6784014,4.52066323 10.8898476,4.88102607 10.89,5.272 L10.89,5.273 Z"
-                        id="Path"
-                        fill="#FFFFFF"
-                        opacity="0.793"
-                    />
-                </g>
-            </g>
+                stroke="#FFD700"
+                strokeWidth="1.5"
+                opacity="0.5"
+            />
+
+            {/* Anillo medio */}
+            <circle
+                cx="23"
+                cy="23"
+                r="12"
+                fill="none"
+                stroke="#B8860B"
+                strokeWidth="1.2"
+                opacity="0.4"
+            />
+
+            {/* Bug icon (bicho de testing) en el centro */}
+            {/* Cuerpo del bug */}
+            <ellipse
+                cx="23"
+                cy="23"
+                rx="5"
+                ry="6.5"
+                fill="#0F172A"
+            />
+
+            {/* Cabeza del bug */}
+            <circle
+                cx="23"
+                cy="17"
+                r="3"
+                fill="#0F172A"
+            />
+
+            {/* Antenas */}
+            <path d="M21 15 L19 12" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M25 15 L27 12" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* Patas izquierdas */}
+            <path d="M18 20 L15 19" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M18 23 L14 23" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M18 26 L15 27" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* Patas derechas */}
+            <path d="M28 20 L31 19" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M28 23 L32 23" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M28 26 L31 27" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* Líneas tech en los bordes */}
+            <path d="M23 4 L23 7" stroke="#FFE55C" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+            <path d="M23 39 L23 42" stroke="#FFE55C" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+            <path d="M4 23 L7 23" stroke="#FFE55C" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+            <path d="M39 23 L42 23" stroke="#FFE55C" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+
+            {/* Marcas diagonales tech */}
+            <path d="M9 9 L12 12" stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M34 34 L37 37" stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M9 37 L12 34" stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M34 12 L37 9" stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+
+            {/* Brillo superior 3D */}
+            <ellipse
+                cx="23"
+                cy="14"
+                rx="10"
+                ry="4"
+                fill="#FFFFFF"
+                opacity="0.4"
+            />
+
+            {/* Destellos en los bordes */}
+            <circle cx="12" cy="12" r="1.5" fill="#FFE55C" opacity="0.8" />
+            <circle cx="34" cy="12" r="1.5" fill="#FFE55C" opacity="0.8" />
+            <circle cx="12" cy="34" r="1.5" fill="#FFE55C" opacity="0.8" />
+            <circle cx="34" cy="34" r="1.5" fill="#FFE55C" opacity="0.8" />
+
+            {/* Gradientes */}
+            <defs>
+                <linearGradient id="coinGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#FFD700" />
+                    <stop offset="50%" stopColor="#DAA520" />
+                    <stop offset="100%" stopColor="#B8860B" />
+                </linearGradient>
+
+                <linearGradient id="coinBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFE55C" />
+                    <stop offset="50%" stopColor="#FFD700" />
+                    <stop offset="100%" stopColor="#FFE55C" />
+                </linearGradient>
+            </defs>
         </svg>
     );
 };

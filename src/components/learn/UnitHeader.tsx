@@ -29,7 +29,7 @@ export const UnitHeader: React.FC<UnitHeaderProps> = ({
 
   return (
     <article
-      className={`max-w-2xl text-white sm:rounded-xl shadow-lg ${backgroundColor}`}
+      className={`w-full text-white sm:rounded-xl shadow-lg ${backgroundColor}`}
     >
       <header className="flex items-center justify-between gap-4 p-6">
         <div className="flex flex-col gap-2">

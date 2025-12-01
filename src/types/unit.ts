@@ -7,7 +7,7 @@
 /**
  * Tipos de tiles disponibles en el mapa de aprendizaje
  */
-export type TileType = "star" | "dumbbell" | "book" | "trophy" | "fast-forward" | "treasure";
+export type TileType = "dumbbell" | "book" | "trophy" | "fast-forward" | "treasure";
 
 /**
  * Estados posibles de un tile/lección
