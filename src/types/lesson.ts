@@ -71,6 +71,7 @@ export interface LessonCompletionRequest {
     lessonId: number;
     correctAnswerCount: number;
     incorrectAnswerCount: number;
+    score?: number; // Nota en porcentaje 0-100 (opcional)
     timeTakenMs: number;
     isPractice: boolean;
 }

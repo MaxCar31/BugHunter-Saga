@@ -5,7 +5,6 @@ import { BottomBar } from "~/components/BottomBar";
 import { LeftBar } from "~/components/LeftBar";
 import { TopBar } from "~/components/TopBar";
 import { useBoundStore } from "~/hooks/useBoundStore";
-import { SettingsRightNav } from "~/components/SettingsRightNav";
 import { updateUserSettings } from "~/services/userService";
 
 const CoachSvg = (props: ComponentProps<"svg">) => {

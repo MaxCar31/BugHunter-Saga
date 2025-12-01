@@ -49,7 +49,7 @@ export const createXpSlice: BoundStateCreator<XpSlice> = (set, get) => ({
     const today = toDateString(dayjs());
     set({ xpByDate: { ...get().xpByDate, [today]: value } });
   },
-  setXpThisWeek: (value: number) => {
+  setXpThisWeek: (_value: number) => {
     // Este método se mantiene por compatibilidad pero no modifica xpByDate
     // ya que xpThisWeek se calcula dinámicamente
   },

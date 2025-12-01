@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { CloseSvg, LessonTopBarEmptyHeart, LessonTopBarHeart } from "~/components/Svgs";
+import { CloseSvg } from "~/components/icons/ui";
+import { LessonTopBarEmptyHeart, LessonTopBarHeart } from "~/components/icons/lessons";
 
 export const ProgressBar = ({
     answeredQuestionsCount,

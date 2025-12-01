@@ -1,5 +1,10 @@
+/**
+ * @deprecated Este componente NO SE USA en la aplicación.
+ * ModuleDropDown es el componente activo para selección de módulos.
+ * Este archivo puede ser eliminado en futuras versiones.
+ */
 import Link from "next/link";
-import { ChevronLeftSvg, ChevronRightSvg } from "./Svgs";
+import { ChevronLeftSvg, ChevronRightSvg } from "~/components/icons/navigation";
 import React, { useRef } from "react";
 // TODO: Reemplazar con datos dinámicos de fetchModules
 // import modules from "~/utils/modules";

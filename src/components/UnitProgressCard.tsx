@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useBoundStore } from '~/hooks/useBoundStore';
 import { apiBase } from '~/utils/config';
 
 interface UnitProgress {

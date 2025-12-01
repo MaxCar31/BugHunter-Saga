@@ -1,4 +1,3 @@
-import { useBoundStore } from "~/hooks/useBoundStore";
 import { useState, useEffect } from "react";
 import { apiBase } from "~/utils/config";
 

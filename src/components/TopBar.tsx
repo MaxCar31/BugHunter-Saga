@@ -5,14 +5,8 @@ import React, { useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { Calendar } from "./Calendar";
 import { ModuleIcon } from "./ModuleIcon";
-import {
-  FireSvg,
-  GemSvg,
-  GlobeIconSvg,
-  LingotsTreasureChestSvg,
-  MoreOptionsSvg,
-  PodcastIconSvg,
-} from "./Svgs";
+import { FireSvg, GemSvg, LingotsTreasureChestSvg } from "~/components/icons/gamification";
+import { GlobeIconSvg, MoreOptionsSvg, PodcastIconSvg } from "~/components/icons/navigation";
 
 const EmptyFireTopBarSvg = (props: ComponentProps<"svg">) => {
   return (

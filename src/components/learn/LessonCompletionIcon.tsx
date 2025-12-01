@@ -3,7 +3,7 @@ import {
   LessonCompletionSvg1,
   LessonCompletionSvg2,
   LessonCompletionSvg3,
-} from "~/components/Svgs";
+} from "~/components/icons/lessons";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
 

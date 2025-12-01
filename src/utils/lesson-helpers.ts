@@ -26,7 +26,7 @@ export const mapBackendTypeToFrontend = (backendType: BackendProblemType): Lesso
         case "MATCH_PAIRS":
             return "MATCH_PAIRS";
         default:
-            console.warn(`Unknown problem type: ${backendType}, defaulting to INFO`);
+            console.warn(`Unknown problem type: ${String(backendType)}, defaulting to INFO`);
             return "INFO";
     }
 };

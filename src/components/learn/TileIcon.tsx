@@ -1,21 +1,9 @@
-import {
-  CheckmarkSvg,
-  LockSvg,
-  StarSvg,
-  ActiveBookSvg,
-  LockedBookSvg,
-  GoldenBookSvg,
-  ActiveDumbbellSvg,
-  LockedDumbbellSvg,
-  GoldenDumbbellSvg,
-  FastForwardSvg,
-  ActiveTreasureSvg,
-  LockedTreasureSvg,
-  GoldenTreasureSvg,
-  ActiveTrophySvg,
-  LockedTrophySvg,
-  GoldenTrophySvg,
-} from "~/components/Svgs";
+import { CheckmarkSvg, LockSvg, StarSvg } from "~/components/icons/gamification";
+import { ActiveBookSvg, LockedBookSvg, GoldenBookSvg } from "~/components/icons/lessons/book";
+import { ActiveDumbbellSvg, LockedDumbbellSvg, GoldenDumbbellSvg } from "~/components/icons/lessons/dumbbell";
+import { FastForwardSvg } from "~/components/icons/lessons";
+import { ActiveTreasureSvg, LockedTreasureSvg, GoldenTreasureSvg } from "~/components/icons/lessons/treasure";
+import { ActiveTrophySvg, LockedTrophySvg, GoldenTrophySvg } from "~/components/icons/lessons/trophy";
 import type { TileType } from "~/types/unit";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";

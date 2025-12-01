@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
 // TODO: Reemplazar con datos dinámicos de fetchModules
 // import modules from "~/utils/modules";
@@ -11,9 +11,17 @@ const modules: any[] = [];
 export const ModuleDropDown = () => {
   const currentModule = useBoundStore((x) => x.module);
   const [modulesShown, setModulesShown] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  if (!currentModule) {
-    return null; // or a loading state
+  // Marcar como montado después de la hidratación
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Durante la hidratación, siempre retornar null para evitar mismatch
+  // Después de montar, mostrar solo si hay módulo
+  if (!isMounted || !currentModule) {
+    return null;
   }
 
   return (
@@ -23,8 +31,8 @@ export const ModuleDropDown = () => {
         onClick={() => setModulesShown((x) => !x)}
         onBlur={() => setModulesShown(false)}
       >
-  <ModuleIcon module={currentModule} width={24} />
-  <span>{currentModule.shortName}</span>
+        <ModuleIcon module={currentModule} width={24} />
+        <span>{currentModule.shortName}</span>
       </button>
       {modulesShown && (
         <ul className="absolute right-0 top-full grid w-[500px] grid-cols-1 rounded-2xl border-2 border-gray-200 bg-white p-6 font-light text-gray-600">

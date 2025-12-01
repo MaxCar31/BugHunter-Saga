@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuidebookSvg } from "~/components/Svgs";
+import { GuidebookSvg } from "~/components/icons/lessons";
 
 interface UnitHeaderProps {
   unitNumber: number;

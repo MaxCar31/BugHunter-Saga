@@ -1,3 +1,8 @@
+/**
+ * @deprecated Este componente NO SE USA en la aplicación.
+ * TopBar.tsx es el componente activo.
+ * Este archivo puede ser eliminado en futuras versiones.
+ */
 import dayjs from "dayjs";
 import Link from "next/link";
 import type { ComponentProps } from "react";
@@ -5,41 +10,24 @@ import React, { useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { Calendar } from "./Calendar";
 import { ModuleIcon } from "./ModuleIcon";
-import {
-  FireSvg,
-  GemSvg,
-  GlobeIconSvg,
-  LingotsTreasureChestSvg,
-  MoreOptionsSvg,
-  PodcastIconSvg,
-} from "./Svgs";
+import { MoreOptionsSvg, PodcastIconSvg, GlobeIconSvg } from "~/components/icons/navigation";
+import { FireSvg, EmptyFireSvg, GemSvg, LingotsTreasureChestSvg } from "~/components/icons/gamification";
 
-const EmptyFireTopBarSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="25" height="30" viewBox="0 0 25 30" fill="none" {...props}>
-      <g opacity="0.2">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M13.9697 2.91035C13.2187 1.96348 11.7813 1.96348 11.0303 2.91035L7.26148 7.66176L4.83362 6.36218C4.61346 6.24433 4.1221 6.09629 3.88966 6.05712C2.72329 5.86056 2.04098 6.78497 2.04447 8.03807L2.06814 16.5554C2.02313 16.9355 2 17.322 2 17.7137C2 23.2979 6.70101 27.8248 12.5 27.8248C18.299 27.8248 23 23.2979 23 17.7137C23 15.3518 22.1591 13.1791 20.7498 11.458L13.9697 2.91035Z"
-          fill="black"
-        />
-      </g>
-    </svg>
-  );
+// Icon wrapper components (inline definitions for deprecated component)
+const FireIcon = ({ isEmpty, ...props }: { isEmpty: boolean } & ComponentProps<"svg">) => {
+  return isEmpty ? <EmptyFireSvg {...props} /> : <FireSvg {...props} />;
 };
 
-const EmptyGemTopBarSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="24" height="30" viewBox="0 0 24 30" fill="none" {...props}>
-      <g opacity="0.2">
-        <path
-          d="M3.63705 7.31556C2.62104 7.92872 2 9.02888 2 10.2156V19.8818C2 21.0685 2.62104 22.1687 3.63705 22.7819L10.1117 26.6893C11.1881 27.3389 12.5356 27.3389 13.612 26.6894L20.087 22.7818C21.1031 22.1687 21.7241 21.0685 21.7241 19.8818V10.2156C21.7241 9.0289 21.1031 7.92872 20.087 7.31557L13.612 3.40806C12.5356 2.7585 11.1881 2.75851 10.1117 3.40809L3.63705 7.31556Z"
-          fill="black"
-        />
-      </g>
-    </svg>
-  );
+const GemIcon = (props: ComponentProps<"svg"> & { size?: number }) => {
+  return <GemSvg {...props} />;
+};
+
+const TreasureChestIcon = (props: ComponentProps<"svg">) => {
+  return <LingotsTreasureChestSvg {...props} />;
+};
+
+const GlobeIcon = (props: ComponentProps<"svg">) => {
+  return <GlobeIconSvg {...props} />;
 };
 
 const AddModuleSvg = (props: ComponentProps<"svg">) => {
@@ -89,11 +77,11 @@ export const TopBar = ({
         </button>
 
         <button
-          className="flex items-center gap-2 font-bold text-white"
+          className="flex items-center gap-2 font-bold"
           onClick={() => setMenu((x) => (x === "STREAK" ? "HIDDEN" : "STREAK"))}
           aria-label="Toggle streak menu"
         >
-          {streak > 0 ? <FireSvg /> : <EmptyFireTopBarSvg />}{" "}
+          <FireIcon isEmpty={streak === 0} className="w-5 h-6" />
           <span className={streak > 0 ? "text-white" : "text-black opacity-20"}>
             {streak}
           </span>
@@ -103,7 +91,7 @@ export const TopBar = ({
           onClick={() => setMenu((x) => (x === "GEMS" ? "HIDDEN" : "GEMS"))}
           aria-label="Toggle puntos QA menu"
         >
-          {lingots > 0 ? <GemSvg /> : <EmptyGemTopBarSvg />}{" "}
+          <GemIcon className={lingots > 0 ? "text-red-500" : "text-gray-300 opacity-20"} size={24} />
           <span
             className={lingots > 0 ? "text-white" : "text-black opacity-20"}
           >
@@ -163,7 +151,7 @@ export const TopBar = ({
               case "GEMS":
                 return (
                   <div className="flex grow items-center gap-3 p-5">
-                    <LingotsTreasureChestSvg className="h-24 w-24" />
+                    <TreasureChestIcon className="h-24 w-24" />
                     <div className="flex flex-col gap-3">
                       <h2 className="text-xl font-bold text-black">Puntos QA</h2>
                       <p className="text-sm font-normal text-gray-400">
@@ -198,7 +186,7 @@ export const TopBar = ({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <GlobeIconSvg className="h-10 w-10" />
+                      <GlobeIcon className="h-10 w-10" />
                       Testing Schools
                     </Link>
                   </div>

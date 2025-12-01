@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CheckmarkSvg } from "~/components/Svgs";
+import { CheckmarkSvg } from "~/components/icons/gamification";
 
 interface TreasureCelebrationProps {
   lingotsEarned: number;

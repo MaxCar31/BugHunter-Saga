@@ -1,7 +1,8 @@
 import { type NextPage } from "next";
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { UpArrowSvg, PracticeExerciseSvg } from "~/components/Svgs";
+import { UpArrowSvg } from "~/components/icons/navigation";
+import { PracticeExerciseSvg } from "~/components/icons/lessons";
 import { TopBar } from "~/components/TopBar";
 import { BottomBar } from "~/components/BottomBar";
 import { RightBar } from "~/components/RightBar";
@@ -10,13 +11,11 @@ import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/types/unit";
 import { fetchModuleUnits } from "~/services/unitService";
-import { useRouter } from "next/router";
 import { claimTreasure } from "~/services/userService";
 import { TreasureCelebration } from "~/components/learn/TreasureCelebration";
 import { TileIcon } from "~/components/learn/TileIcon";
 import { HoverLabel } from "~/components/learn/HoverLabel";
 import { UnitHeader } from "~/components/learn/UnitHeader";
-import { LessonCompletionIcon } from "~/components/learn/LessonCompletionIcon";
 import { getTileLeftClassName, getTileTooltipLeftOffset } from "~/utils/tilePositions";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
@@ -363,7 +362,6 @@ const UnitSection = ({
 const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
-  const router = useRouter();
 
   // --- CARGA DINÁMICA DE LAS UNIDADES ---
   const [units, setUnits] = useState<Unit[]>([]);
@@ -371,6 +369,7 @@ const Learn: NextPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [scrollY, setScrollY] = useState(0);
   const [claimingTreasure, setClaimingTreasure] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [treasureCelebration, setTreasureCelebration] = useState<{
     show: boolean;
     lingotsEarned: number;
@@ -378,6 +377,11 @@ const Learn: NextPage = () => {
 
   // Zustand stores
   const setLingots = useBoundStore((x) => x.setLingots);
+
+  // Marcar como montado después de la hidratación
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Hook para cargar las unidades
   useEffect(() => {
@@ -396,7 +400,7 @@ const Learn: NextPage = () => {
         const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
         console.log("🔍 Units loaded:", loadedUnits);
         setUnits(loadedUnits);
-        
+
         // Sincronizar caché con lecciones COMPLETE del backend
         const completedLessonIds: number[] = [];
         loadedUnits.forEach(u => {
@@ -406,7 +410,7 @@ const Learn: NextPage = () => {
             }
           });
         });
-        
+
         if (currentModule.code && completedLessonIds.length >= 0) {
           const updateCache = useBoundStore.getState().updateCompletedLessonsCache;
           updateCache(currentModule.code, completedLessonIds);
@@ -467,6 +471,17 @@ const Learn: NextPage = () => {
       setClaimingTreasure(false);
     }
   };
+
+  // Mostrar loading durante la hidratación para evitar mismatch
+  if (!isMounted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <div className="rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-b-4 border-blue-500 sm:h-12 sm:w-12"></div>
+        </div>
+      </div>
+    );
+  }
 
   // Early returns después de todos los hooks
   if (!currentModule?.code) {
@@ -529,7 +544,7 @@ const Learn: NextPage = () => {
 
       <div className="flex justify-center gap-3 pt-14 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-8 min-h-screen bg-gray-50">
         <div className="flex w-full max-w-2xl grow flex-col pb-20 sm:pb-24">
-          
+
 
           {isLoading && (
             <UnitSection

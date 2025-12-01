@@ -7,23 +7,8 @@ import type {
 } from "~/types/lesson";
 import { mapBackendProblemToFrontend } from "~/utils/lesson-helpers";
 
-// Tipos basados en tu contrato
-export interface LessonCompletionRequest {
-  lessonId: number;
-  correctAnswerCount: number;
-  incorrectAnswerCount: number;
-  // Nota en porcentaje 0-100
-  score?: number;
-  timeTakenMs: number;
-  isPractice: boolean;
-}
-
-export interface LessonCompletionResponse {
-  xpEarned: number;
-  lingotsEarned: number;
-  newTotalLingots: number;
-  newStreak: number;
-}
+// Re-export types for convenience
+export type { LessonCompletionRequest, LessonCompletionResponse };
 
 const createAuthHeaders = (token?: string) => ({
   accept: "*/*",

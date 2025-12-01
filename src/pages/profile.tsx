@@ -1,19 +1,11 @@
 import type { NextPage } from "next";
 import { BottomBar } from "~/components/BottomBar";
 import { LeftBar } from "~/components/LeftBar";
-import {
-  BronzeLeagueSvg,
-  EditPencilSvg,
-  EmptyFireSvg,
-  FireSvg,
-  LightningProgressSvg,
-  EmptyMedalSvg,
-  ProfileFriendsSvg,
-  ProfileTimeJoinedSvg,
-  SettingsGearSvg,
-} from "~/components/Svgs";
+import { BronzeLeagueSvg } from "~/components/icons/league";
+import { EditPencilSvg, SettingsGearSvg } from "~/components/icons/ui";
+import { LightningProgressSvg, GemSvg } from "~/components/icons/gamification";
+import { ProfileTimeJoinedSvg } from "~/components/icons/profile";
 import Link from "next/link";
-import { Flag } from "~/components/Flag";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -127,9 +119,6 @@ const ProfileTopSection = () => {
   const name = useBoundStore((x) => x.name);
   const username = useBoundStore((x) => x.username);
   const joinedAt = useBoundStore((x) => x.joinedAt).format("MMMM YYYY");
-  const followingCount = 0;
-  const followersCount = 0;
-  const module = useBoundStore((x) => x.module);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -167,10 +156,9 @@ const ProfileTopSection = () => {
 };
 
 const ProfileStatsSection = () => {
-  const streak = useBoundStore((x) => x.streak);
+  const lingots = useBoundStore((x) => x.lingots);
   const totalXp = 125;
   const league = "Bronze";
-  const top3Finishes = 0;
 
   return (
     <section>
@@ -190,6 +178,13 @@ const ProfileStatsSection = () => {
             <span className="text-sm text-gray-400 md:text-base">
               Current league
             </span>
+          </div>
+        </div>
+        <div className="col-span-2 flex gap-3 rounded-2xl border-2 border-[#f2a445] bg-[#fff7e6] p-3 md:gap-4 md:px-6 md:py-5">
+          <GemSvg />
+          <div className="flex flex-col justify-center gap-0.5">
+            <span className="text-2xl font-bold text-[#f2a445] md:text-3xl">{lingots}</span>
+            <span className="text-sm font-medium text-gray-600 md:text-base">Puntos QA</span>
           </div>
         </div>
       </div>

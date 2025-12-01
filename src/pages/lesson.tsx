@@ -1,26 +1,16 @@
 import type { NextPage } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import React, { useRef, useState, useEffect } from "react";
 import {
-  BigCloseSvg,
-  CloseSvg,
-  DoneSvg,
   LessonFastForwardEndFailSvg,
   LessonFastForwardEndPassSvg,
   LessonFastForwardStartSvg,
-  LessonTopBarEmptyHeart,
-  LessonTopBarHeart,
-} from "~/components/Svgs";
+} from "~/components/icons/lessons";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
-import type { ModuleLesson } from "~/types/lesson";
 import { completeLessonAPI, type LessonCompletionRequest } from "~/services/lessonService";
 
 // Importar componentes refactorizados
-import { ProgressBar } from "~/components/lessons/ProgressBar";
-import { QuitMessage } from "~/components/lessons/QuitMessage";
-import { CheckAnswer } from "~/components/lessons/CheckAnswer";
 import { ReviewLesson } from "~/components/lessons/ReviewLesson";
 import { ProblemInfo } from "~/components/lessons/ProblemInfo";
 import { FillInTheBlankQuestion } from "~/components/lessons/FillInTheBlankQuestion";
@@ -82,7 +72,7 @@ const Lesson: NextPage = () => {
   useEffect(() => {
     if (!currentModule && typeof window !== "undefined") {
       setIsWaitingForModule(true);
-      
+
       // Dar tiempo para que el módulo se cargue antes de redirigir
       const timer = setTimeout(() => {
         if (!useBoundStore.getState().module) {
@@ -310,18 +300,18 @@ const Lesson: NextPage = () => {
   // Calcular porcentaje de respuestas correctas
   const totalAnswered = correctAnswerCount + incorrectAnswerCount;
   const correctPercentage = totalAnswered > 0 ? (correctAnswerCount / totalAnswered) * 100 : 0;
-  
+
   // Mostrar LessonComplete cuando:
   // 1. Hemos respondido todas las preguntas no-INFO, O
   // 2. Se marcó explícitamente como terminada (para lecciones que terminan en INFO), O
   // 3. Hemos llegado al final de todos los problemas
   // 4. Y ADEMÁS: El porcentaje de respuestas correctas debe ser >= 50%
   const hasMinimumScore = correctPercentage >= 50;
-  
+
   const shouldShowLessonComplete =
     (lessonFinished ||
-    (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
-    (lessonProblem >= lessonProblems.length)) && hasMinimumScore;
+      (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
+      (lessonProblem >= lessonProblems.length)) && hasMinimumScore;
 
   // Función para reiniciar el cuestionario
   const resetLesson = () => {
@@ -337,17 +327,17 @@ const Lesson: NextPage = () => {
     setQuestionResults([]);
     setReviewLessonShown(false);
     setIsStartingLesson(true);
-    
+
     // Reiniciar tiempos
     startTime.current = Date.now();
     endTime.current = startTime.current + 1000 * 60 * 3 + 1000 * 33;
   };
 
   // Mostrar pantalla de fallo si completó todas las preguntas pero no alcanzó el 50%
-  const shouldShowLessonFailed = 
+  const shouldShowLessonFailed =
     (lessonFinished ||
-    (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
-    (lessonProblem >= lessonProblems.length)) && !hasMinimumScore && totalAnswered > 0;
+      (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
+      (lessonProblem >= lessonProblems.length)) && !hasMinimumScore && totalAnswered > 0;
 
   if (shouldShowLessonFailed && !correctAnswerShown) {
     return (
@@ -517,7 +507,6 @@ const LessonComplete = ({
   const setLingots = useBoundStore((x) => x.setLingots);
   const setStreak = useBoundStore((x) => x.setStreak);
   const currentStreak = useBoundStore((x) => x.streak);
-  const currentModule = useBoundStore((x) => x.module);
 
   const handleContinue = async () => {
     if (lessonCompleted || isCompletingLesson) {
@@ -565,7 +554,7 @@ const LessonComplete = ({
 
     } catch (error) {
       console.error("Error completing lesson:", error);
-      
+
       // Verificar si el error es por score insuficiente
       const errorMessage = error instanceof Error ? error.message : "Error desconocido";
       if (errorMessage.includes("50%")) {
@@ -575,10 +564,10 @@ const LessonComplete = ({
         window.location.reload();
         return;
       }
-      
+
       // Para otros errores, mostrar mensaje y permitir reintentar
       alert(`Error al guardar progreso en el servidor: ${errorMessage}. Intenta nuevamente.`);
-      
+
       // NO navegar, permitir que el usuario reintente
     } finally {
       setIsCompletingLesson(false);
@@ -792,7 +781,7 @@ const LessonFailed = ({
   const handleGoBack = async () => {
     // Debug: verificar que el módulo actual esté disponible
     console.log("🔄 Volviendo a lecciones, módulo actual:", currentModule);
-    
+
     // Redirigir a /learn que debería mostrar las lecciones del módulo actual
     await router.push("/learn");
   };
@@ -806,7 +795,7 @@ const LessonFailed = ({
         <p className="text-center text-lg text-gray-600">
           Necesitas al menos 50% de respuestas correctas para pasar a la siguiente lección.
         </p>
-        
+
         <div className="flex flex-wrap justify-center gap-5">
           <div className="min-w-[110px] rounded-xl border-2 border-red-400 bg-red-400">
             <h2 className="py-1 text-center text-white">Tu Puntuación</h2>
@@ -857,7 +846,7 @@ const LessonFailed = ({
           </button>
         </div>
       </section>
-      
+
       <ReviewLesson
         reviewLessonShown={reviewLessonShown}
         setReviewLessonShown={setReviewLessonShown}
