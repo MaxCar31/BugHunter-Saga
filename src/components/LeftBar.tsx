@@ -63,7 +63,7 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
               className="flex items-center gap-3 rounded-xl px-2 py-1 font-bold uppercase text-red-600 hover:bg-red-50 transition-colors"
               onClick={() => {
                 logOut();
-                localStorage.removeItem("bh_token");
+                sessionStorage.removeItem("bh_token");
                 void router.push("/?login");
               }}
               aria-label="Cerrar sesión"

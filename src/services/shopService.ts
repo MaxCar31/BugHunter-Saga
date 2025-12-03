@@ -7,7 +7,7 @@
  * 1. getShopItems(): Carga todos los artículos disponibles
  * 2. purchaseItem(itemId): Compra un artículo específico
  * 
- * Autenticación: Bearer token desde localStorage (clave 'bh_token')
+ * Autenticación: Bearer token desde sessionStorage (clave 'bh_token')
  * Manejo de errores: 400 (fondos insuficientes), 401 (no autenticado), 500 (error servidor)
  */
 
@@ -19,7 +19,7 @@ import type { ShopItemDTO, PurchaseResultDTO } from "~/types/shop";
  */
 const createAuthHeaders = (): HeadersInit => ({
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('bh_token') || ''}`,
+    'Authorization': `Bearer ${sessionStorage.getItem('bh_token') || ''}`,
 });
 
 /**

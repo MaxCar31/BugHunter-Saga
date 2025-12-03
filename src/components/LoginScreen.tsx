@@ -104,10 +104,10 @@ export const LoginScreen = ({
           user: { username: string; name: string; email: string };
         };
 
-        localStorage.setItem("bh_token", data.token);
-        localStorage.setItem("bh_username", data.user.username);
-        localStorage.setItem("bh_name", data.user.name);
-        localStorage.setItem("bh_email", data.user.email);
+        sessionStorage.setItem("bh_token", data.token);
+        sessionStorage.setItem("bh_username", data.user.username);
+        sessionStorage.setItem("bh_name", data.user.name);
+        sessionStorage.setItem("bh_email", data.user.email);
         setUsername(data.user.username);
         setName(data.user.name);
         setEmail(data.user.email);

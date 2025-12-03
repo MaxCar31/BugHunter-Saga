@@ -15,7 +15,7 @@ export type UserSlice = {
   logOut: () => void;
 };
 
-// Cargar estado de usuario desde localStorage
+// Cargar estado de usuario desde sessionStorage
 const getInitialUserState = () => {
   if (typeof window === "undefined") {
     return {
@@ -27,11 +27,11 @@ const getInitialUserState = () => {
     };
   }
 
-  const token = localStorage.getItem("bh_token");
-  const name = localStorage.getItem("bh_name") || "";
-  const username = localStorage.getItem("bh_username") || "";
-  const email = localStorage.getItem("bh_email") || "";
-  const joinedAtStr = localStorage.getItem("bh_joinedAt");
+  const token = sessionStorage.getItem("bh_token");
+  const name = sessionStorage.getItem("bh_name") || "";
+  const username = sessionStorage.getItem("bh_username") || "";
+  const email = sessionStorage.getItem("bh_email") || "";
+  const joinedAtStr = sessionStorage.getItem("bh_joinedAt");
 
   return {
     name,
@@ -46,25 +46,25 @@ export const createUserSlice: BoundStateCreator<UserSlice> = (set) => ({
   ...getInitialUserState(),
   setName: (name: string) => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("bh_name", name);
+      sessionStorage.setItem("bh_name", name);
     }
     set(() => ({ name }));
   },
   setUsername: (username: string) => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("bh_username", username);
+      sessionStorage.setItem("bh_username", username);
     }
     set(() => ({ username }));
   },
   setEmail: (email: string) => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("bh_email", email);
+      sessionStorage.setItem("bh_email", email);
     }
     set(() => ({ email }));
   },
   setJoinedAt: (joinedAt: dayjs.Dayjs) => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("bh_joinedAt", joinedAt.toISOString());
+      sessionStorage.setItem("bh_joinedAt", joinedAt.toISOString());
     }
     set(() => ({ joinedAt }));
   },
@@ -72,15 +72,15 @@ export const createUserSlice: BoundStateCreator<UserSlice> = (set) => ({
     set(() => ({ loggedIn: true }));
   },
   logOut: () => {
-    // Limpiar todo el localStorage al hacer logout
+    // Limpiar todo el sessionStorage al hacer logout
     if (typeof window !== "undefined") {
-      localStorage.removeItem("bh_token");
-      localStorage.removeItem("bh_name");
-      localStorage.removeItem("bh_username");
-      localStorage.removeItem("bh_email");
-      localStorage.removeItem("bh_joinedAt");
-      localStorage.removeItem("bh_lingots");
-      localStorage.removeItem("bh_module");
+      sessionStorage.removeItem("bh_token");
+      sessionStorage.removeItem("bh_name");
+      sessionStorage.removeItem("bh_username");
+      sessionStorage.removeItem("bh_email");
+      sessionStorage.removeItem("bh_joinedAt");
+      sessionStorage.removeItem("bh_lingots");
+      sessionStorage.removeItem("bh_module");
     }
     set(() => ({
       loggedIn: false,

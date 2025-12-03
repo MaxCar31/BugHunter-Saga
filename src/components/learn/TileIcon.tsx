@@ -1,7 +1,6 @@
 import { CheckmarkSvg, LockSvg, StarSvg } from "~/components/icons/gamification";
 import { ActiveBookSvg, GoldenBookSvg } from "~/components/icons/lessons/book";
 import { ActiveDumbbellSvg, GoldenDumbbellSvg } from "~/components/icons/lessons/dumbbell";
-import { FastForwardSvg } from "~/components/icons/lessons";
 import { ActiveTreasureSvg, LockedTreasureSvg, GoldenTreasureSvg } from "~/components/icons/lessons/treasure";
 import { ActiveTrophySvg, GoldenTrophySvg } from "~/components/icons/lessons/trophy";
 import type { TileType } from "~/types/unit";

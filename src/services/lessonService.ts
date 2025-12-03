@@ -72,7 +72,7 @@ export const fetchLessonProblems = async (lessonId: number, token?: string): Pro
 export const completeLessonAPI = async (
   request: LessonCompletionRequest
 ): Promise<LessonCompletionResponse> => {
-  const token = localStorage.getItem("bh_token");
+  const token = sessionStorage.getItem("bh_token");
 
   if (!token) {
     throw new Error("No authentication token found");

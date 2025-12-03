@@ -1,5 +1,6 @@
 import { type NextPage } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { UpArrowSvg } from "~/components/icons/navigation";
 import { PracticeExerciseSvg } from "~/components/icons/lessons";
@@ -353,6 +354,7 @@ const UnitSection = ({
 };
 
 const Learn: NextPage = () => {
+  const router = useRouter();
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
 
@@ -389,7 +391,7 @@ const Learn: NextPage = () => {
       setError(null);
 
       try {
-        const token = localStorage.getItem("bh_token");
+        const token = sessionStorage.getItem("bh_token");
         const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
         console.log("🔍 Units loaded:", loadedUnits);
         setUnits(loadedUnits);
@@ -444,7 +446,7 @@ const Learn: NextPage = () => {
 
       // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
       if (currentModule?.code) {
-        const token = localStorage.getItem("bh_token");
+        const token = sessionStorage.getItem("bh_token");
         const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
         setUnits(loadedUnits);
       }
@@ -478,22 +480,9 @@ const Learn: NextPage = () => {
 
   // Early returns después de todos los hooks
   if (!currentModule?.code) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-        <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
-          <h1 className="mb-4 text-xl font-bold text-gray-800 sm:text-2xl">No se ha seleccionado un módulo</h1>
-          <p className="mb-6 text-sm text-gray-600 sm:text-base">
-            Por favor, selecciona un módulo para continuar aprendiendo.
-          </p>
-          <Link
-            href="/register"
-            className="inline-block rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 text-sm font-bold uppercase text-white transition hover:brightness-110 sm:text-base"
-          >
-            Seleccionar Módulo
-          </Link>
-        </div>
-      </div>
-    );
+    // Redirigir automáticamente al tutorial si no hay módulo seleccionado
+    void router.push("/tutorial");
+    return null;
   }
 
   if (isLoading) {
@@ -567,7 +556,7 @@ const Learn: NextPage = () => {
           <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between sm:bottom-24">
             <Link
               href="/lesson?practice"
-              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16">
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16"
             >
               <span className="sr-only">Practice exercise</span>
               <PracticeExerciseSvg className="h-7 w-7 sm:h-8 sm:w-8" />

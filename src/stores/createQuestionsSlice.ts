@@ -26,7 +26,7 @@ export const createQuestionsSlice: StateCreator<
     }
 
     try {
-      const token = localStorage.getItem("bh_token");
+      const token = sessionStorage.getItem("bh_token");
       const problems = await fetchModuleProblems(moduleCode, token || undefined);
 
       set((state) => ({
@@ -44,7 +44,7 @@ export const createQuestionsSlice: StateCreator<
 
   loadLessonProblems: async (lessonId: number) => {
     try {
-      const token = localStorage.getItem("bh_token");
+      const token = sessionStorage.getItem("bh_token");
       const problems = await fetchLessonProblems(lessonId, token || undefined);
 
       set({ problems });

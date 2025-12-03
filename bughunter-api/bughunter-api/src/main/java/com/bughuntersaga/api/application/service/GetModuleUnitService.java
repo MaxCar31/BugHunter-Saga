@@ -46,18 +46,62 @@ public class GetModuleUnitService implements GetModuleUnitUseCase {
         Set<Integer> completedLessonIds =
                 userLessonProgressRepositoryPort.findCompletedLessonIdsByUserId(currentUser.getId());
 
-        // --- 4. Actualizar el estado de cada lección ---
-        units.forEach(unit -> {
-            if (unit.getLessons() != null) {
-                unit.getLessons().forEach(lesson -> {
-                    if (completedLessonIds.contains(lesson.getId())) {
-                        lesson.setStatus("COMPLETE");
-                    } else {
-                        lesson.setStatus("ACTIVE");
-                    }
-                });
+        // --- 4. Calcular el estado de cada lección basado en progreso secuencial ---
+        for (int unitIndex = 0; unitIndex < units.size(); unitIndex++) {
+            Unit unit = units.get(unitIndex);
+            
+            if (unit.getLessons() == null || unit.getLessons().isEmpty()) {
+                continue;
             }
-        });
+
+            // Verificar si todas las unidades anteriores están completas
+            boolean previousUnitsComplete = true;
+            for (int i = 0; i < unitIndex; i++) {
+                Unit previousUnit = units.get(i);
+                if (previousUnit.getLessons() != null) {
+                    boolean allLessonsComplete = previousUnit.getLessons().stream()
+                            .allMatch(l -> completedLessonIds.contains(l.getId()));
+                    if (!allLessonsComplete) {
+                        previousUnitsComplete = false;
+                        break;
+                    }
+                }
+            }
+
+            // Asignar estado a cada lección en la unidad actual
+            for (int lessonIndex = 0; lessonIndex < unit.getLessons().size(); lessonIndex++) {
+                var lesson = unit.getLessons().get(lessonIndex);
+
+                // Si ya está completa
+                if (completedLessonIds.contains(lesson.getId())) {
+                    lesson.setStatus("COMPLETE");
+                    continue;
+                }
+
+                // Si hay unidades anteriores incompletas, está bloqueada
+                if (!previousUnitsComplete) {
+                    lesson.setStatus("LOCKED");
+                    continue;
+                }
+
+                // Verificar si todas las lecciones anteriores en esta unidad están completas
+                boolean previousLessonsComplete = true;
+                for (int i = 0; i < lessonIndex; i++) {
+                    var previousLesson = unit.getLessons().get(i);
+                    if (!completedLessonIds.contains(previousLesson.getId())) {
+                        previousLessonsComplete = false;
+                        break;
+                    }
+                }
+
+                // Asignar ACTIVE o LOCKED
+                if (previousLessonsComplete) {
+                    lesson.setStatus("ACTIVE");
+                } else {
+                    lesson.setStatus("LOCKED");
+                }
+            }
+        }
 
         return units;
     }

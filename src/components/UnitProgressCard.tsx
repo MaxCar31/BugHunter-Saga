@@ -25,7 +25,7 @@ const UnitProgressCard = ({ unitId, className = "" }: UnitProgressCardProps) => 
     const fetchUnitProgress = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('bh_token');
+        const token = sessionStorage.getItem('bh_token');
 
         if (!token) {
           setError('No se encontró token de autenticación');

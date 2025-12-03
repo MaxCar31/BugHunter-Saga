@@ -11,7 +11,6 @@ import UnitProgressCard from "./UnitProgressCard";
 
 export const RightBar = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
-  const lingots = useBoundStore((x) => x.lingots);
   const currentModule = useBoundStore((x) => x.module);
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
 
@@ -164,15 +163,7 @@ export const RightBar = () => {
         </article>
 
         {/* Sección de Puntos QA */}
-        {loggedIn && (
-          <section className="flex items-center gap-4 rounded-2xl border-2 border-[#f2a445] bg-[#fff7e6] px-5 py-4">
-            <GemSvg />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Puntos QA</span>
-              <span className="text-3xl font-bold text-[#f2a445]">{lingots}</span>
-            </div>
-          </section>
-        )}
+        {loggedIn && <LingotsSection />}
 
         {loggedIn && totalLessonsCompleted < 10 ? (
           <UnlockLeaderboardsSection />
@@ -191,6 +182,22 @@ export const RightBar = () => {
         setLoginScreenState={setLoginScreenState}
       />
     </>
+  );
+};
+
+const LingotsSection = () => {
+  const lingots = useBoundStore((x) => x.lingots);
+
+  return (
+    <section className="flex items-center gap-2.5 rounded-xl border-2 border-blue-500 bg-blue-50 px-3 py-2">
+      <div className="flex-shrink-0">
+        <GemSvg />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">Puntos QA</span>
+        <span className="text-lg font-bold text-blue-600">{lingots}</span>
+      </div>
+    </section>
   );
 };
 

@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
-import type { ComponentProps } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { BottomBar } from "~/components/BottomBar";
 import { LeftBar } from "~/components/LeftBar";
@@ -9,70 +8,33 @@ import { TopBar } from "~/components/TopBar";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { getShopItems, purchaseItem } from "~/services/shopService";
 import type { ShopItemDTO } from "~/types/shop";
+import {
+  GemSvg,
+  BadgeTestMasterSvg,
+  BadgeQualityInspectorSvg,
+  BadgeTestingGuruSvg,
+  BadgeUnstoppableTesterSvg,
+  BadgeBugHunterSvg,
+} from "~/components/icons/gamification";
 
-// SVG para icono de gema vacía (artículo no disponible)
-const EmptyGemSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="26" height="30" viewBox="0 0 26 30" {...props}>
-      <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-        <g fill="#E5E5E5" stroke="#FFF" strokeWidth="2">
-          <path d="M4.12 6.36l6.475-3.908a4.387 4.387 0 0 1 4.534 0l6.475 3.907a4.387 4.387 0 0 1 2.12 3.757v9.666a4.387 4.387 0 0 1-2.12 3.756l-6.475 3.907a4.387 4.387 0 0 1-4.534 0L4.12 23.538A4.387 4.387 0 0 1 2 19.782v-9.666c0-1.538.804-2.962 2.12-3.757z" />
-        </g>
-      </g>
-    </svg>
-  );
-};
+/**
+ * 🔍 Explicación:
+ * Página de la tienda que muestra badges de BugHunter Saga:
+ * - Badges: Insignias permanentes testing-themed (5 badges)
+ * 
+ * Flujo de compra:
+ * 1. Usuario hace clic en "Comprar"
+ * 2. Frontend valida fondos (lingots)
+ * 3. Llama a purchaseItem(itemId)
+ * 4. Backend valida compra única
+ * 5. Frontend actualiza lingots y muestra mensaje de éxito
+ * 
+ * Todos los items son permanentes (NO consumibles) y compra única.
+ */
 
-// SVG para gema llena (usado en precio)
-const FilledGemSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="26" height="30" viewBox="0 0 26 30" {...props}>
-      <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-        <g fill="#1CB0F6">
-          <path d="M4.12 6.36l6.475-3.908a4.387 4.387 0 0 1 4.534 0l6.475 3.907a4.387 4.387 0 0 1 2.12 3.757v9.666a4.387 4.387 0 0 1-2.12 3.756l-6.475 3.907a4.387 4.387 0 0 1-4.534 0L4.12 23.538A4.387 4.387 0 0 1 2 19.782v-9.666c0-1.538.804-2.962 2.12-3.757z" />
-        </g>
-      </g>
-    </svg>
-  );
-};
-
-// SVG simplificado para icono de DobleXP (rayo)
-const DoubleXpSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="124" height="124" viewBox="0 0 124 124" {...props}>
-      <g fill="#FFC800">
-        <path d="M62 10 L80 60 L65 60 L75 114 L40 65 L55 65 Z" />
-      </g>
-      <text x="50%" y="55%" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#FF9600">2X</text>
-    </svg>
-  );
-};
-
-// SVG simplificado para icono de TripleXP (doble rayo)
-const TripleXpSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="124" height="124" viewBox="0 0 124 124" {...props}>
-      <g fill="#FF9600">
-        <path d="M50 5 L65 50 L55 50 L62 100 L35 55 L45 55 Z" />
-        <path d="M74 5 L89 50 L79 50 L86 100 L59 55 L69 55 Z" />
-      </g>
-      <text x="50%" y="55%" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#FFC800">3X</text>
-    </svg>
-  );
-};
-
-// SVG simplificado para avatar tester
-const AvatarTesterSvg = (props: ComponentProps<"svg">) => {
-  return (
-    <svg width="124" height="124" viewBox="0 0 124 124" {...props}>
-      <circle cx="62" cy="45" r="20" fill="#58CC02" />
-      <path d="M30 100 C 30 75, 45 65, 62 65 C 79 65, 94 75, 94 100 Z" fill="#58CC02" />
-      <circle cx="55" cy="42" r="3" fill="#000" />
-      <circle cx="69" cy="42" r="3" fill="#000" />
-      <path d="M 52 52 Q 62 58, 72 52" stroke="#000" strokeWidth="2" fill="none" />
-    </svg>
-  );
-};
+// ============================================================================
+// Componente Principal: Shop
+// ============================================================================
 
 const Shop: NextPage = () => {
   const [purchaseMessage, setPurchaseMessage] = useState<string | null>(null);
@@ -110,8 +72,9 @@ const Shop: NextPage = () => {
       }
     };
 
+    // Cargar items al montar el componente
     loadShopItems();
-  }, [setShopItems, setLoading, setError]);
+  }, [setShopItems, setLoading, setError]); // Incluir setters en dependencias
 
   const handlePurchase = async (item: ShopItemDTO) => {
     if (lingots < item.cost) {
@@ -128,7 +91,20 @@ const Shop: NextPage = () => {
     try {
       const result = await purchaseItem(item.itemId);
       setLingots(result.totalLingots);
-      setPurchaseMessage(`¡${item.name} comprado exitosamente!`);
+
+      // Mensaje especial para badges y títulos (compra única)
+      if (item.itemId.startsWith("badge-")) {
+        setPurchaseMessage(`¡${item.name} desbloqueado! Ahora se muestra en tu perfil.`);
+      } else if (item.itemId.startsWith("title-")) {
+        setPurchaseMessage(`¡${item.name} adquirido! Ahora se muestra en tu perfil.`);
+      } else {
+        setPurchaseMessage(`¡${item.name} comprado exitosamente!`);
+      }
+
+      // Recargar items de la tienda para que el item comprado desaparezca
+      const updatedItems = await getShopItems();
+      setShopItems(updatedItems);
+
       setTimeout(() => setPurchaseMessage(null), 3000);
     } catch (err) {
       const errorMsg =
@@ -140,35 +116,44 @@ const Shop: NextPage = () => {
     }
   };
 
-  // Función para obtener el SVG correcto según itemId
+  // Mapear itemId a componente SVG (tamaño reducido)
   const getItemIcon = (itemId: string) => {
     switch (itemId) {
-      case "double-xp":
-        return <DoubleXpSvg className="shrink-0" />;
-      case "triple-xp":
-        return <TripleXpSvg className="shrink-0" />;
-      case "avatar-tester":
-        return <AvatarTesterSvg className="h-32 w-32 shrink-0 p-4" />;
+      case "badge-test-master":
+        return <BadgeTestMasterSvg className="h-20 w-20 shrink-0" />;
+      case "badge-quality-inspector":
+        return <BadgeQualityInspectorSvg className="h-20 w-20 shrink-0" />;
+      case "badge-testing-guru":
+        return <BadgeTestingGuruSvg className="h-20 w-20 shrink-0" />;
+      case "badge-unstoppable-tester":
+        return <BadgeUnstoppableTesterSvg className="h-20 w-20 shrink-0" />;
+      case "badge-bug-hunter":
+        return <BadgeBugHunterSvg className="h-20 w-20 shrink-0" />;
       default:
-        return <EmptyGemSvg className="shrink-0" />;
+        return <GemSvg className="h-20 w-20 shrink-0" />;
     }
   };
 
-  const powerUps = shopItems.filter(
-    (item) => item.itemId === "double-xp" || item.itemId === "triple-xp"
-  );
-  const customization = shopItems.filter(
-    (item) => item.itemId === "avatar-tester"
+  // Filtrar solo badges (todos los items de la tienda son badges ahora)
+  const badges = useMemo(
+    () => shopItems.filter((item) => item.itemId.startsWith("badge-")),
+    [shopItems]
   );
 
+  // Estados de carga y error
   if (loading) {
     return (
       <div>
         <TopBar />
         <LeftBar selectedTab="Tienda" />
-        <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2">
+        <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
           <div className="w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] pb-20">
-            <p className="py-7 text-center text-gray-600">Cargando tienda...</p>
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-300 border-t-green-500"></div>
+                <p className="text-lg text-gray-600">Cargando tienda...</p>
+              </div>
+            </div>
           </div>
           <RightBar />
         </div>
@@ -182,12 +167,12 @@ const Shop: NextPage = () => {
       <div>
         <TopBar />
         <LeftBar selectedTab="Tienda" />
-        <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2">
+        <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
           <div className="w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] pb-20">
-            <div className="py-7">
-              <div className="rounded-xl bg-red-100 p-6 text-center">
-                <p className="font-bold text-red-800">Error al cargar la tienda</p>
-                <p className="text-red-600">{error}</p>
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="rounded-xl bg-red-100 p-8 text-center">
+                <p className="text-xl font-bold text-red-800">Error al cargar la tienda</p>
+                <p className="mt-2 text-red-600">{error}</p>
               </div>
             </div>
           </div>
@@ -202,101 +187,88 @@ const Shop: NextPage = () => {
     <div>
       <TopBar />
       <LeftBar selectedTab="Tienda" />
-      <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2">
-        <div className="w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] pb-20">
+
+      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
+        <div className="w-full max-w-4xl xl:max-w-[1000px] pb-20 px-4 sm:px-6">
+
+          {/* Mensaje de Compra (Éxito/Error) */}
           {purchaseMessage && (
-            <div
-              className={`mb-4 rounded-xl p-4 text-center font-bold ${purchaseMessage.includes("exitosamente")
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-                }`}
-            >
+            <div className={`mb-6 rounded-2xl p-4 text-center font-bold shadow-lg ${purchaseMessage.includes("exitosamente") || purchaseMessage.includes("desbloqueado") || purchaseMessage.includes("adquirido")
+              ? "bg-green-100 text-green-800 border-2 border-green-300"
+              : "bg-red-100 text-red-800 border-2 border-red-300"
+              }`}>
               {purchaseMessage}
             </div>
           )}
 
-          {powerUps.length > 0 && (
-            <div className="py-7">
-              <h2 className="mb-5 text-2xl font-bold">Potenciadores</h2>
-              {powerUps.map((item) => (
-                <div
-                  key={item.itemId}
-                  className="flex border-t-2 border-gray-300 py-5"
-                >
-                  {getItemIcon(item.itemId)}
-                  <section className="flex flex-col gap-3">
-                    <h3 className="text-lg font-bold">{item.name}</h3>
-                    <p className="text-sm text-gray-500">{item.description}</p>
-                    <button
-                      className={`flex w-fit items-center gap-1 rounded-2xl border-2 ${purchasingItemId === item.itemId || lingots < item.cost
-                        ? "cursor-not-allowed border-gray-300 bg-white px-4 py-2 text-sm font-bold uppercase text-gray-300"
-                        : "border-b-4 border-green-600 bg-green-500 px-4 py-3 text-sm font-bold uppercase text-white hover:brightness-110"
-                        }`}
-                      onClick={() => handlePurchase(item)}
-                      disabled={
-                        purchasingItemId === item.itemId || lingots < item.cost
-                      }
-                    >
-                      {purchasingItemId === item.itemId ? (
-                        "Comprando..."
-                      ) : lingots < item.cost ? (
-                        <>
-                          Obtener por: <EmptyGemSvg /> {item.cost}
-                        </>
-                      ) : (
-                        <>
-                          Obtener por: <FilledGemSvg /> {item.cost}
-                        </>
-                      )}
-                    </button>
-                  </section>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* ============================================ */}
+          {/* HEADER DE TIENDA                              */}
+          {/* ============================================ */}
+          <div className="border-b-2 border-gray-200 mb-6 pb-4">
+            <h1 className="text-2xl font-bold text-gray-800">Badges</h1>
+            <p className="text-sm text-gray-600 mt-2">Desbloquea insignias permanentes con tus Puntos QA</p>
+          </div>
 
-          {customization.length > 0 && (
-            <div className="py-7">
-              <h2 className="mb-5 text-2xl font-bold">Personalización</h2>
-              {customization.map((item) => (
-                <div
-                  key={item.itemId}
-                  className="flex border-t-2 border-gray-300 py-5"
-                >
-                  {getItemIcon(item.itemId)}
-                  <section className="flex flex-col gap-3">
-                    <h3 className="text-lg font-bold">{item.name}</h3>
-                    <p className="text-sm text-gray-500">{item.description}</p>
-                    <button
-                      className={`flex w-fit items-center gap-1 rounded-2xl border-2 ${purchasingItemId === item.itemId || lingots < item.cost
-                        ? "cursor-not-allowed border-gray-300 bg-white px-4 py-2 text-sm font-bold uppercase text-gray-300"
-                        : "border-b-4 border-blue-600 bg-blue-500 px-4 py-3 text-sm font-bold uppercase text-white hover:brightness-110"
-                        }`}
-                      onClick={() => handlePurchase(item)}
-                      disabled={
-                        purchasingItemId === item.itemId || lingots < item.cost
-                      }
-                    >
-                      {purchasingItemId === item.itemId ? (
-                        "Comprando..."
-                      ) : lingots < item.cost ? (
-                        <>
-                          Obtener por: <EmptyGemSvg /> {item.cost}
-                        </>
-                      ) : (
-                        <>
-                          Obtener por: <FilledGemSvg /> {item.cost}
-                        </>
-                      )}
-                    </button>
-                  </section>
+          {/* ============================================ */}
+          {/* CONTENIDO DE BADGES (INSIGNIAS)              */}
+          {/* ============================================ */}
+          <div>
+            <div className="space-y-4">
+              {badges.length === 0 ? (
+                <div className="text-center py-20 text-gray-400">
+                  <p className="text-xl font-bold">¡Ya compraste todas las insignias!</p>
+                  <p className="text-sm mt-2">Visita tu perfil para verlas</p>
                 </div>
-              ))}
+              ) : (
+                badges.map((item) => {
+                  const isDisabled = purchasingItemId === item.itemId || lingots < item.cost;
+                  return (
+                    <div
+                      key={item.itemId}
+                      className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all bg-white ${isDisabled
+                        ? "border-gray-200 opacity-50 cursor-not-allowed"
+                        : "border-gray-200 hover:border-blue-300 hover:shadow-lg"
+                        }`}
+                    >
+                      <div className={`flex-shrink-0 ${isDisabled ? "grayscale" : ""}`}>
+                        {getItemIcon(item.itemId)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">{item.name}</h3>
+                        <p className="text-sm text-gray-600">{item.description}</p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <button
+                          className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase transition-all whitespace-nowrap ${isDisabled
+                            ? "cursor-not-allowed border-2 border-gray-400 bg-gray-100 text-gray-400"
+                            : "border-2 border-blue-600 bg-blue-500 text-white hover:bg-blue-600 hover:scale-105 shadow-md"
+                            }`}
+                          onClick={() => handlePurchase(item)}
+                          disabled={isDisabled}
+                        >
+                          {purchasingItemId === item.itemId ? (
+                            <span className="flex items-center gap-2">
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+                              Comprando...
+                            </span>
+                          ) : lingots < item.cost ? (
+                            <><GemSvg className="h-5 w-5 opacity-50" /> {item.cost}</>
+                          ) : (
+                            <><GemSvg className="h-5 w-5" /> Desbloquear</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
-          )}
+          </div>
+
         </div>
         <RightBar />
       </div>
+
       <BottomBar selectedTab="Tienda" />
     </div>
   );

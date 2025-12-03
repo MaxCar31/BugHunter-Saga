@@ -23,7 +23,7 @@ const Register: NextPage = () => {
   useEffect(() => {
     const loadModules = async () => {
       try {
-        const token = localStorage.getItem("bh_token");
+        const token = sessionStorage.getItem("bh_token");
         const data = await fetchModules(token || undefined);
         setModules(data);
       } catch (err) {

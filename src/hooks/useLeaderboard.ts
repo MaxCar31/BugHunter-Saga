@@ -46,7 +46,7 @@ export const useLeaderboardUsers = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const token = localStorage.getItem("bh_token");
+        const token = sessionStorage.getItem("bh_token");
         const data = await fetchLeaderboard(token || undefined);
         setLeaderboardData(data.users);
       } catch (err) {
