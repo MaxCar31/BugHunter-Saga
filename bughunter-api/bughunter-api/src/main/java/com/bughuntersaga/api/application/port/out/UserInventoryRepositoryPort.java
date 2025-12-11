@@ -2,6 +2,7 @@ package com.bughuntersaga.api.application.port.out;
 
 import com.bughuntersaga.api.domain.model.UserInventory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +19,9 @@ public interface UserInventoryRepositoryPort {
      * Guarda (crea o actualiza) un artículo en el inventario.
      */
     UserInventory save(UserInventory inventory);
+
+    /**
+     * Obtiene todos los items (badges/títulos) del inventario del usuario.
+     */
+    List<UserInventory> findAllByUserId(UUID userId);
 }

@@ -1,51 +1,53 @@
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
 export type LessonSlice = {
-  // Cambio: Ahora guardamos un Set de lessonIds completados por módulo
-  completedLessonsByModule: Record<string, Set<number>>;
+  // Caché temporal de lecciones completadas que vienen del backend
+  // Solo se usa para mostrar el estado de los tiles hasta la próxima carga
+  completedLessonsCache: Record<string, Set<number>>;
 
-  // Verifica si una lección específica está completada
-  isLessonCompleted: (moduleCode: string, lessonId: number) => boolean;
-
-  // Marca una lección como completada
-  markLessonAsCompleted: (moduleCode: string, lessonId: number) => void;
-
-  // Obtiene todas las lecciones completadas de un módulo
+  // Obtiene el conjunto de lecciones completadas para un módulo (desde caché)
   getCompletedLessons: (moduleCode: string) => Set<number>;
+
+  // Actualiza la caché con los datos que vienen del backend
+  updateCompletedLessonsCache: (moduleCode: string, lessonIds: number[]) => void;
+
+  // Limpia la caché (útil para forzar recarga desde backend)
+  clearCompletedLessonsCache: (moduleCode?: string) => void;
 
   // Compatibilidad: Devuelve el conteo de lecciones completadas
   getLessonsCompletedForModule: (moduleCode: string) => number;
 };
 
 export const createLessonSlice: BoundStateCreator<LessonSlice> = (set, get) => ({
-  completedLessonsByModule: {},
-
-  isLessonCompleted: (moduleCode: string, lessonId: number) => {
-    const completed = get().completedLessonsByModule[moduleCode];
-    return completed ? completed.has(lessonId) : false;
-  },
-
-  markLessonAsCompleted: (moduleCode: string, lessonId: number) =>
-    set(({ completedLessonsByModule }) => {
-      const currentCompleted = completedLessonsByModule[moduleCode] ?? new Set<number>();
-      const newCompleted = new Set(currentCompleted);
-      newCompleted.add(lessonId);
-
-      return {
-        completedLessonsByModule: {
-          ...completedLessonsByModule,
-          [moduleCode]: newCompleted,
-        },
-      };
-    }),
+  // Caché temporal inicialmente vacía
+  completedLessonsCache: {},
 
   getCompletedLessons: (moduleCode: string) => {
-    return get().completedLessonsByModule[moduleCode] ?? new Set<number>();
+    const cache = get().completedLessonsCache[moduleCode];
+    return cache ?? new Set<number>();
   },
 
-  // Compatibilidad: Retorna el número de lecciones completadas
+  updateCompletedLessonsCache: (moduleCode: string, lessonIds: number[]) =>
+    set(({ completedLessonsCache }) => ({
+      completedLessonsCache: {
+        ...completedLessonsCache,
+        [moduleCode]: new Set(lessonIds),
+      },
+    })),
+
+  clearCompletedLessonsCache: (moduleCode?: string) =>
+    set(({ completedLessonsCache }) => {
+      if (moduleCode) {
+        const newCache = { ...completedLessonsCache };
+        delete newCache[moduleCode];
+        return { completedLessonsCache: newCache };
+      } else {
+        return { completedLessonsCache: {} };
+      }
+    }),
+
   getLessonsCompletedForModule: (moduleCode: string) => {
-    const completed = get().completedLessonsByModule[moduleCode];
-    return completed ? completed.size : 0;
+    const completed = get().getCompletedLessons(moduleCode);
+    return completed.size;
   },
 });

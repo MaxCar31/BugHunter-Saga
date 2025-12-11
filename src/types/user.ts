@@ -6,6 +6,16 @@
 // ==================== USER PROFILE ====================
 
 /**
+ * Badge obtenido por el usuario
+ */
+export interface BadgeDTO {
+    itemCode: string;
+    name: string;
+    description: string;
+    icon: string;
+}
+
+/**
  * Perfil completo del usuario (Response de GET /api/users/me/profile)
  */
 export interface UserProfileDTO {
@@ -17,6 +27,7 @@ export interface UserProfileDTO {
     lingots: number;
     dailyXpGoal: number;
     soundEffectsEnabled: boolean;
+    badges: BadgeDTO[];
 }
 
 // ==================== UPDATE ACCOUNT ====================

@@ -26,9 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalApiExceptionHandler {
 
-
-
-
     /**
      * Maneja UserAlreadyExistsException (400 Bad Request).
      */
@@ -96,7 +93,8 @@ public class GlobalApiExceptionHandler {
 
     /**
      * Maneja LessonAlreadyCompletedException (409 Conflict).
-     * Se lanza cuando un usuario intenta completar una lección que ya completó previamente.
+     * Se lanza cuando un usuario intenta completar una lección que ya completó
+     * previamente.
      */
     @ExceptionHandler(LessonAlreadyCompletedException.class)
     public ResponseEntity<ErrorDTO> handleLessonAlreadyCompleted(LessonAlreadyCompletedException ex) {
@@ -110,6 +108,21 @@ public class GlobalApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    /**
+     * Maneja InsufficientScoreException (400 Bad Request).
+     * Se lanza cuando el score de la lección es insuficiente para completarla.
+     */
+    @ExceptionHandler(InsufficientScoreException.class)
+    public ResponseEntity<ErrorDTO> handleInsufficientScore(InsufficientScoreException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
     /**
      * Maneja errores de validación de Spring (400 Bad Request).
@@ -129,6 +142,7 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorDTO> handleIllegalArgument(IllegalArgumentException ex) {
         ErrorDTO error = ErrorDTO.builder()
@@ -140,12 +154,12 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
     /**
      * Maneja CUALQUIER otra excepción no capturada (500 Internal Server Error).
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleGenericException(Exception ex) {
-
 
         log.error("Error 500 no controlado: {}", ex.getMessage(), ex);
 

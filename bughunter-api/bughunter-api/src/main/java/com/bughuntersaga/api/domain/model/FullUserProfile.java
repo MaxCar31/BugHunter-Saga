@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,4 +31,7 @@ public class FullUserProfile {
     private Integer lingots;
     private Integer dailyXpGoal;
     private Boolean soundEffectsEnabled;
+
+    // Badges obtenidos
+    private List<Badge> badges;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { BigCloseSvg, DoneSvg } from "~/components/Svgs";
+import { BigCloseSvg, DoneSvg } from "~/components/icons/ui";
 
 export const CheckAnswer = ({
     isAnswerSelected,

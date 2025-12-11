@@ -1,26 +1,16 @@
 import type { NextPage } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import React, { useRef, useState, useEffect } from "react";
 import {
-  BigCloseSvg,
-  CloseSvg,
-  DoneSvg,
   LessonFastForwardEndFailSvg,
   LessonFastForwardEndPassSvg,
   LessonFastForwardStartSvg,
-  LessonTopBarEmptyHeart,
-  LessonTopBarHeart,
-} from "~/components/Svgs";
+} from "~/components/icons/lessons";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
-import { type ModuleLesson } from "~/utils/lessons";
 import { completeLessonAPI, type LessonCompletionRequest } from "~/services/lessonService";
 
 // Importar componentes refactorizados
-import { ProgressBar } from "~/components/lessons/ProgressBar";
-import { QuitMessage } from "~/components/lessons/QuitMessage";
-import { CheckAnswer } from "~/components/lessons/CheckAnswer";
 import { ReviewLesson } from "~/components/lessons/ReviewLesson";
 import { ProblemInfo } from "~/components/lessons/ProblemInfo";
 import { FillInTheBlankQuestion } from "~/components/lessons/FillInTheBlankQuestion";
@@ -65,6 +55,7 @@ const Lesson: NextPage = () => {
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
   const [reviewLessonShown, setReviewLessonShown] = useState(false);
   const [isStartingLesson, setIsStartingLesson] = useState(true);
+  const [isWaitingForModule, setIsWaitingForModule] = useState(false);
 
   const startTime = useRef(Date.now());
   const endTime = useRef(startTime.current + 1000 * 60 * 3 + 1000 * 33);
@@ -77,10 +68,24 @@ const Lesson: NextPage = () => {
     }
   }, [lessonId, loadLessonProblems]);
 
-  // Redirigir si no hay módulo
+  // Redirigir si no hay módulo después de un delay para permitir carga
   useEffect(() => {
     if (!currentModule && typeof window !== "undefined") {
-      void router.push('/register');
+      setIsWaitingForModule(true);
+
+      // Dar tiempo para que el módulo se cargue antes de redirigir
+      const timer = setTimeout(() => {
+        if (!useBoundStore.getState().module) {
+          // Redirigir a /learn en lugar de /register para mantener mejor UX
+          void router.push('/learn');
+        } else {
+          setIsWaitingForModule(false);
+        }
+      }, 2000); // Esperar 2 segundos antes de redirigir
+
+      return () => clearTimeout(timer);
+    } else if (currentModule) {
+      setIsWaitingForModule(false);
     }
   }, [currentModule, router]);
 
@@ -96,10 +101,17 @@ const Lesson: NextPage = () => {
   }
 
   // Si no hay módulo, mostrar loading mientras se redirige
-  if (!currentModule) {
+  if (!currentModule || isWaitingForModule) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-xl">Cargando módulo...</p>
+        <div className="text-center">
+          <p className="text-xl">Cargando módulo...</p>
+          {isWaitingForModule && (
+            <p className="text-sm text-gray-500 mt-2">
+              Verificando configuración del módulo...
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -285,14 +297,62 @@ const Lesson: NextPage = () => {
     );
   }
 
+  // Calcular porcentaje de respuestas correctas
+  const totalAnswered = correctAnswerCount + incorrectAnswerCount;
+  const correctPercentage = totalAnswered > 0 ? (correctAnswerCount / totalAnswered) * 100 : 0;
+
   // Mostrar LessonComplete cuando:
   // 1. Hemos respondido todas las preguntas no-INFO, O
   // 2. Se marcó explícitamente como terminada (para lecciones que terminan en INFO), O
   // 3. Hemos llegado al final de todos los problemas
+  // 4. Y ADEMÁS: El porcentaje de respuestas correctas debe ser >= 50%
+  const hasMinimumScore = correctPercentage >= 50;
+
   const shouldShowLessonComplete =
-    lessonFinished ||
-    (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
-    (lessonProblem >= lessonProblems.length);
+    (lessonFinished ||
+      (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
+      (lessonProblem >= lessonProblems.length)) && hasMinimumScore;
+
+  // Función para reiniciar el cuestionario
+  const resetLesson = () => {
+    setLessonProblem(0);
+    setLessonFinished(false);
+    setCorrectAnswerCount(0);
+    setIncorrectAnswerCount(0);
+    setAnsweredQuestionsCount(0);
+    setSelectedAnswer(null);
+    setCorrectAnswerShown(false);
+    setQuitMessageShown(false);
+    setSelectedAnswers([]);
+    setQuestionResults([]);
+    setReviewLessonShown(false);
+    setIsStartingLesson(true);
+
+    // Reiniciar tiempos
+    startTime.current = Date.now();
+    endTime.current = startTime.current + 1000 * 60 * 3 + 1000 * 33;
+  };
+
+  // Mostrar pantalla de fallo si completó todas las preguntas pero no alcanzó el 50%
+  const shouldShowLessonFailed =
+    (lessonFinished ||
+      (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
+      (lessonProblem >= lessonProblems.length)) && !hasMinimumScore && totalAnswered > 0;
+
+  if (shouldShowLessonFailed && !correctAnswerShown) {
+    return (
+      <LessonFailed
+        correctAnswerCount={correctAnswerCount}
+        incorrectAnswerCount={incorrectAnswerCount}
+        correctPercentage={correctPercentage}
+        reviewLessonShown={reviewLessonShown}
+        setReviewLessonShown={setReviewLessonShown}
+        questionResults={questionResults}
+        currentModule={currentModule}
+        onTryAgain={resetLesson}
+      />
+    );
+  }
 
   if (shouldShowLessonComplete && !correctAnswerShown) {
     return (
@@ -447,8 +507,6 @@ const LessonComplete = ({
   const setLingots = useBoundStore((x) => x.setLingots);
   const setStreak = useBoundStore((x) => x.setStreak);
   const currentStreak = useBoundStore((x) => x.streak);
-  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
-  const currentModule = useBoundStore((x) => x.module);
 
   const handleContinue = async () => {
     if (lessonCompleted || isCompletingLesson) {
@@ -460,11 +518,16 @@ const LessonComplete = ({
     setIsCompletingLesson(true);
 
     try {
-      // Preparar la request usando el lessonId de los props
+      // Calcular nota como porcentaje de aciertos redondeado a entero
+      const totalAnswered = correctAnswerCount + incorrectAnswerCount;
+      const score = totalAnswered > 0 ? Math.round((correctAnswerCount / totalAnswered) * 100) : 0;
+
+      // Preparar la request usando el lessonId de los props (incluye score)
       const request: LessonCompletionRequest = {
         lessonId,
         correctAnswerCount,
         incorrectAnswerCount,
+        score,
         timeTakenMs: endTime.current - startTime.current,
         isPractice,
       };
@@ -481,41 +544,31 @@ const LessonComplete = ({
       setStreak(response.newStreak);
       addToday();
 
-      // 🎯 MARCAR LA LECCIÓN COMO COMPLETADA (solo si NO es práctica)
-      if (!isPractice) {
-        markLessonAsCompleted(currentModule?.code || '', lessonId);
-      }
+      // NO guardamos nada localmente - todo viene del backend
+      // El progreso se sincronizará automáticamente cuando regresemos a /learn
 
       setLessonCompleted(true);
 
-      // Navegar a /learn
-      await router.push("/learn");
+      // Navegar a /learn con parámetro reload para forzar recarga de unidades
+      await router.push("/learn?reload=1");
 
     } catch (error) {
       console.error("Error completing lesson:", error);
 
-      // En caso de error, usar fallback con datos locales
-      setBackendResponse({
-        xpEarned: correctAnswerCount,
-        lingotsEarned: isPractice ? 0 : 5,
-        newTotalLingots: useBoundStore.getState().lingots + (isPractice ? 0 : 5),
-        newStreak: currentStreak + 1,
-      });
-
-      // Actualizar store con fallback local
-      increaseXp(correctAnswerCount);
-      addToday();
-      const currentLingots = useBoundStore.getState().lingots;
-      setLingots(currentLingots + (isPractice ? 0 : 5));
-
-      // 🎯 MARCAR LA LECCIÓN COMO COMPLETADA (solo si NO es práctica)
-      if (!isPractice) {
-        markLessonAsCompleted(currentModule?.code || '', lessonId);
+      // Verificar si el error es por score insuficiente
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      if (errorMessage.includes("50%")) {
+        // Error de score insuficiente - no guardar nada localmente
+        alert("No pudiste completar la lección. Necesitas al menos 50% de respuestas correctas.");
+        // Recargar la página para intentar de nuevo
+        window.location.reload();
+        return;
       }
 
-      // Mostrar mensaje de error pero permitir continuar
-      alert("Error guardando progreso en el servidor, pero se guardó localmente.");
-      await router.push("/learn");
+      // Para otros errores, mostrar mensaje y permitir reintentar
+      alert(`Error al guardar progreso en el servidor: ${errorMessage}. Intenta nuevamente.`);
+
+      // NO navegar, permitir que el usuario reintente
     } finally {
       setIsCompletingLesson(false);
     }
@@ -541,7 +594,7 @@ const LessonComplete = ({
             </div>
           </div>
           <div className="min-w-[110px] rounded-xl border-2 border-green-400 bg-green-400">
-            <h2 className="py-1 text-center text-white">Amazing</h2>
+            <h2 className="py-1 text-center text-white">Porcentaje</h2>
             <div className="flex justify-center rounded-xl bg-white py-4 text-green-400">
               {Math.round(
                 (correctAnswerCount /
@@ -549,6 +602,18 @@ const LessonComplete = ({
                 100,
               )}
               %
+            </div>
+          </div>
+          <div className="min-w-[110px] rounded-xl border-2 border-emerald-400 bg-emerald-400">
+            <h2 className="py-1 text-center text-white">Correctas</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-emerald-400">
+              {correctAnswerCount}
+            </div>
+          </div>
+          <div className="min-w-[110px] rounded-xl border-2 border-red-400 bg-red-400">
+            <h2 className="py-1 text-center text-white">Incorrectas</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-red-400">
+              {incorrectAnswerCount}
             </div>
           </div>
           {/* Mostrar lingots ganados solo si no es práctica */}
@@ -678,6 +743,110 @@ const LessonFastForwardEndFail = ({
           </Link>
         </div>
       </section>
+      <ReviewLesson
+        reviewLessonShown={reviewLessonShown}
+        setReviewLessonShown={setReviewLessonShown}
+        questionResults={questionResults}
+      />
+    </div>
+  );
+};
+
+const LessonFailed = ({
+  correctAnswerCount,
+  incorrectAnswerCount,
+  correctPercentage,
+  reviewLessonShown,
+  setReviewLessonShown,
+  questionResults,
+  currentModule,
+  onTryAgain,
+}: {
+  correctAnswerCount: number;
+  incorrectAnswerCount: number;
+  correctPercentage: number;
+  reviewLessonShown: boolean;
+  setReviewLessonShown: React.Dispatch<React.SetStateAction<boolean>>;
+  questionResults: QuestionResult[];
+  currentModule: any; // Tipo del módulo actual
+  onTryAgain: () => void;
+}) => {
+  const router = useRouter();
+
+  const handleTryAgain = () => {
+    // Llamar a la función de reinicio pasada como prop
+    onTryAgain();
+  };
+
+  const handleGoBack = async () => {
+    // Debug: verificar que el módulo actual esté disponible
+    console.log("🔄 Volviendo a lecciones, módulo actual:", currentModule);
+
+    // Redirigir a /learn que debería mostrar las lecciones del módulo actual
+    await router.push("/learn");
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
+      <div className="flex grow flex-col items-center justify-center gap-8 font-bold">
+        <h1 className="text-center text-3xl text-red-500">
+          ¡Necesitas mejorar!
+        </h1>
+        <p className="text-center text-lg text-gray-600">
+          Necesitas al menos 50% de respuestas correctas para pasar a la siguiente lección.
+        </p>
+
+        <div className="flex flex-wrap justify-center gap-5">
+          <div className="min-w-[110px] rounded-xl border-2 border-red-400 bg-red-400">
+            <h2 className="py-1 text-center text-white">Tu Puntuación</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-red-400">
+              {Math.round(correctPercentage)}%
+            </div>
+          </div>
+          <div className="min-w-[110px] rounded-xl border-2 border-emerald-400 bg-emerald-400">
+            <h2 className="py-1 text-center text-white">Correctas</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-emerald-400">
+              {correctAnswerCount}
+            </div>
+          </div>
+          <div className="min-w-[110px] rounded-xl border-2 border-red-400 bg-red-400">
+            <h2 className="py-1 text-center text-white">Incorrectas</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-red-400">
+              {incorrectAnswerCount}
+            </div>
+          </div>
+          <div className="min-w-[110px] rounded-xl border-2 border-gray-400 bg-gray-400">
+            <h2 className="py-1 text-center text-white">Requerido</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-gray-600">
+              50%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section className="border-gray-200 sm:border-t-2 sm:p-10">
+        <div className="mx-auto flex max-w-5xl flex-col gap-5 sm:flex-row sm:justify-between">
+          <button
+            className="flex w-full items-center justify-center rounded-2xl border-2 border-b-4 border-gray-200 bg-white p-3 font-bold uppercase text-gray-400 transition hover:border-gray-300 hover:bg-gray-200 sm:min-w-[150px] sm:max-w-fit"
+            onClick={() => setReviewLessonShown(true)}
+          >
+            Revisar Errores
+          </button>
+          <button
+            className="flex w-full items-center justify-center rounded-2xl border-2 border-b-4 border-gray-200 bg-white p-3 font-bold uppercase text-gray-400 transition hover:border-gray-300 hover:bg-gray-200 sm:min-w-[150px] sm:max-w-fit"
+            onClick={handleGoBack}
+          >
+            Volver a Lecciones
+          </button>
+          <button
+            className="flex w-full items-center justify-center rounded-2xl border-b-4 border-orange-600 bg-orange-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
+            onClick={handleTryAgain}
+          >
+            Intentar de Nuevo
+          </button>
+        </div>
+      </section>
+
       <ReviewLesson
         reviewLessonShown={reviewLessonShown}
         setReviewLessonShown={setReviewLessonShown}

@@ -1,6 +1,6 @@
 import type { StateCreator } from "zustand";
-import type { ModuleLesson } from "~/utils/lessons";
-import { fetchModuleProblems, fetchLessonProblems } from "~/utils/lessons";
+import type { ModuleLesson } from "~/types/lesson";
+import { fetchModuleProblems, fetchLessonProblems } from "~/services/lessonService";
 export interface QuestionsSlice {
   questions: Record<string, ModuleLesson[]>;
   problems: ModuleLesson[]; // Problemas de la lección actual
@@ -26,7 +26,7 @@ export const createQuestionsSlice: StateCreator<
     }
 
     try {
-      const token = localStorage.getItem("bh_token");
+      const token = sessionStorage.getItem("bh_token");
       const problems = await fetchModuleProblems(moduleCode, token || undefined);
 
       set((state) => ({
@@ -44,7 +44,7 @@ export const createQuestionsSlice: StateCreator<
 
   loadLessonProblems: async (lessonId: number) => {
     try {
-      const token = localStorage.getItem("bh_token");
+      const token = sessionStorage.getItem("bh_token");
       const problems = await fetchLessonProblems(lessonId, token || undefined);
 
       set({ problems });

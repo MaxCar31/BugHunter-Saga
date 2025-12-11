@@ -1,18 +1,25 @@
 package com.bughuntersaga.api.application.service;
 
 import com.bughuntersaga.api.application.port.in.GetUserProfileUseCase;
+import com.bughuntersaga.api.application.port.out.ShopItemRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserInventoryRepositoryPort;
 import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
 import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
 import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.Badge;
 import com.bughuntersaga.api.domain.model.FullUserProfile;
+import com.bughuntersaga.api.domain.model.ShopItem;
 import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.model.UserInventory;
 import com.bughuntersaga.api.domain.model.UserProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +28,8 @@ public class GetUserProfileService implements GetUserProfileUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
     private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final UserInventoryRepositoryPort userInventoryRepositoryPort;
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
 
     @Override
     public FullUserProfile getProfile() {
@@ -28,7 +37,28 @@ public class GetUserProfileService implements GetUserProfileUseCase {
         User currentUser = getCurrentUser();
         UserProfile userProfile = getUserProfile(currentUser.getId());
 
-        // 2. Combinar en el modelo de dominio
+        // 2. Obtener badges del inventario (solo badges, no títulos)
+        List<UserInventory> inventory = userInventoryRepositoryPort.findAllByUserId(currentUser.getId());
+        List<Badge> badges = inventory.stream()
+                .filter(inv -> inv.getItemCode().startsWith("badge-"))
+                .map(inv -> {
+                    // Buscar información del ShopItem para obtener nombre, descripción e icono
+                    ShopItem shopItem = shopItemRepositoryPort.findByItemCode(inv.getItemCode())
+                            .orElse(null);
+                    
+                    if (shopItem == null) return null;
+                    
+                    return Badge.builder()
+                            .itemCode(inv.getItemCode())
+                            .name(shopItem.getName())
+                            .description(shopItem.getDescription())
+                            .icon(shopItem.getIcon())
+                            .build();
+                })
+                .filter(badge -> badge != null)
+                .collect(Collectors.toList());
+
+        // 3. Combinar en el modelo de dominio
         return FullUserProfile.builder()
                 .userId(currentUser.getId())
                 .name(currentUser.getName())
@@ -38,6 +68,7 @@ public class GetUserProfileService implements GetUserProfileUseCase {
                 .lingots(userProfile.getLingots())
                 .dailyXpGoal(userProfile.getDailyXpGoal())
                 .soundEffectsEnabled(userProfile.getSoundEffectsEnabled())
+                .badges(badges)
                 .build();
     }
 

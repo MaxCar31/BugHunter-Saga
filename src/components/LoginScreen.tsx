@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CloseSvg } from "./Svgs";
+import { CloseSvg } from "~/components/icons/ui";
 import React, { useEffect, useRef, useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
@@ -11,15 +11,21 @@ export const useLoginScreen = () => {
   const router = useRouter();
   const loggedIn = useBoundStore((x) => x.loggedIn);
 
-  const queryState: LoginScreenState = (() => {
-    if (loggedIn) return "HIDDEN";
+  // Estado inicial simple basado solo en query params
+  const getInitialState = (): LoginScreenState => {
     if ("login" in router.query) return "LOGIN";
     if ("sign-up" in router.query) return "SIGNUP";
     return "HIDDEN";
-  })();
+  };
 
-  const [loginScreenState, setLoginScreenState] = useState(queryState);
-  useEffect(() => setLoginScreenState(queryState), [queryState]);
+  const [loginScreenState, setLoginScreenState] = useState<LoginScreenState>(getInitialState);
+
+  // Si usuario logueado está en homepage, redirigir a /learn
+  useEffect(() => {
+    if (loggedIn && router.pathname === "/") {
+      void router.push("/learn");
+    }
+  }, [loggedIn, router]);
 
   return { loginScreenState, setLoginScreenState };
 };
@@ -59,7 +65,7 @@ export const LoginScreen = ({
     setIsLoading(true);
 
     let endpoint = "";
-    let body: any = {};
+    let body: Record<string, unknown> = {};
 
     try {
       if (loginScreenState === "LOGIN") {
@@ -98,11 +104,31 @@ export const LoginScreen = ({
           user: { username: string; name: string; email: string };
         };
 
-        localStorage.setItem("bh_token", data.token);
+        sessionStorage.setItem("bh_token", data.token);
+        sessionStorage.setItem("bh_username", data.user.username);
+        sessionStorage.setItem("bh_name", data.user.name);
+        sessionStorage.setItem("bh_email", data.user.email);
         setUsername(data.user.username);
         setName(data.user.name);
         setEmail(data.user.email);
         logIn();
+
+        // Cargar lingots inmediatamente después del login
+        try {
+          const statsRes = await fetch(`${apiBase}/api/users/me/stats`, {
+            headers: {
+              'Authorization': `Bearer ${data.token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          if (statsRes.ok) {
+            const stats = await statsRes.json();
+            useBoundStore.getState().setLingots(stats.totalLingots);
+          }
+        } catch (err) {
+          console.error("Error loading lingots after login:", err);
+        }
+
         setIsLoading(false);
         void router.push("/learn");
         return;
@@ -212,7 +238,7 @@ export const LoginScreen = ({
           <button
             className={`rounded-2xl border-b-4 border-[#d18a2a] bg-[#f2a445] py-3 font-bold uppercase text-white transition ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:brightness-110"
               }`}
-            onClick={() => handleSubmit().catch(() => { })}
+            onClick={() => { void handleSubmit(); }}
             disabled={isLoading}
           >
             {isLoading

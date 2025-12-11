@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BigCloseSvg, DoneSvg } from "~/components/Svgs";
+import { BigCloseSvg, DoneSvg } from "~/components/icons/ui";
 
 type QuestionResult = {
     question: string;

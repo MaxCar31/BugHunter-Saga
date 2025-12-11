@@ -6,8 +6,8 @@ import { ModuleIcon } from "~/components/ModuleIcon";
 import _bgSnow from "../../public/bg-snow.svg";
 import type { StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
-import type { Module } from "~/utils/modules";
-import { fetchModules } from "~/utils/modules";
+import type { ModuleWithTypedUI } from "~/types/module";
+import { fetchModules } from "~/services/moduleService";
 
 const bgSnow = _bgSnow as unknown as StaticImageData;
 
@@ -15,7 +15,7 @@ const Register: NextPage = () => {
   const setModule = useBoundStore((x) => x.setModule);
 
   // --- CARGA DINÁMICA DE MÓDULOS ---
-  const [modules, setModules] = useState<Module[]>([]);
+  const [modules, setModules] = useState<ModuleWithTypedUI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +23,7 @@ const Register: NextPage = () => {
   useEffect(() => {
     const loadModules = async () => {
       try {
-        const token = localStorage.getItem("bh_token");
+        const token = sessionStorage.getItem("bh_token");
         const data = await fetchModules(token || undefined);
         setModules(data);
       } catch (err) {

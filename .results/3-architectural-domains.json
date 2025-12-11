@@ -1,0 +1,151 @@
+{
+    "frontend-ui": {
+        "description": "React component-based UI with Next.js Pages Router",
+        "required_patterns": {
+            "component-structure": "React functional components with TypeScript",
+            "state-management": "Must use useBoundStore hook from Zustand for global state",
+            "styling": "Must use Tailwind CSS utility classes",
+            "routing": "File-based routing via Next.js pages directory",
+            "data-fetching": "Must use service layer (userService, lessonService) for API calls"
+        },
+        "architectural_constraints": {
+            "component-organization": "Components organized by feature (learn/, lessons/) or top-level UI elements",
+            "props-typing": "All component props must be explicitly typed with TypeScript interfaces",
+            "svg-icons": "Custom SVG icons embedded directly in components, no icon library",
+            "responsive-design": "Mobile-first with bottom navigation bar for mobile, different layout for desktop (md: breakpoint)",
+            "accessibility": "Use sr-only class for screen reader labels on icons"
+        }
+    },
+    "frontend-state-management": {
+        "description": "Zustand-based global state with slice pattern",
+        "required_patterns": {
+            "slice-creation": "All state slices must use BoundStateCreator type from useBoundStore",
+            "slice-composition": "Slices must be composed in useBoundStore using spread operator",
+            "store-access": "Components must access state via useBoundStore hook, never create separate stores",
+            "slice-naming": "Slices follow createXxxSlice naming convention (createUserSlice, createXpSlice, etc.)"
+        },
+        "architectural_constraints": {
+            "no-redux": "Do not use Redux or Context API for global state - Zustand only",
+            "slice-isolation": "Each slice manages a specific domain (user, xp, streaks, lingots, etc.)",
+            "state-updates": "State updates via setter functions defined in each slice",
+            "initialization": "State can be initialized at module level (see useBoundStore.ts window check)",
+            "persistence": "No built-in state persistence - state is ephemeral per session"
+        }
+    },
+    "frontend-data-layer": {
+        "description": "Service layer for API communication with backend",
+        "required_patterns": {
+            "api-base-url": "All API calls must use apiBase from utils/config.ts",
+            "authentication": "Must include JWT token from localStorage in Authorization header for protected endpoints",
+            "error-handling": "Services must handle fetch errors and return typed error responses",
+            "type-safety": "All API responses must be typed with TypeScript interfaces from types/"
+        },
+        "architectural_constraints": {
+            "service-organization": "Services organized by domain (userService, lessonService)",
+            "fetch-only": "Use native fetch API, no axios or other HTTP libraries",
+            "token-management": "JWT token stored in localStorage with key 'authToken'",
+            "cors-headers": "Content-Type: application/json required for POST/PUT requests",
+            "ssr-awareness": "Services check typeof window !== 'undefined' before accessing localStorage"
+        }
+    },
+    "backend-hexagonal-architecture": {
+        "description": "Clean architecture with ports and adapters pattern (Hexagonal Architecture)",
+        "required_patterns": {
+            "domain-layer": "Core business logic in domain/ with no external dependencies",
+            "application-layer": "Use cases in application/service/ implementing port interfaces from application/port/in/",
+            "ports": "All external interactions through port interfaces (application/port/out/ for outbound)",
+            "adapters": "Infrastructure implementations in infrastructure/ implementing port interfaces",
+            "dependency-direction": "Dependencies point inward: Infrastructure -> Application -> Domain"
+        },
+        "architectural_constraints": {
+            "no-framework-in-domain": "Domain models must not depend on Spring, JPA, or any framework",
+            "use-case-interfaces": "Every service must implement a UseCase interface",
+            "repository-ports": "Data access through RepositoryPort interfaces, never direct JPA repository calls from services",
+            "dto-mapping": "Web layer DTOs must be mapped to application commands/results, never pass DTOs to domain",
+            "transaction-boundaries": "Transactions managed at application service layer with @Transactional"
+        }
+    },
+    "backend-data-persistence": {
+        "description": "JPA/Hibernate with PostgreSQL and repository pattern",
+        "required_patterns": {
+            "entity-naming": "JPA entities end with Entity suffix (UserEntity, LessonEntity)",
+            "repository-naming": "Spring Data JPA repositories end with JpaRepository suffix",
+            "adapter-implementation": "Repository adapters in infrastructure/persistence/adapter/ implement domain RepositoryPort",
+            "mapper-usage": "MapStruct mappers convert between Entity and Domain models",
+            "composite-keys": "Composite keys use @Embeddable ID classes (UserLessonProgressId, UserStreakId)"
+        },
+        "architectural_constraints": {
+            "no-entities-in-domain": "Never pass JPA entities outside persistence layer",
+            "query-methods": "Complex queries use @Query with JPQL or native SQL in JpaRepository interfaces",
+            "projections": "Use interface projections for complex query results (LeaderboardProjection)",
+            "flyway-migrations": "All schema changes via versioned Flyway scripts in db/migration/",
+            "lazy-loading": "Be cautious with @OneToMany/@ManyToOne to avoid N+1 queries"
+        }
+    },
+    "backend-security-authentication": {
+        "description": "JWT-based stateless authentication with Spring Security",
+        "required_patterns": {
+            "jwt-generation": "Use TokenGeneratorPort (implemented by JwtTokenGeneratorAdapter) for token creation",
+            "password-hashing": "Use PasswordEncoderPort (implemented by SpringPasswordEncoderAdapter with BCrypt)",
+            "authentication-filter": "JwtAuthenticationFilter validates tokens on every request",
+            "security-context": "Authenticated user accessible via SecurityContextHolder in services",
+            "stateless-sessions": "SessionCreationPolicy.STATELESS - no server-side session"
+        },
+        "architectural_constraints": {
+            "public-endpoints": "/api/auth/** and /api/content/modules are public, all others require authentication",
+            "token-in-header": "JWT must be passed as 'Bearer <token>' in Authorization header",
+            "cors-enabled": "CORS configured to allow all origins (development - should be restricted in production)",
+            "no-session-cookies": "Do not use session cookies or remember-me functionality",
+            "token-expiration": "JWT expiration configured via app.jwt.expiration property"
+        }
+    },
+    "backend-api-layer": {
+        "description": "REST API with Spring MVC controllers and OpenAPI documentation",
+        "required_patterns": {
+            "controller-organization": "Controllers in infrastructure/web/controller/ organized by domain (AuthController, ContentController, etc.)",
+            "dto-usage": "Web DTOs in infrastructure/web/dto/ for request/response bodies",
+            "api-mapping": "MapStruct API mappers convert DTOs to application commands/results",
+            "endpoint-structure": "RESTful endpoints with /api prefix: /api/auth, /api/users, /api/content, /api/progress, /api/shop",
+            "validation": "Use Jakarta validation annotations (@NotBlank, @Email, @Size) on DTOs"
+        },
+        "architectural_constraints": {
+            "global-exception-handling": "GlobalApiExceptionHandler catches domain exceptions and returns standardized ErrorDTO",
+            "http-status-codes": "201 for creation, 200 for success, 404 for not found, 400 for validation errors, 401 for auth failures",
+            "swagger-ui": "OpenAPI docs accessible at /swagger-ui.html, redirect from root /",
+            "no-business-logic": "Controllers must only orchestrate, never contain business logic",
+            "response-wrapping": "Consistent response structure with DTOs, errors wrapped in ErrorDTO"
+        }
+    },
+    "backend-dependency-injection": {
+        "description": "Spring IoC container with constructor injection",
+        "required_patterns": {
+            "constructor-injection": "Use @RequiredArgsConstructor (Lombok) with private final fields for dependency injection",
+            "component-scanning": "Services annotated with @Service, adapters with @Component, controllers with @RestController",
+            "bean-configuration": "Manual bean wiring in BeanConfiguration for use case services",
+            "port-implementation": "Adapters must implement port interfaces and be registered as Spring beans"
+        },
+        "architectural_constraints": {
+            "no-field-injection": "Never use @Autowired on fields, always constructor injection",
+            "no-circular-dependencies": "Avoid circular dependencies between services",
+            "interface-based": "Inject via port interfaces, not concrete implementations",
+            "single-configuration-class": "Centralized bean configuration in infrastructure/config/BeanConfiguration"
+        }
+    },
+    "gamification-system": {
+        "description": "XP, streaks, lingots, and league mechanics",
+        "required_patterns": {
+            "xp-calculation": "XP earned based on lesson completion (correctAnswerCount affects calculation)",
+            "streak-tracking": "Daily streak logic based on consecutive days of activity",
+            "lingot-economy": "Lingots earned on first lesson completion (not in practice mode)",
+            "leaderboard-ranking": "Weekly XP-based ranking with league system",
+            "progress-tracking": "UserLessonProgress tracks completion status per user per lesson"
+        },
+        "architectural_constraints": {
+            "transactional-rewards": "Lesson completion, XP award, and lingot grant must be atomic (single transaction)",
+            "streak-date-logic": "Streaks use date comparison logic - must handle timezone correctly",
+            "practice-mode": "Practice mode (isPractice flag) does not award lingots or count toward progress",
+            "treasure-claiming": "Treasure rewards are one-time claims per lesson",
+            "no-xp-deduction": "XP can only increase, never decrease"
+        }
+    }
+}

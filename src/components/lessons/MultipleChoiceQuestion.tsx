@@ -2,7 +2,7 @@ import React from "react";
 import { ProgressBar } from "./ProgressBar";
 import { QuitMessage } from "./QuitMessage";
 import { CheckAnswer } from "./CheckAnswer";
-import type { ModuleLesson } from "~/utils/lessons";
+import type { ModuleLesson } from "~/types/lesson";
 
 export const MultipleChoiceQuestion = ({
     problem,
@@ -63,11 +63,11 @@ export const MultipleChoiceQuestion = ({
                             return (
                                 <div
                                     key={i}
-                                    className={`cursor-pointer rounded-xl border-2 border-b-4 p-4 ${i === selectedAnswer ? "border-blue-300 bg-blue-100 text-blue-400" : "border-gray-200 hover:bg-gray-100"}`}
+                                    className={`rounded-xl border-2 border-b-4 p-4 ${correctAnswerShown ? "cursor-not-allowed" : "cursor-pointer"} ${i === selectedAnswer ? "border-blue-300 bg-blue-100 text-blue-400" : "border-gray-200"} ${!correctAnswerShown && "hover:bg-gray-100"}`}
                                     role="radio"
                                     aria-checked={i === selectedAnswer}
                                     tabIndex={0}
-                                    onClick={() => setSelectedAnswer(i)}
+                                    onClick={() => !correctAnswerShown && setSelectedAnswer(i)}
                                 >
                                     {answer.icon}
                                     <h2 className="text-center">{answer.name}</h2>

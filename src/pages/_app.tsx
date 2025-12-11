@@ -1,9 +1,16 @@
 import { type AppType } from "next/dist/shared/lib/utils";
 import Head from "next/head";
+import { useEffect, useState } from "react";
 
 import "~/styles/globals.css";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <>
       <Head>
@@ -18,7 +25,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <meta name="theme-color" content="#1D3557" />
         <link rel="manifest" href="/app.webmanifest" />
       </Head>
-      <Component {...pageProps} />
+      {mounted ? <Component {...pageProps} /> : null}
     </>
   );
 };

@@ -1,10 +1,10 @@
-import type { Module } from "~/utils/modules";
+import type { ModuleWithTypedUI } from "~/types/module";
 
 export const ModuleIcon = ({
   module,
   width = 82,
 }: {
-  module: Module | null;
+  module: ModuleWithTypedUI | null;
   width?: number;
 }) => {
   const getModuleIcon = (moduleCode: string) => {
@@ -64,7 +64,6 @@ export const ModuleIcon = ({
   };
 
   if (!module) {
-    const height = Math.round((width * 66) / 82);
     return (
       <svg width={width} viewBox="0 0 82 66" fill="none">
         <rect width="82" height="66" rx="8" fill="#999" />

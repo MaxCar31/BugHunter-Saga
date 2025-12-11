@@ -1,16 +1,32 @@
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
-import type { Module } from "~/utils/modules";
+import type { ModuleWithTypedUI } from "~/types/module";
 
 export type ModuleSlice = {
-  module: Module | null;
-  setModule: (newModule: Module) => void;
+  module: ModuleWithTypedUI | null;
+  setModule: (newModule: ModuleWithTypedUI) => void;
+};
+
+// Cargar módulo desde sessionStorage (solo en cliente)
+const getInitialModule = (): ModuleWithTypedUI | null => {
+  if (typeof window === "undefined") return null;
+  const stored = sessionStorage.getItem("bh_module");
+  if (!stored) return null;
+  try {
+    return JSON.parse(stored) as ModuleWithTypedUI;
+  } catch {
+    return null;
+  }
 };
 
 export const createModuleSlice: BoundStateCreator<ModuleSlice> = (set, get) => {
   const slice = {
-    module: null,
-    setModule: (newModule: Module) => {
+    module: getInitialModule(),
+    setModule: (newModule: ModuleWithTypedUI) => {
       set({ module: newModule });
+      // Persistir en sessionStorage
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("bh_module", JSON.stringify(newModule));
+      }
       // Carga preguntas para el módulo seleccionado
       void get().loadQuestions(newModule.code);
     },

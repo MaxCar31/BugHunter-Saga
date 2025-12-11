@@ -1,15 +1,27 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBoundStore } from "~/hooks/useBoundStore";
-import modules from "~/utils/modules";
+// TODO: Reemplazar con datos dinámicos de fetchModules
+// import modules from "~/utils/modules";
 import { ModuleIcon } from "./ModuleIcon";
 
-export const ModuleDropDown = () => {
-  const module = useBoundStore((x) => x.module);
-  const [modulesShown, setModulesShown] = useState(false);
+// Temporal: array vacío hasta implementar carga dinámica
+const modules: any[] = [];
 
-  if (!module) {
-    return null; // or a loading state
+export const ModuleDropDown = () => {
+  const currentModule = useBoundStore((x) => x.module);
+  const [modulesShown, setModulesShown] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Marcar como montado después de la hidratación
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Durante la hidratación, siempre retornar null para evitar mismatch
+  // Después de montar, mostrar solo si hay módulo
+  if (!isMounted || !currentModule) {
+    return null;
   }
 
   return (
@@ -19,23 +31,23 @@ export const ModuleDropDown = () => {
         onClick={() => setModulesShown((x) => !x)}
         onBlur={() => setModulesShown(false)}
       >
-        <ModuleIcon module={module} width={24} />
-        <span>{module.shortName}</span>
+        <ModuleIcon module={currentModule} width={24} />
+        <span>{currentModule.shortName}</span>
       </button>
       {modulesShown && (
         <ul className="absolute right-0 top-full grid w-[500px] grid-cols-1 rounded-2xl border-2 border-gray-200 bg-white p-6 font-light text-gray-600">
-          {modules.map((module) => {
+          {modules.map((m) => {
             return (
-              <li key={module.code}>
+              <li key={m.code}>
                 <Link
                   href={`/learn`}
                   tabIndex={0}
                   className="flex items-center gap-3 whitespace-nowrap rounded-xl p-3 hover:bg-gray-300"
                 >
-                  <ModuleIcon module={module} width={24} />
+                  <ModuleIcon module={m} width={24} />
                   <div className="flex flex-col">
-                    <span className="font-bold">{module.name}</span>
-                    <span className="text-sm text-gray-400">{module.description}</span>
+                    <span className="font-bold">{m.name}</span>
+                    <span className="text-sm text-gray-400">{m.description}</span>
                   </div>
                 </Link>
               </li>

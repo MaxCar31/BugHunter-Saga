@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
@@ -29,5 +30,12 @@ public class ShopItemRepositoryAdapter implements ShopItemRepositoryPort {
     public Optional<ShopItem> findByItemCode(String itemCode) {
         return jpaRepository.findByItemCode(itemCode)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<ShopItem> findAvailableItemsForUser(UUID userId) {
+        return jpaRepository.findAvailableForUser(userId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

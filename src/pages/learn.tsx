@@ -1,22 +1,22 @@
 import { type NextPage } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { UpArrowSvg, PracticeExerciseSvg } from "~/components/Svgs";
+import { UpArrowSvg } from "~/components/icons/navigation";
+import { PracticeExerciseSvg } from "~/components/icons/lessons";
 import { TopBar } from "~/components/TopBar";
 import { BottomBar } from "~/components/BottomBar";
 import { RightBar } from "~/components/RightBar";
 import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
-import type { Tile, TileType, Unit } from "~/utils/units";
-import { fetchModuleUnits } from "~/utils/units";
-import { useRouter } from "next/router";
+import type { Tile, TileType, Unit } from "~/types/unit";
+import { fetchModuleUnits } from "~/services/unitService";
 import { claimTreasure } from "~/services/userService";
 import { TreasureCelebration } from "~/components/learn/TreasureCelebration";
 import { TileIcon } from "~/components/learn/TileIcon";
 import { HoverLabel } from "~/components/learn/HoverLabel";
 import { UnitHeader } from "~/components/learn/UnitHeader";
-import { LessonCompletionIcon } from "~/components/learn/LessonCompletionIcon";
 import { getTileLeftClassName, getTileTooltipLeftOffset } from "~/utils/tilePositions";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
@@ -210,10 +210,6 @@ const UnitSection = ({
   const closeTooltip = useCallback(() => setSelectedTile(null), []);
 
   const currentModule = useBoundStore((x) => x.module);
-  const getCompletedLessons = useBoundStore((x) => x.getCompletedLessons);
-  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
-
-  const completedLessons = getCompletedLessons(currentModule?.code || '');
 
   // Mostrar skeleton mientras se carga
   if (!unit || !unit.tiles || unit.tiles.length === 0) {
@@ -225,39 +221,33 @@ const UnitSection = ({
     );
   }
 
+  const totalTiles = unit.tiles.length;
+  const completedInUnit = unit.tiles.filter(t => t.status === 'COMPLETE').length;
+
   return (
-    <>
+    <div data-unit-number={unit.unitNumber}>
       <UnitHeader
         unitNumber={unit.unitNumber}
         description={unit.description}
         backgroundColor={unit.backgroundColor}
         borderColor={unit.borderColor}
         moduleCode={currentModule?.code || ''}
+        completedCount={completedInUnit}
+        totalCount={totalTiles}
       />
-      <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 px-4 sm:gap-6 sm:px-0">
+      <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 sm:gap-6">
         {unit.tiles.map((tile, i): JSX.Element => {
-          // Calcular el estado real basado en el progreso del usuario
-          const status = calculateTileStatus(tile, unit, allUnits, completedLessons);
+          // Usar el estado que viene del backend (fuente de verdad)
+          const status = tile.status;
 
           return (
             <Fragment key={i}>
               {(() => {
                 switch (tile.type) {
-                  case "star":
                   case "book":
                   case "dumbbell":
                   case "trophy":
                   case "fast-forward":
-                    if (tile.type === "trophy" && status === "COMPLETE") {
-                      return (
-                        <div className="relative">
-                          <TileIcon tileType={tile.type} status={status} />
-                          <div className="absolute left-0 right-0 top-6 flex justify-center text-lg font-bold text-yellow-700">
-                            {unit.unitNumber}
-                          </div>
-                        </div>
-                      );
-                    }
                     return (
                       <div
                         className={`relative h-[93px] w-[98px] ${getTileLeftClassName({
@@ -294,6 +284,11 @@ const UnitSection = ({
                           }}
                         >
                           <TileIcon tileType={tile.type} status={status} />
+                          {tile.type === "trophy" && status === "COMPLETE" && (
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-yellow-700">
+                              {unit.unitNumber}
+                            </div>
+                          )}
                           <span className="sr-only">Show lesson</span>
                         </button>
                       </div>
@@ -332,7 +327,6 @@ const UnitSection = ({
                   switch (tile.type) {
                     case "book":
                     case "dumbbell":
-                    case "star":
                       return tile.description;
                     case "fast-forward":
                       return status === "LOCKED"
@@ -352,14 +346,14 @@ const UnitSection = ({
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 
 const Learn: NextPage = () => {
+  const router = useRouter();
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
-  const router = useRouter();
 
   // --- CARGA DINÁMICA DE LAS UNIDADES ---
   const [units, setUnits] = useState<Unit[]>([]);
@@ -367,6 +361,7 @@ const Learn: NextPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [scrollY, setScrollY] = useState(0);
   const [claimingTreasure, setClaimingTreasure] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [treasureCelebration, setTreasureCelebration] = useState<{
     show: boolean;
     lingotsEarned: number;
@@ -374,7 +369,11 @@ const Learn: NextPage = () => {
 
   // Zustand stores
   const setLingots = useBoundStore((x) => x.setLingots);
-  const markLessonAsCompleted = useBoundStore((x) => x.markLessonAsCompleted);
+
+  // Marcar como montado después de la hidratación
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Hook para cargar las unidades
   useEffect(() => {
@@ -389,10 +388,25 @@ const Learn: NextPage = () => {
       setError(null);
 
       try {
-        const token = localStorage.getItem("bh_token");
+        const token = sessionStorage.getItem("bh_token");
         const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
         console.log("🔍 Units loaded:", loadedUnits);
         setUnits(loadedUnits);
+
+        // Sincronizar caché con lecciones COMPLETE del backend
+        const completedLessonIds: number[] = [];
+        loadedUnits.forEach(u => {
+          u.tiles.forEach(t => {
+            if (t.status === 'COMPLETE') {
+              completedLessonIds.push(t.lessonId);
+            }
+          });
+        });
+
+        if (currentModule.code && completedLessonIds.length >= 0) {
+          const updateCache = useBoundStore.getState().updateCompletedLessonsCache;
+          updateCache(currentModule.code, completedLessonIds);
+        }
       } catch (err) {
         console.error("❌ Error loading units:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -402,7 +416,7 @@ const Learn: NextPage = () => {
     };
 
     void loadUnits();
-  }, [currentModule?.code]);
+  }, [currentModule?.code, router.query.reload]);
 
   // Hook para scroll
   useEffect(() => {
@@ -425,19 +439,8 @@ const Learn: NextPage = () => {
       // Actualizar lingots en el store
       setLingots(reward.totalLingots);
 
-      // Marcar el tesoro como completado en el store local
-      if (currentModule?.code) {
-        markLessonAsCompleted(currentModule.code, lessonId);
-      }
-
-      // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
-      if (currentModule?.code) {
-        const token = localStorage.getItem("bh_token");
-        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
-        setUnits(loadedUnits);
-      }
-
-      // Mostrar celebración
+      // Mostrar celebración PRIMERO
+      // La recarga de unidades ocurrirá cuando el usuario cierre el modal
       setTreasureCelebration({
         show: true,
         lingotsEarned: reward.lingotsEarned,
@@ -453,24 +456,57 @@ const Learn: NextPage = () => {
     }
   };
 
-  // Early returns después de todos los hooks
-  if (!currentModule?.code) {
+  // Handler para cerrar el modal de celebración del tesoro
+  // Recarga las unidades DESPUÉS de que el usuario confirme visualmente la recompensa
+  const handleCloseTreasureCelebration = async () => {
+    // Cerrar el modal inmediatamente para mejor UX
+    setTreasureCelebration({ show: false, lingotsEarned: 0 });
+
+    // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
+    if (currentModule?.code) {
+      try {
+        const token = sessionStorage.getItem("bh_token");
+        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
+
+        // Forzar re-render con nueva referencia del array
+        setUnits([...loadedUnits]);
+
+        // Actualizar caché de lecciones completadas
+        const completedLessonIds: number[] = [];
+        loadedUnits.forEach(u => {
+          u.tiles.forEach(t => {
+            if (t.status === 'COMPLETE') {
+              completedLessonIds.push(t.lessonId);
+            }
+          });
+        });
+
+        const updateCache = useBoundStore.getState().updateCompletedLessonsCache;
+        updateCache(currentModule.code, completedLessonIds);
+
+        console.log("✅ Unidades y caché actualizados después de reclamar tesoro");
+      } catch (err) {
+        console.error("❌ Error al recargar unidades:", err);
+      }
+    }
+  };
+
+  // Mostrar loading durante la hidratación para evitar mismatch
+  if (!isMounted) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-        <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
-          <h1 className="mb-4 text-xl font-bold text-gray-800 sm:text-2xl">No se ha seleccionado un módulo</h1>
-          <p className="mb-6 text-sm text-gray-600 sm:text-base">
-            Por favor, selecciona un módulo para continuar aprendiendo.
-          </p>
-          <Link
-            href="/register"
-            className="inline-block rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 text-sm font-bold uppercase text-white transition hover:brightness-110 sm:text-base"
-          >
-            Seleccionar Módulo
-          </Link>
+        <div className="rounded-xl bg-white p-6 text-center shadow-lg sm:p-8">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-b-4 border-blue-500 sm:h-12 sm:w-12"></div>
         </div>
       </div>
     );
+  }
+
+  // Early returns después de todos los hooks
+  if (!currentModule?.code) {
+    // Redirigir automáticamente al tutorial si no hay módulo seleccionado
+    void router.push("/tutorial");
+    return null;
   }
 
   if (isLoading) {
@@ -512,8 +548,10 @@ const Learn: NextPage = () => {
       />
       <LeftBar selectedTab="Aprender" />
 
-      <div className="flex justify-center gap-3 pt-14 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-8 min-h-screen bg-gray-50">
-        <div className="flex w-full max-w-2xl grow flex-col pb-20 sm:pb-24">
+      <div className="flex justify-center gap-4 pt-14 px-3 sm:px-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-5 xl:gap-7 xl:px-2 min-h-screen bg-gray-50">
+        <div className="flex w-full max-w-3xl lg:max-w-4xl xl:max-w-[1000px] grow flex-col pb-20 sm:pb-24">
+
+
           {isLoading && (
             <UnitSection
               unit={null}
@@ -539,7 +577,7 @@ const Learn: NextPage = () => {
             />
           ))}
 
-          <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between px-4 sm:px-0 sm:bottom-24">
+          <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between sm:bottom-24">
             <Link
               href="/lesson?practice"
               className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16"
@@ -571,7 +609,7 @@ const Learn: NextPage = () => {
       {treasureCelebration.show && (
         <TreasureCelebration
           lingotsEarned={treasureCelebration.lingotsEarned}
-          onClose={() => setTreasureCelebration({ show: false, lingotsEarned: 0 })}
+          onClose={handleCloseTreasureCelebration}
         />
       )}
     </>

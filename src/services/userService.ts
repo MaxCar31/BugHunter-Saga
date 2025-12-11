@@ -20,11 +20,11 @@ import type {
 // ==================== UTILIDADES ====================
 
 /**
- * Obtiene el token de autenticación del localStorage
+ * Obtiene el token de autenticación del sessionStorage
  */
 const getAuthToken = (): string | null => {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("bh_token");
+    return sessionStorage.getItem("bh_token");
 };
 
 /**

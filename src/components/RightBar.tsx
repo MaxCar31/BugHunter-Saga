@@ -1,30 +1,17 @@
 import Link from "next/link";
-import type { ComponentProps } from "react";
 import React, { useState, useEffect } from "react";
-import dayjs from "dayjs";
-import {
-  BronzeLeagueSvg,
-  EmptyFireSvg,
-  EmptyGemSvg,
-  FireSvg,
-  GemSvg,
-  LightningProgressSvg,
-  LingotsTreasureChestSvg,
-  TreasureProgressSvg,
-} from "./Svgs";
-import { Calendar } from "./Calendar";
+import { LightningProgressSvg, GemSvg, LingotsTreasureChestSvg } from "~/components/icons/gamification";
+import { BronzeLeagueSvg } from "~/components/icons/league";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { ModuleIcon } from "./ModuleIcon";
 import type { LoginScreenState } from "./LoginScreen";
 import { LoginScreen } from "./LoginScreen";
-import { useLeaderboardRank } from "~/hooks/useLeaderboard";
 import { getUserStats } from "~/services/userService";
+import UnitProgressCard from "./UnitProgressCard";
 
 export const RightBar = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
-  const lingots = useBoundStore((x) => x.lingots);
-  const streak = useBoundStore((x) => x.streak);
-  const module = useBoundStore((x) => x.module);
+  const currentModule = useBoundStore((x) => x.module);
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
 
   const setLingots = useBoundStore((x) => x.setLingots);
@@ -39,9 +26,6 @@ export const RightBar = () => {
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
 
   const [modulesShown, setModulesShown] = useState(false);
-  const [streakShown, setStreakShown] = useState(false);
-  const [now, setNow] = useState(dayjs());
-  const [gemsShown, setGemsShown] = useState(false);
   const [loginScreenState, setLoginScreenState] = useState<LoginScreenState>("HIDDEN");
 
   // ✅ Cargar estadísticas del usuario al montar el componente
@@ -63,12 +47,12 @@ export const RightBar = () => {
       }
     };
 
-    loadStats();
+    void loadStats();
   }, [loggedIn, setLingots, setStreak, setTotalXp, setXpToday, setActiveDays, setLeagueRank]);
 
   return (
     <>
-      <aside className="sticky top-0 hidden w-96 flex-col gap-6 self-start sm:flex">
+      <aside className="sticky top-0 hidden w-80 lg:w-84 xl:w-[360px] 2xl:w-[380px] flex-col gap-6 self-start flex-shrink-0 sm:flex">
         <article className="my-6 flex justify-between gap-4">
           <div
             className="relative flex cursor-default items-center gap-2 rounded-xl p-3 font-bold uppercase text-gray-500 hover:bg-gray-100"
@@ -78,8 +62,8 @@ export const RightBar = () => {
             role="button"
             tabIndex={0}
           >
-            <ModuleIcon module={module} width={45} />
-            <div>{module?.name}</div>
+            <ModuleIcon module={currentModule} width={45} />
+            <div>{currentModule?.name}</div>
             <div
               className="absolute top-full z-10 rounded-2xl border-2 border-gray-300 bg-white"
               style={{
@@ -92,8 +76,8 @@ export const RightBar = () => {
                 Mis Módulos
               </h2>
               <button className="flex w-full items-center gap-3 border-t-2 border-gray-300 bg-blue-100 px-5 py-3 text-left font-bold">
-                <ModuleIcon module={module} width={45} />
-                <span className="text-blue-500">{module?.name}</span>
+                <ModuleIcon module={currentModule} width={45} />
+                <span className="text-blue-500">{currentModule?.name}</span>
               </button>
               <Link
                 className="flex w-full items-center gap-3 rounded-b-2xl border-t-2 border-gray-300 px-5 py-3 text-left font-bold hover:bg-gray-100"
@@ -177,11 +161,16 @@ export const RightBar = () => {
             </div>
           </span> */}
         </article>
+
+        {/* Sección de Puntos QA */}
+        {loggedIn && <LingotsSection />}
+
         {loggedIn && totalLessonsCompleted < 10 ? (
           <UnlockLeaderboardsSection />
         ) : loggedIn && totalLessonsCompleted >= 10 ? (
           <LeaderboardRankSection />
         ) : null}
+        <UnitProgressSection />
         <DailyQuestsSection />
         <XpProgressSection />
         {!loggedIn && (
@@ -196,6 +185,22 @@ export const RightBar = () => {
   );
 };
 
+const LingotsSection = () => {
+  const lingots = useBoundStore((x) => x.lingots);
+
+  return (
+    <section className="flex items-center gap-2.5 rounded-xl border-2 border-blue-500 bg-blue-50 px-3 py-2">
+      <div className="flex-shrink-0">
+        <GemSvg />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">Puntos QA</span>
+        <span className="text-lg font-bold text-blue-600">{lingots}</span>
+      </div>
+    </section>
+  );
+};
+
 const UnlockLeaderboardsSection = () => {
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
 
@@ -206,8 +211,6 @@ const UnlockLeaderboardsSection = () => {
   if (totalLessonsCompleted >= 10) {
     return null;
   }
-
-  const lessonsNeededToUnlockLeaderboards = 10 - totalLessonsCompleted;
 
   return (
     <></>
@@ -229,7 +232,7 @@ const LeaderboardRankSection = () => {
       </div>
       <div className="flex items-center gap-6">
         <div className="flex items-center justify-center">
-          <BronzeLeagueSvg />
+          <BronzeLeagueSvg className="w-12 h-12" />
           <span className="absolute text-xl font-black text-white">
             {leagueRank ?? "-"}
           </span>
@@ -252,7 +255,7 @@ const DailyQuestsSection = () => {
     <article className="flex flex-col gap-5 rounded-2xl border-2 border-gray-200 p-6">
       <h2 className="text-xl font-bold text-gray-700">Misiones Diarias</h2>
       <div className="flex gap-5">
-        <TreasureClosedSvg />
+        <LingotsTreasureChestSvg className="w-14 h-14" />
         <div className="flex flex-col gap-2">
           <h3 className="text-base font-bold text-gray-800">
             Gana {goalXp} XP
@@ -268,29 +271,53 @@ const DailyQuestsSection = () => {
   );
 };
 
-const LockedLeaderboardsSvg = () => {
-  return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-      <path
-        d="M23.544 3.41476L33.1698 3.41476C36.9415 3.41476 39.9991 6.47231 39.9991 10.244V14.554L10.9707 43.5824C4.66224 40.6308 0.240328 34.3187 0.00878906 26.95L23.544 3.41476Z"
-        fill="#A6A6A6"
-      />
-      <path
-        d="M39.9991 33.554V37.8637C39.9991 41.6354 36.9415 44.693 33.1698 44.693L14.6287 44.693C10.857 44.693 7.79945 41.6354 7.79945 37.8637V18.9326L39.9991 33.554Z"
-        fill="#A6A6A6"
-      />
-    </svg>
-  );
-};
+// ✅ SVG components migrados a ~/components/icons/
+// Los componentes inline fueron refactorizados para mantenibilidad
 
-const TreasureClosedSvg = (props: ComponentProps<"svg">) => {
+const UnitProgressSection = () => {
+  const loggedIn = useBoundStore((x) => x.loggedIn);
+  const [currentUnitId, setCurrentUnitId] = useState<number>(1);
+
+  // Detectar la unidad actual basado en el scroll o la URL
+  useEffect(() => {
+    const detectCurrentUnit = () => {
+      // Buscar todas las secciones de unidad en la página
+      const unitSections = document.querySelectorAll('[data-unit-number]');
+      const scrollY = window.scrollY + 200; // Offset para detectar mejor
+
+      for (const section of Array.from(unitSections)) {
+        const sectionTop = (section as HTMLElement).offsetTop;
+        const sectionBottom = sectionTop + (section as HTMLElement).offsetHeight;
+
+        if (scrollY >= sectionTop && scrollY <= sectionBottom) {
+          const unitNumber = parseInt((section as HTMLElement).dataset.unitNumber || '1');
+          setCurrentUnitId(unitNumber);
+          break;
+        }
+      }
+    };
+
+    // Detectar unidad al cargar
+    detectCurrentUnit();
+
+    // Detectar unidad al hacer scroll
+    const handleScroll = () => {
+      detectCurrentUnit();
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!loggedIn) {
+    return null;
+  }
+
   return (
-    <svg width="56" height="42" viewBox="0 0 56 42" fill="none" {...props}>
-      <rect x="0" y="16" width="56" height="26" rx="4" fill="#E5E7EB" />
-      <rect x="24" y="16" width="8" height="10" fill="#9CA3AF" />
-      <circle cx="28" cy="26" r="3" fill="#6B7280" />
-      <rect x="20" y="0" width="16" height="16" rx="8" stroke="#E5E7EB" strokeWidth="4" fill="none" />
-    </svg>
+    <UnitProgressCard
+      unitId={currentUnitId}
+      className="w-full"
+    />
   );
 };
 
@@ -304,7 +331,7 @@ const XpProgressSection = () => {
         <h2 className="text-xl font-bold text-gray-700">Meta Diaria</h2>
       </div>
       <div className="flex gap-5">
-        <TreasureClosedSvg />
+        <LingotsTreasureChestSvg className="w-14 h-14" />
         <div className="flex flex-col gap-2">
           <div className="flex items-center">
             <div className="relative h-5 w-52 rounded-l-full bg-gray-200">

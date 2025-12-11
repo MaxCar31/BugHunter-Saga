@@ -1,52 +1,29 @@
-import { apiBase } from "./config";
+/**
+ * @deprecated Este archivo ha sido refactorizado.
+ * 
+ * Los tipos ahora están en: src/types/module.ts
+ * Los servicios ahora están en: src/services/moduleService.ts
+ * Las funciones helper ahora están en: src/utils/module-helpers.ts
+ * 
+ * Por favor actualiza tus imports:
+ * 
+ * Antes:
+ * import { Module, fetchModules } from "~/utils/modules";
+ * 
+ * Después:
+ * import type { Module } from "~/types/module";
+ * import { fetchModules } from "~/services/moduleService";
+ */
 
-export type Module = {
-  id: number;
-  code: string;
-  name: string;
-  shortName: string;
-  description: string;
-  uiConfig: {
-    backgroundColor: string;
-    color: string;
-    borderColor?: string;
-    icon: string;
-    textColor?: string;
-  };
-  viewBox?: string; // Para compatibilidad con Flag.tsx
-};
-
-export const fetchModules = async (token?: string): Promise<Module[]> => {
-  try {
-    const response = await fetch(`${apiBase}/api/content/modules`, {
-      headers: {
-        accept: "*/*",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error ${response.status} fetching modules`);
-    }
-
-    const modules: Module[] = await response.json();
-
-    return modules.map((module) => ({
-      ...module,
-      viewBox: "0 0 24 19", // Default viewBox para Flag component
-      uiConfig: {
-        ...module.uiConfig,
-        backgroundColor: module.uiConfig.backgroundColor as `bg-${string}`,
-        borderColor: (module.uiConfig.borderColor ?? `border-${module.uiConfig.color}-600`) as `border-${string}`,
-        textColor: (module.uiConfig.textColor ?? `text-${module.uiConfig.color}-500`) as `text-${string}`,
-      },
-    }));
-  } catch (error) {
-    console.error("Error fetching modules:", error);
-    throw error;
-  }
-};
-
-const modules: Module[] = [];
-
-export default modules;
+// Re-exports temporales para backward compatibility (eliminar después de migración)
+export type { Module, ModuleWithTypedUI } from "~/types/module";
+export { fetchModules } from "~/services/moduleService";
+export {
+  findModuleByCode,
+  findModuleById,
+  sortModulesById,
+  getModuleBorderColor,
+  getModuleBackgroundColor,
+  getModuleTextColor,
+  hasCompleteUIConfig,
+} from "~/utils/module-helpers";

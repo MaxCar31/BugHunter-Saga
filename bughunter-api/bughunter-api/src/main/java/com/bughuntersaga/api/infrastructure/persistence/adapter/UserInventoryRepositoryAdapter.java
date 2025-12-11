@@ -50,4 +50,11 @@ public class UserInventoryRepositoryAdapter implements UserInventoryRepositoryPo
         // Mapear de vuelta a Dominio
         return mapper.toDomain(savedEntity);
     }
+
+    @Override
+    public java.util.List<UserInventory> findAllByUserId(UUID userId) {
+        return jpaRepository.findAllByUserId(userId).stream()
+                .map(mapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

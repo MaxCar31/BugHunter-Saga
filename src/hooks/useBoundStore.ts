@@ -20,6 +20,8 @@ import type { QuestionsSlice } from "~/stores/createQuestionsSlice";
 import { createQuestionsSlice } from "~/stores/createQuestionsSlice";
 import type { LeagueSlice } from "~/stores/createLeagueStore";
 import { createLeagueSlice } from "~/stores/createLeagueStore";
+import type { ShopSlice } from "~/stores/createShopSlice";
+import { createShopSlice } from "~/stores/createShopSlice";
 
 type BoundState = GoalXpSlice &
   ModuleSlice &
@@ -30,7 +32,8 @@ type BoundState = GoalXpSlice &
   UserSlice &
   XpSlice &
   QuestionsSlice &
-  LeagueSlice;
+  LeagueSlice &
+  ShopSlice;
 
 export type BoundStateCreator<SliceState> = StateCreator<
   BoundState,
@@ -50,6 +53,7 @@ export const useBoundStore = create<BoundState>((...args) => ({
   ...createXpSlice(...args),
   ...createQuestionsSlice(...args),
   ...createLeagueSlice(...args),
+  ...createShopSlice(...args),
 }));
 
 

@@ -13,7 +13,7 @@ import {
   LockedLeagueSvg,
   SecondPlaceSvg,
   ThirdPlaceSvg,
-} from "~/components/Svgs";
+} from "~/components/icons/league";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useLeaderboardUsers } from "~/hooks/useLeaderboard";
