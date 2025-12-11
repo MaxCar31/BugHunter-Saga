@@ -17,6 +17,7 @@ Instead of creating multiple independent Zustand stores, all state slices are co
 - XpSlice
 - QuestionsSlice
 - LeagueSlice
+- ShopSlice
 
 ### Implementation: useBoundStore.ts
 
@@ -39,7 +40,8 @@ type BoundState = GoalXpSlice &
   UserSlice &
   XpSlice &
   QuestionsSlice &
-  LeagueSlice;
+  LeagueSlice &
+  ShopSlice;
 
 // Custom StateCreator type for slice compatibility
 export type BoundStateCreator<SliceState> = StateCreator<
@@ -61,6 +63,7 @@ export const useBoundStore = create<BoundState>((...args) => ({
   ...createXpSlice(...args),
   ...createQuestionsSlice(...args),
   ...createLeagueSlice(...args),
+  ...createShopSlice(...args),
 }));
 
 // Optional: Initialize state on client-side
@@ -226,6 +229,13 @@ Manages leaderboard/league state:
 - `league: League | null`
 - `rank: number`
 - Actions: `setLeague()`, `setRank()`
+
+### 11. ShopSlice
+Manages shop/store state:
+- `shopItems: ShopItemDTO[]`
+- `loading: boolean`
+- `error: string | null`
+- Actions: `setShopItems()`, `setLoading()`, `setError()`
 
 ## State Initialization
 

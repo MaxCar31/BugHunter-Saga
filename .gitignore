@@ -70,3 +70,6 @@ tmp/
 
 # Spring Boot
 spring-boot-starter.log
+
+# Documentation
+docs/

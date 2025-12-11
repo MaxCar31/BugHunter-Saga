@@ -549,8 +549,8 @@ const LessonComplete = ({
 
       setLessonCompleted(true);
 
-      // Navegar a /learn
-      await router.push("/learn");
+      // Navegar a /learn con parámetro reload para forzar recarga de unidades
+      await router.push("/learn?reload=1");
 
     } catch (error) {
       console.error("Error completing lesson:", error);

@@ -77,11 +77,14 @@ export const FillInTheBlankQuestion = ({
                                 return (
                                     <button
                                         key={i}
-                                        className="rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
+                                        className="rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700 disabled:cursor-not-allowed"
+                                        disabled={correctAnswerShown}
                                         onClick={() => {
-                                            setSelectedAnswers((selectedAnswers) => {
-                                                return selectedAnswers.filter((x) => x !== i);
-                                            });
+                                            if (!correctAnswerShown) {
+                                                setSelectedAnswers((selectedAnswers) => {
+                                                    return selectedAnswers.filter((x) => x !== i);
+                                                });
+                                            }
                                         }}
                                     >
                                         {answerTiles?.[i] || ""}
@@ -100,15 +103,17 @@ export const FillInTheBlankQuestion = ({
                                             ? "rounded-2xl border-2 border-b-4 border-gray-200 bg-gray-200 p-2 text-gray-200"
                                             : "rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
                                     }
-                                    disabled={selectedAnswers.includes(i)}
-                                    onClick={() =>
-                                        setSelectedAnswers((selectedAnswers) => {
-                                            if (selectedAnswers.includes(i)) {
-                                                return selectedAnswers;
-                                            }
-                                            return [...selectedAnswers, i];
-                                        })
-                                    }
+                                    disabled={correctAnswerShown || selectedAnswers.includes(i)}
+                                    onClick={() => {
+                                        if (!correctAnswerShown) {
+                                            setSelectedAnswers((selectedAnswers) => {
+                                                if (selectedAnswers.includes(i)) {
+                                                    return selectedAnswers;
+                                                }
+                                                return [...selectedAnswers, i];
+                                            });
+                                        }
+                                    }}
                                 >
                                     {answerTile}
                                 </button>

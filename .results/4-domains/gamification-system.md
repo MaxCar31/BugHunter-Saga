@@ -227,19 +227,131 @@ Different lesson types provide variety in gameplay:
 Virtual items purchasable with lingots.
 
 #### Shop Items
-Examples (from typical gamification):
-- **Streak Freeze**: Protects streak if you miss a day (10 lingots)
-- **Double XP**: 2x XP for next lesson (15 lingots)
-- **Outfits/Cosmetics**: Visual customization (20-50 lingots)
-- **Bonus Content**: Extra lessons or hints (25 lingots)
+Items are stored in the `shop_items` table and managed via `ShopItemRepositoryPort`:
+- **Streak Freeze**: Protects streak if you miss a day
+- **Double XP**: 2x XP for next lesson
+- **Outfits/Cosmetics**: Visual customization
+- **Bonus Content**: Extra lessons or hints
 
-#### Purchase Flow
+Each item has:
+- `itemCode`: Unique identifier (e.g., "streak-freeze")
+- `name`: Display name (e.g., "Congelador de Racha")
+- `description`: Item description
+- `cost`: Price in lingots
+- `itemType`: Category (POWER_UP, COSMETIC, CONSUMABLE)
+
+#### Shop API Services
+
+**GetShopItemsService:**
 ```java
-// Conceptual PurchaseItemService flow
-1. Validate item exists and user has enough lingots
-2. Deduct lingots from user profile
-3. Add item to user inventory (UserInventory table)
-4. Return updated lingot balance
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class GetShopItemsService implements GetShopItemsUseCase {
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
+    private final UserRepositoryPort userRepositoryPort;
+
+    @Override
+    public List<ShopItem> getShopItems() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+        
+        // Returns only items user hasn't purchased (or can purchase multiple times)
+        return shopItemRepositoryPort.findAvailableItemsForUser(currentUser.getId());
+    }
+}
+```
+
+**PurchaseItemService:**
+```java
+@Service
+@RequiredArgsConstructor
+public class PurchaseItemService implements PurchaseItemUseCase {
+    private final UserRepositoryPort userRepositoryPort;
+    private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
+    private final UserInventoryRepositoryPort userInventoryRepositoryPort;
+    private final GetUserStatsUseCase getUserStatsUseCase;
+    private final Clock clock;
+
+    @Override
+    @Transactional
+    public UserStatsResult purchaseItem(String itemCode) {
+        // 1. Get current user and profile
+        User currentUser = getCurrentUser();
+        UUID userId = currentUser.getId();
+        UserProfile userProfile = getUserProfile(userId);
+
+        // 2. Validate item exists
+        ShopItem item = shopItemRepositoryPort.findByItemCode(itemCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Artículo no encontrado: " + itemCode, itemCode));
+
+        // 3. Validate sufficient lingots
+        if (userProfile.getLingots() < item.getCost()) {
+            throw new InsufficientFundsException("Fondos insuficientes. Necesita " + item.getCost() + " lingots.");
+        }
+
+        // 4. Deduct lingots
+        userProfile.setLingots(userProfile.getLingots() - item.getCost());
+        userProfileRepositoryPort.save(userProfile);
+
+        // 5. Add to inventory (update quantity if exists)
+        Optional<UserInventory> existingInventory = userInventoryRepositoryPort
+                .findByUserIdAndItemCode(userId, itemCode);
+
+        UserInventory inventoryToSave;
+        if (existingInventory.isPresent()) {
+            inventoryToSave = existingInventory.get();
+            inventoryToSave.setQuantity(inventoryToSave.getQuantity() + 1);
+        } else {
+            inventoryToSave = UserInventory.builder()
+                    .userId(userId)
+                    .itemCode(itemCode)
+                    .quantity(1)
+                    .createdAt(ZonedDateTime.now(clock))
+                    .build();
+        }
+        userInventoryRepositoryPort.save(inventoryToSave);
+
+        // 6. Return updated stats
+        return getUserStatsUseCase.getUserStats();
+    }
+}
+```
+
+#### Frontend Integration
+Shop state managed via Zustand `ShopSlice`:
+
+```typescript
+// From createShopSlice.ts
+export type ShopSlice = {
+    shopItems: ShopItemDTO[];
+    loading: boolean;
+    error: string | null;
+    setShopItems: (items: ShopItemDTO[]) => void;
+    setLoading: (loading: boolean) => void;
+    setError: (error: string | null) => void;
+};
+```
+
+**Shop Service:**
+```typescript
+// From shopService.ts
+export const getShopItems = async (): Promise<ShopItemDTO[]> => {
+  const response = await fetch(`${apiBase}/shop/items`, {
+    headers: createAuthHeaders(),
+  });
+  return response.json();
+};
+
+export const purchaseItem = async (itemId: string): Promise<UserStatsDTO> => {
+  const response = await fetch(`${apiBase}/shop/purchase/${itemId}`, {
+    method: 'POST',
+    headers: createAuthHeaders(),
+  });
+  return response.json();
+};
 ```
 
 ## Transactional Integrity

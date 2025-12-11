@@ -210,9 +210,6 @@ const UnitSection = ({
   const closeTooltip = useCallback(() => setSelectedTile(null), []);
 
   const currentModule = useBoundStore((x) => x.module);
-  const getCompletedLessons = useBoundStore((x) => x.getCompletedLessons);
-
-  const completedLessons = getCompletedLessons(currentModule?.code || '');
 
   // Mostrar skeleton mientras se carga
   if (!unit || !unit.tiles || unit.tiles.length === 0) {
@@ -225,7 +222,7 @@ const UnitSection = ({
   }
 
   const totalTiles = unit.tiles.length;
-  const completedInUnit = unit.tiles.filter(t => completedLessons.has(t.lessonId)).length;
+  const completedInUnit = unit.tiles.filter(t => t.status === 'COMPLETE').length;
 
   return (
     <div data-unit-number={unit.unitNumber}>
@@ -240,8 +237,8 @@ const UnitSection = ({
       />
       <div className="relative mb-8 mt-6 flex w-full flex-col items-center gap-4 sm:gap-6">
         {unit.tiles.map((tile, i): JSX.Element => {
-          // Calcular el estado real basado en el progreso del usuario
-          const status = calculateTileStatus(tile, unit, allUnits, completedLessons);
+          // Usar el estado que viene del backend (fuente de verdad)
+          const status = tile.status;
 
           return (
             <Fragment key={i}>
@@ -419,7 +416,7 @@ const Learn: NextPage = () => {
     };
 
     void loadUnits();
-  }, [currentModule?.code]);
+  }, [currentModule?.code, router.query.reload]);
 
   // Hook para scroll
   useEffect(() => {
@@ -442,16 +439,8 @@ const Learn: NextPage = () => {
       // Actualizar lingots en el store
       setLingots(reward.totalLingots);
 
-      // NO marcamos localmente - la recarga del backend se encargará de mostrar el tesoro como COMPLETE
-
-      // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
-      if (currentModule?.code) {
-        const token = sessionStorage.getItem("bh_token");
-        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
-        setUnits(loadedUnits);
-      }
-
-      // Mostrar celebración
+      // Mostrar celebración PRIMERO
+      // La recarga de unidades ocurrirá cuando el usuario cierre el modal
       setTreasureCelebration({
         show: true,
         lingotsEarned: reward.lingotsEarned,
@@ -464,6 +453,41 @@ const Learn: NextPage = () => {
       alert(errorMessage);
     } finally {
       setClaimingTreasure(false);
+    }
+  };
+
+  // Handler para cerrar el modal de celebración del tesoro
+  // Recarga las unidades DESPUÉS de que el usuario confirme visualmente la recompensa
+  const handleCloseTreasureCelebration = async () => {
+    // Cerrar el modal inmediatamente para mejor UX
+    setTreasureCelebration({ show: false, lingotsEarned: 0 });
+
+    // Recargar las unidades para actualizar el estado del tesoro a COMPLETE
+    if (currentModule?.code) {
+      try {
+        const token = sessionStorage.getItem("bh_token");
+        const loadedUnits = await fetchModuleUnits(currentModule.code, token || undefined);
+
+        // Forzar re-render con nueva referencia del array
+        setUnits([...loadedUnits]);
+
+        // Actualizar caché de lecciones completadas
+        const completedLessonIds: number[] = [];
+        loadedUnits.forEach(u => {
+          u.tiles.forEach(t => {
+            if (t.status === 'COMPLETE') {
+              completedLessonIds.push(t.lessonId);
+            }
+          });
+        });
+
+        const updateCache = useBoundStore.getState().updateCompletedLessonsCache;
+        updateCache(currentModule.code, completedLessonIds);
+
+        console.log("✅ Unidades y caché actualizados después de reclamar tesoro");
+      } catch (err) {
+        console.error("❌ Error al recargar unidades:", err);
+      }
     }
   };
 
@@ -585,7 +609,7 @@ const Learn: NextPage = () => {
       {treasureCelebration.show && (
         <TreasureCelebration
           lingotsEarned={treasureCelebration.lingotsEarned}
-          onClose={() => setTreasureCelebration({ show: false, lingotsEarned: 0 })}
+          onClose={handleCloseTreasureCelebration}
         />
       )}
     </>

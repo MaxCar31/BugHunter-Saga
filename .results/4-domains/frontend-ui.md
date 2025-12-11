@@ -83,36 +83,153 @@ className={
 
 ## SVG Icons
 
-### Embedding Strategy
-Icons are embedded directly in components as inline SVG, not from an icon library:
+### Icon System Architecture
+Icons are organized in a **modular structure** (76 total icon components) replacing the old monolithic `Svgs.tsx`:
+
+```
+components/icons/
+├── index.ts                    # Main export barrel
+├── gamification/               # 19 gamification icons
+│   ├── index.ts
+│   ├── BadgeBugHunterSvg.tsx
+│   ├── BadgeQualityInspectorSvg.tsx
+│   ├── CheckmarkSvg.tsx
+│   ├── EmptyFireSvg.tsx
+│   ├── FireSvg.tsx
+│   ├── GemSvg.tsx
+│   ├── LightningProgressSvg.tsx
+│   ├── LingotsTreasureChestSvg.tsx
+│   ├── LockSvg.tsx
+│   ├── StarSvg.tsx
+│   └── ...
+├── league/                     # 8 league/leaderboard icons
+│   ├── index.ts
+│   ├── BronzeLeagueSvg.tsx
+│   ├── FirstPlaceSvg.tsx
+│   ├── LeaderboardBannerSvg.tsx
+│   └── ...
+├── lessons/                    # 32 lesson-related icons
+│   ├── index.ts
+│   ├── book/
+│   │   ├── index.ts
+│   │   ├── ActiveBookSvg.tsx
+│   │   ├── GoldenBookSvg.tsx
+│   ├── dumbbell/
+│   │   ├── index.ts
+│   │   ├── ActiveDumbbellSvg.tsx
+│   │   ├── GoldenDumbbellSvg.tsx
+│   ├── treasure/
+│   │   ├── index.ts
+│   │   ├── ActiveTreasureSvg.tsx
+│   │   ├── GoldenTreasureSvg.tsx
+│   │   ├── LockedTreasureSvg.tsx
+│   ├── trophy/
+│   │   ├── index.ts
+│   │   ├── ActiveTrophySvg.tsx
+│   │   ├── GoldenTrophySvg.tsx
+│   ├── FastForwardSvg.tsx
+│   ├── GuidebookSvg.tsx
+│   ├── LessonCompletionSvg0.tsx
+│   ├── LessonTopBarHeart.tsx
+│   └── ...
+├── navigation/                 # 10 navigation icons
+│   ├── index.ts
+│   ├── ChevronDownSvg.tsx
+│   ├── ChevronLeftSvg.tsx
+│   ├── GlobeSvg.tsx
+│   ├── MoreOptionsSvg.tsx
+│   └── ...
+├── profile/                    # 5 profile icons
+│   ├── index.ts
+│   ├── EmptyMedalSvg.tsx
+│   ├── ProfileFriendsSvg.tsx
+│   ├── QATesterRobotSvg.tsx
+│   └── ...
+└── ui/                         # 6 UI utility icons
+    ├── index.ts
+    ├── BigCloseSvg.tsx
+    ├── CloseSvg.tsx
+    ├── DoneSvg.tsx
+    ├── EditPencilSvg.tsx
+    └── ...
+```
+
+### Import Pattern
+Icons are imported via barrel exports:
 
 ```typescript
-icon: (
-  <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-    <path d="..." fill="#FEC701" />
-    <path opacity="0.3" d="..." fill="white" />
-  </svg>
-)
+// Import specific icons from category
+import { FireSvg, GemSvg, StarSvg } from "~/components/icons/gamification";
+import { ActiveBookSvg, GoldenBookSvg } from "~/components/icons/lessons/book";
+
+// Or import from main index (re-exports all categories)
+import { FireSvg, ActiveBookSvg } from "~/components/icons";
 ```
+
+### Icon Component Pattern
+Each icon is a standalone React component:
+
+```typescript
+// Example: FireSvg.tsx
+export const FireSvg = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="..." fill="#FF9600" />
+    <path d="..." fill="#FF6B00" />
+  </svg>
+);
+```
+
+### Benefits of Modular Structure
+- ✅ **Tree-shaking**: Only imports used icons
+- ✅ **Maintainability**: Easy to find and update specific icons
+- ✅ **Semantic organization**: Icons grouped by purpose
+- ✅ **Type safety**: Each icon exported with proper TypeScript types
+- ✅ **Performance**: Smaller bundle sizes vs monolithic file
 
 ### Icon States Pattern
 Components like `TileIcon` implement multi-state icons:
 ```typescript
+import { CheckmarkSvg, StarSvg, LockSvg } from "~/components/icons";
+import { ActiveBookSvg, GoldenBookSvg } from "~/components/icons/lessons/book";
+
 switch (tileType) {
   case "star":
     return status === "COMPLETE" ? <CheckmarkSvg /> 
          : status === "ACTIVE" ? <StarSvg /> 
          : <LockSvg />;
+  case "book":
+    return status === "COMPLETE" ? <GoldenBookSvg />
+         : status === "ACTIVE" ? <ActiveBookSvg />
+         : <LockSvg />;
   // ... other types
 }
 ```
 
-### Shared SVG Components
-Common icons exported from `~/components/Svgs.tsx`:
-- CheckmarkSvg, LockSvg, StarSvg
-- ActiveBookSvg, LockedBookSvg, GoldenBookSvg
-- ActiveDumbbellSvg, LockedDumbbellSvg, GoldenDumbbellSvg
-- etc.
+### Modular Icon Categories
+**Gamification Icons** (`~/components/icons/gamification`):
+- CheckmarkSvg, LockSvg, StarSvg, FireSvg, GemSvg
+- Badge icons: BadgeBugHunterSvg, BadgeQualityInspectorSvg
+- Progress icons: LightningProgressSvg, TreasureProgressSvg
+
+**Lesson Icons** (`~/components/icons/lessons/[type]`):
+- Book: ActiveBookSvg, GoldenBookSvg
+- Dumbbell: ActiveDumbbellSvg, GoldenDumbbellSvg  
+- Trophy: ActiveTrophySvg, GoldenTrophySvg
+- Treasure: ActiveTreasureSvg, GoldenTreasureSvg, LockedTreasureSvg
+
+**League Icons** (`~/components/icons/league`):
+- BronzeLeagueSvg, FirstPlaceSvg, SecondPlaceSvg, ThirdPlaceSvg
+- LeaderboardBannerSvg, LockedLeagueSvg
+
+**Navigation Icons** (`~/components/icons/navigation`):
+- ChevronDownSvg, ChevronLeftSvg, ChevronRightSvg
+- GlobeSvg, MoreOptionsSvg, UpArrowSvg
+
+**Profile Icons** (`~/components/icons/profile`):
+- QATesterRobotSvg, ProfileFriendsSvg, EmptyMedalSvg
+
+**UI Icons** (`~/components/icons/ui`):
+- CloseSvg, BigCloseSvg, DoneSvg, EditPencilSvg, SettingsGearSvg
 
 ## Responsive Design
 
