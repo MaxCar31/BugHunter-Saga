@@ -33,6 +33,7 @@ public interface ContentPersistenceMapper {
     // ============================================================
 
     Module moduleToDomain(ModuleEntity moduleEntity);
+
     ModuleEntity moduleToEntity(Module module);
 
     // ============================================================
@@ -41,6 +42,7 @@ public interface ContentPersistenceMapper {
 
     @Mapping(target = "lessons", ignore = true)
     Unit unitToDomain(UnitEntity entity);
+
     UnitEntity unitToEntity(Unit domain);
 
     // ============================================================
@@ -49,6 +51,7 @@ public interface ContentPersistenceMapper {
 
     @Mapping(target = "status", ignore = true)
     Lesson lessonToDomain(LessonEntity entity);
+
     LessonEntity lessonToEntity(Lesson domain);
 
     // ============================================================
@@ -60,7 +63,8 @@ public interface ContentPersistenceMapper {
      * Mapea dinámicamente según el tipo definido en el JSON.
      */
     default Problem problemToDomain(ProblemEntity entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         Map<String, Object> content = entity.getContent();
         if (content == null) {
@@ -80,6 +84,7 @@ public interface ContentPersistenceMapper {
             case "INFO" -> mapInfo(builder, content);
             case "MULTIPLE_CHOICE" -> mapMultipleChoice(builder, content);
             case "FILL_IN_THE_BLANK" -> mapFillInBlank(builder, content);
+            case "CODE_CHALLENGE" -> mapCodeChallenge(builder, content);
         }
 
         return builder.build();
@@ -130,12 +135,34 @@ public interface ContentPersistenceMapper {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private void mapCodeChallenge(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        builder.codeTemplate((String) content.get("codeTemplate"));
+        builder.expectedAnswer((String) content.get("expectedAnswer"));
+        builder.hint((String) content.get("hint"));
+        builder.explanation((String) content.get("explanation"));
+
+        Object testCasesObj = content.get("testCases");
+        if (testCasesObj instanceof List<?> testCasesList) {
+            List<Map<String, Object>> rawTestCases = (List<Map<String, Object>>) testCasesList;
+            List<Problem.TestCase> testCases = rawTestCases.stream()
+                    .map(map -> Problem.TestCase.builder()
+                            .input((String) map.get("input"))
+                            .expectedOutput((String) map.get("expectedOutput"))
+                            .description((String) map.get("description"))
+                            .build())
+                    .collect(Collectors.toList());
+            builder.testCases(testCases);
+        }
+    }
+
     // ============================================================
     // problemToEntity
     // ============================================================
 
     default ProblemEntity problemToEntity(Problem domain) {
-        if (domain == null) return null;
+        if (domain == null)
+            return null;
 
         Map<String, Object> content = Map.ofEntries(
                 Map.entry("type", domain.getType()),
@@ -146,8 +173,7 @@ public interface ContentPersistenceMapper {
                 Map.entry("answers", domain.getAnswers()),
                 Map.entry("correctAnswer", domain.getCorrectAnswer()),
                 Map.entry("answerTiles", domain.getAnswerTiles()),
-                Map.entry("correctAnswerIndices", domain.getCorrectAnswerIndices())
-        );
+                Map.entry("correctAnswerIndices", domain.getCorrectAnswerIndices()));
 
         return ProblemEntity.builder()
                 .type(domain.getType())

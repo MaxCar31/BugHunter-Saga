@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { ProgressBar } from "./ProgressBar";
 import { QuitMessage } from "./QuitMessage";
 import { CheckAnswer } from "./CheckAnswer";
+import { CodeEditorQuestion } from "./CodeEditorQuestion";
 import type { ModuleLesson } from "~/types/lesson";
+
+interface ProblemContent {
+  type: string;
+  question?: string;
+  codeTemplate?: string;
+  expectedAnswer?: string;
+  hint?: string;
+  explanation?: string;
+  testCases?: Array<{
+    input: string;
+    expectedOutput: string;
+    description: string;
+  }>;
+}
 
 export const FillInTheBlankQuestion = ({
     problem,
@@ -34,9 +49,27 @@ export const FillInTheBlankQuestion = ({
     onSkip: () => void;
     hearts: number | null;
 }) => {
-    // Type guard para asegurar que es una lección tipo FILL_IN_THE_BLANK
-    if (problem.type !== "FILL_IN_THE_BLANK") {
+    const [codeAnswerCorrect, setCodeAnswerCorrect] = useState(false);
+    
+    // Type guard para asegurar que es una lección tipo FILL_IN_THE_BLANK o CODE_EXERCISE
+    if (problem.type !== "FILL_IN_THE_BLANK" && problem.type !== "CODE_EXERCISE") {
         return null;
+    }
+
+    // Parsear el contenido si es JSON (para ejercicios de código)
+    let isCodeExercise = false;
+    let contentData: ProblemContent | null = null;
+    
+    try {
+        if (typeof problem.content === "string") {
+            contentData = JSON.parse(problem.content);
+            isCodeExercise = (contentData?.type === "CODE_EXERCISE" || contentData?.type === "FILL_IN_THE_BLANK") && !!contentData?.codeTemplate;
+        } else if (problem.content && typeof problem.content === "object") {
+            contentData = problem.content;
+            isCodeExercise = (contentData?.type === "CODE_EXERCISE" || contentData?.type === "FILL_IN_THE_BLANK") && !!contentData?.codeTemplate;
+        }
+    } catch (e) {
+        // No es JSON, es un problema tradicional
     }
 
     const { question, correctAnswerIndices, answerTiles } = problem;
@@ -52,94 +85,133 @@ export const FillInTheBlankQuestion = ({
                         hearts={hearts}
                     />
                 </div>
-                <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-24">
-                    <h1 className="mb-2 text-2xl font-bold sm:text-3xl">
-                        Completa la definición
-                    </h1>
+                <section className="flex max-w-4xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-6 w-full px-4">
+                    {/* Si es ejercicio de código */}
+                    {isCodeExercise && contentData ? (
+                        <CodeEditorQuestion
+                            id="code-exercise"
+                            question={contentData.question || "Ejercicio de Código"}
+                            codeTemplate={contentData.codeTemplate || ""}
+                            expectedAnswer={contentData.expectedAnswer || ""}
+                            hint={contentData.hint || "Revisa el código cuidadosamente"}
+                            explanation={contentData.explanation || ""}
+                            testCases={contentData.testCases || []}
+                            onAnswer={(answer, correct) => {
+                                setCodeAnswerCorrect(correct);
+                                if (correct) {
+                                    onCheckAnswer();
+                                }
+                            }}
+                        />
+                    ) : (
+                        /* Si es ejercicio tradicional de tiles */
+                        <>
+                            <h1 className="mb-2 text-2xl font-bold sm:text-3xl">
+                                Completa la definición
+                            </h1>
 
-                    <div className="w-full">
-                        <div className="flex items-center gap-2 px-2">
-                            <Image src="/logo.svg" alt="" width={92} height={115} />
-                            <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
-                                {question || "Pregunta no disponible"}
-                                <div
-                                    className="absolute h-4 w-4 rotate-45 border-b-2 border-l-2 border-gray-200 bg-white"
-                                    style={{
-                                        top: "calc(50% - 8px)",
-                                        left: "-10px",
-                                    }}
-                                ></div>
-                            </div>
-                        </div>
-
-                        <div className="flex min-h-[60px] flex-wrap gap-1 border-b-2 border-t-2 border-gray-200 py-1">
-                            {selectedAnswers.map((i) => {
-                                return (
-                                    <button
-                                        key={i}
-                                        className="rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700 disabled:cursor-not-allowed"
-                                        disabled={correctAnswerShown}
-                                        onClick={() => {
-                                            if (!correctAnswerShown) {
-                                                setSelectedAnswers((selectedAnswers) => {
-                                                    return selectedAnswers.filter((x) => x !== i);
-                                                });
-                                            }
-                                        }}
-                                    >
-                                        {answerTiles?.[i] || ""}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-1">
-                        {answerTiles?.map((answerTile, i) => {
-                            return (
-                                <button
-                                    key={i}
-                                    className={
-                                        selectedAnswers.includes(i)
-                                            ? "rounded-2xl border-2 border-b-4 border-gray-200 bg-gray-200 p-2 text-gray-200"
-                                            : "rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
-                                    }
-                                    disabled={correctAnswerShown || selectedAnswers.includes(i)}
-                                    onClick={() => {
-                                        if (!correctAnswerShown) {
-                                            setSelectedAnswers((selectedAnswers) => {
-                                                if (selectedAnswers.includes(i)) {
-                                                    return selectedAnswers;
-                                                }
-                                                return [...selectedAnswers, i];
-                                            });
-                                        }
-                                    }}
-                                >
-                                    {answerTile}
-                                </button>
-                            );
-                        }) || (
-                                <div className="text-center text-gray-500">
-                                    No hay opciones disponibles
+                            <div className="w-full">
+                                <div className="flex items-center gap-2 px-2">
+                                    <Image src="/logo.svg" alt="" width={92} height={115} />
+                                    <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
+                                        {question || "Pregunta no disponible"}
+                                        <div
+                                            className="absolute h-4 w-4 rotate-45 border-b-2 border-l-2 border-gray-200 bg-white"
+                                            style={{
+                                                top: "calc(50% - 8px)",
+                                                left: "-10px",
+                                            }}
+                                        ></div>
+                                    </div>
                                 </div>
-                            )}
-                    </div>
+
+                                <div className="flex min-h-[60px] flex-wrap gap-1 border-b-2 border-t-2 border-gray-200 py-1">
+                                    {selectedAnswers.map((i) => {
+                                        return (
+                                            <button
+                                                key={i}
+                                                className="rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700 disabled:cursor-not-allowed"
+                                                disabled={correctAnswerShown}
+                                                onClick={() => {
+                                                    if (!correctAnswerShown) {
+                                                        setSelectedAnswers((selectedAnswers) => {
+                                                            return selectedAnswers.filter((x) => x !== i);
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                {answerTiles?.[i] || ""}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap justify-center gap-1">
+                                {answerTiles?.map((answerTile, i) => {
+                                    return (
+                                        <button
+                                            key={i}
+                                            className={
+                                                selectedAnswers.includes(i)
+                                                    ? "rounded-2xl border-2 border-b-4 border-gray-200 bg-gray-200 p-2 text-gray-200"
+                                                    : "rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
+                                            }
+                                            disabled={correctAnswerShown || selectedAnswers.includes(i)}
+                                            onClick={() => {
+                                                if (!correctAnswerShown) {
+                                                    setSelectedAnswers((selectedAnswers) => {
+                                                        if (selectedAnswers.includes(i)) {
+                                                            return selectedAnswers;
+                                                        }
+                                                        return [...selectedAnswers, i];
+                                                    });
+                                                }
+                                            }}
+                                        >
+                                            {answerTile}
+                                        </button>
+                                    );
+                                }) || (
+                                        <div className="text-center text-gray-500">
+                                            No hay opciones disponibles
+                                        </div>
+                                    )}
+                            </div>
+                        </>
+                    )}
                 </section>
             </div>
 
-            <CheckAnswer
-                correctAnswer={
-                    correctAnswerIndices && answerTiles
-                        ? correctAnswerIndices.map((i) => answerTiles[i]).join(" ")
-                        : ""
-                }
-                correctAnswerShown={correctAnswerShown}
-                isAnswerCorrect={isAnswerCorrect}
-                isAnswerSelected={selectedAnswers.length > 0}
-                onCheckAnswer={onCheckAnswer}
-                onFinish={onFinish}
-                onSkip={onSkip}
-            />
+            {/* Solo mostrar CheckAnswer para ejercicios de tiles tradicionales */}
+            {!isCodeExercise && (
+                <CheckAnswer
+                    correctAnswer={
+                        correctAnswerIndices && answerTiles
+                            ? correctAnswerIndices.map((i) => answerTiles[i]).join(" ")
+                            : ""
+                    }
+                    correctAnswerShown={correctAnswerShown}
+                    isAnswerCorrect={isAnswerCorrect}
+                    isAnswerSelected={selectedAnswers.length > 0}
+                    onCheckAnswer={onCheckAnswer}
+                    onFinish={onFinish}
+                    onSkip={onSkip}
+                />
+            )}
+
+            {/* Para ejercicios de código, mostrar botón de continuar cuando es correcto */}
+            {isCodeExercise && codeAnswerCorrect && (
+                <section className="border-gray-200 sm:border-t-2 sm:p-10">
+                    <div className="mx-auto flex max-w-5xl justify-center sm:justify-between">
+                        <button
+                            className="rounded-2xl border-2 border-b-4 border-green-600 bg-green-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
+                            onClick={onFinish}
+                        >
+                            Continuar
+                        </button>
+                    </div>
+                </section>
+            )}
 
             <QuitMessage
                 quitMessageShown={quitMessageShown}

@@ -282,7 +282,7 @@ const UnitProgressSection = () => {
   useEffect(() => {
     const detectCurrentUnit = () => {
       // Buscar todas las secciones de unidad en la página
-      const unitSections = document.querySelectorAll('[data-unit-number]');
+      const unitSections = document.querySelectorAll('[data-unit-id]');
       const scrollY = window.scrollY + 200; // Offset para detectar mejor
 
       for (const section of Array.from(unitSections)) {
@@ -290,9 +290,19 @@ const UnitProgressSection = () => {
         const sectionBottom = sectionTop + (section as HTMLElement).offsetHeight;
 
         if (scrollY >= sectionTop && scrollY <= sectionBottom) {
-          const unitNumber = parseInt((section as HTMLElement).dataset.unitNumber || '1');
-          setCurrentUnitId(unitNumber);
+          const unitId = parseInt((section as HTMLElement).dataset.unitId || '1');
+          if (unitId && !isNaN(unitId)) {
+            setCurrentUnitId(unitId);
+          }
           break;
+        }
+      }
+      
+      // Si no encontró ninguno con scroll, usar el primero disponible
+      if (unitSections.length > 0 && scrollY < (unitSections[0] as HTMLElement).offsetTop) {
+        const firstUnitId = parseInt((unitSections[0] as HTMLElement).dataset.unitId || '1');
+        if (firstUnitId && !isNaN(firstUnitId)) {
+          setCurrentUnitId(firstUnitId);
         }
       }
     };
@@ -300,13 +310,32 @@ const UnitProgressSection = () => {
     // Detectar unidad al cargar
     detectCurrentUnit();
 
+    // Reintentar después de un delay para cuando las unidades se renderizan
+    const retryTimeout = setTimeout(() => {
+      detectCurrentUnit();
+    }, 500);
+
     // Detectar unidad al hacer scroll
     const handleScroll = () => {
       detectCurrentUnit();
     };
 
+    // Detectar cuando cambia el módulo (las unidades se recargan)
+    const handleModuleChanged = () => {
+      // Esperar a que las unidades se rendericen
+      setTimeout(() => {
+        detectCurrentUnit();
+      }, 300);
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('moduleChanged', handleModuleChanged);
+
+    return () => {
+      clearTimeout(retryTimeout);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('moduleChanged', handleModuleChanged);
+    };
   }, []);
 
   if (!loggedIn) {

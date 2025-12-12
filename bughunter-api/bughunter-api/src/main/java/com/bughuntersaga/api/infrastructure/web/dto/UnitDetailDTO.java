@@ -13,11 +13,11 @@ import java.util.List;
  * Schema: UnitDetailDTO de OpenAPI
  */
 public record UnitDetailDTO(
-        Integer unitNumber,
-        String description,
-        String backgroundColor,
-        String textColor,
-        String borderColor,
-        List<LessonTileDTO> tiles
-) {
+                Integer unitId,
+                Integer unitNumber,
+                String description,
+                String backgroundColor,
+                String textColor,
+                String borderColor,
+                List<LessonTileDTO> tiles) {
 }

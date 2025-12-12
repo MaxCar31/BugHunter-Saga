@@ -1,6 +1,12 @@
 import React from "react";
 import { BigCloseSvg, DoneSvg } from "~/components/icons/ui";
 
+interface BranchCoverageData {
+    covered: number;
+    total: number;
+    percentage: number;
+}
+
 export const CheckAnswer = ({
     isAnswerSelected,
     isAnswerCorrect,
@@ -9,6 +15,7 @@ export const CheckAnswer = ({
     onCheckAnswer,
     onFinish,
     onSkip,
+    branchCoverage,
 }: {
     isAnswerSelected: boolean;
     isAnswerCorrect: boolean;
@@ -17,6 +24,7 @@ export const CheckAnswer = ({
     onCheckAnswer: () => void;
     onFinish: () => void;
     onSkip: () => void;
+    branchCoverage?: BranchCoverageData | null;
 }) => {
     return (
         <>
@@ -47,25 +55,73 @@ export const CheckAnswer = ({
             </section>
 
             <div
-                className={`fixed ${correctAnswerShown ? (isAnswerCorrect ? "bottom-0 bg-lime-100 font-bold text-green-600" : "bottom-0 bg-red-100 font-bold text-red-500") : "-bottom-52"} left-0 right-0 transition-all`}
+                className={`fixed ${correctAnswerShown ? (isAnswerCorrect ? "bottom-0 bg-lime-100 font-bold text-green-600" : "bottom-0 bg-red-100 font-bold text-red-500") : "-bottom-52"} left-0 right-0 transition-all z-50`}
             >
-                <div className="flex max-w-5xl flex-col gap-4 p-5 sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:p-10 sm:py-14">
+                <div className="flex max-w-5xl flex-col gap-4 p-5 sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:p-10 sm:py-8">
                     <>
                         {isAnswerCorrect ? (
-                            <div className="mb-2 flex flex-col gap-5 sm:flex-row sm:items-center">
+                            <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-center">
                                 <div className="hidden rounded-full bg-white p-5 text-green-500 sm:block">
                                     <DoneSvg />
                                 </div>
-                                <div className="text-2xl">¡Buen trabajo!</div>
+                                <div className="flex flex-col gap-1">
+                                    <div className="text-2xl">¡Buen trabajo!</div>
+                                    {/* Panel de Cobertura de Ramas */}
+                                    {branchCoverage && (
+                                        <div className="flex items-center gap-3 mt-2 rounded-lg bg-white/80 px-4 py-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-normal text-gray-600">Cobertura:</span>
+                                                <span className={`text-xl font-bold ${branchCoverage.percentage >= 50 ? "text-green-600" : "text-red-600"}`}>
+                                                    {branchCoverage.percentage}%
+                                                </span>
+                                            </div>
+                                            <div className="h-6 w-px bg-gray-300"></div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-normal text-gray-600">Ramas:</span>
+                                                <span className="text-sm font-bold text-blue-600">{branchCoverage.covered}/{branchCoverage.total}</span>
+                                            </div>
+                                            <div className="h-6 w-px bg-gray-300"></div>
+                                            <div className="text-xs font-normal text-gray-500">
+                                                S(G) = {branchCoverage.covered}/{branchCoverage.total}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ) : (
-                            <div className="mb-2 flex flex-col gap-5 sm:flex-row sm:items-center">
+                            <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-center">
                                 <div className="hidden rounded-full bg-white p-5 text-red-500 sm:block">
                                     <BigCloseSvg />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <div className="text-2xl">Solución correcta:</div>{" "}
-                                    <div className="text-sm font-normal">{correctAnswer}</div>
+                                    {/* Panel de Cobertura de Ramas (respuesta incorrecta) */}
+                                    {branchCoverage ? (
+                                        <>
+                                            <div className="text-2xl">Cobertura Insuficiente</div>
+                                            <div className="flex items-center gap-3 rounded-lg bg-white/80 px-4 py-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-normal text-gray-600">Cobertura:</span>
+                                                    <span className="text-xl font-bold text-red-600">
+                                                        {branchCoverage.percentage}%
+                                                    </span>
+                                                </div>
+                                                <div className="h-6 w-px bg-gray-300"></div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-normal text-gray-600">Ramas:</span>
+                                                    <span className="text-sm font-bold text-blue-600">{branchCoverage.covered}/{branchCoverage.total}</span>
+                                                </div>
+                                                <div className="h-6 w-px bg-gray-300"></div>
+                                                <div className="text-xs font-normal text-gray-500">
+                                                    Mínimo requerido: 50%
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="text-2xl">Solución correcta:</div>
+                                            <div className="text-sm font-normal">{correctAnswer}</div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}

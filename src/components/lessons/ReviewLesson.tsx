@@ -53,7 +53,10 @@ export const ReviewLesson = ({
                                 }
                             >
                                 <div className="flex justify-between gap-2">
-                                    <h3 className="font-bold">{questionResult.question}</h3>
+                                    <h3 
+                                        className="font-bold [&>code]:rounded [&>code]:bg-gray-800 [&>code]:px-1 [&>code]:font-mono [&>code]:text-xs [&>code]:text-green-400"
+                                        dangerouslySetInnerHTML={{ __html: questionResult.question }}
+                                    />
                                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white">
                                         {questionResult.yourResponse ===
                                             questionResult.correctResponse ? (

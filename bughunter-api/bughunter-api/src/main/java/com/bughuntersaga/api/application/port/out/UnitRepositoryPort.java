@@ -1,13 +1,20 @@
 
 package com.bughuntersaga.api.application.port.out;
 
-
 import com.bughuntersaga.api.domain.model.Unit;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UnitRepositoryPort {
+
+    /**
+     * Busca una unidad por su ID.
+     *
+     * @param unitId ID de la unidad
+     * @return Unidad encontrada o vacío
+     */
+    Optional<Unit> findById(Integer unitId);
 
     /**
      * Obtiene la primera unidad de un módulo.
@@ -24,6 +31,5 @@ public interface UnitRepositoryPort {
      * @return Lista de unidades
      */
     List<Unit> findAllUnitsByModuleCode(String moduleCode);
-
 
 }

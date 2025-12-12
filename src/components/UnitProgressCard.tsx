@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { apiBase } from '~/utils/config';
 
 interface UnitProgress {
@@ -21,40 +21,69 @@ const UnitProgressCard = ({ unitId, className = "" }: UnitProgressCardProps) => 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUnitProgress = async () => {
-      try {
-        setLoading(true);
-        const token = sessionStorage.getItem('bh_token');
+  const fetchUnitProgress = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = sessionStorage.getItem('bh_token');
 
-        if (!token) {
-          setError('No se encontró token de autenticación');
-          return;
-        }
-
-        const response = await fetch(`${apiBase}/api/progress/unit/${unitId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
-        const data: UnitProgress = await response.json();
-        setUnitProgress(data);
-      } catch (err) {
-        console.error('Error fetching unit progress:', err);
-        setError(err instanceof Error ? err.message : 'Error desconocido');
-      } finally {
-        setLoading(false);
+      if (!token) {
+        setError('No se encontró token de autenticación');
+        return;
       }
+
+      const response = await fetch(`${apiBase}/api/progress/unit/${unitId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data: UnitProgress = await response.json();
+      setUnitProgress(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching unit progress:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  }, [unitId]);
+
+  useEffect(() => {
+    fetchUnitProgress();
+  }, [fetchUnitProgress]);
+
+  // Escuchar evento de lección completada para actualizar automáticamente
+  useEffect(() => {
+    const handleLessonCompleted = () => {
+      console.log('UnitProgressCard: Lesson completed event received, refreshing...');
+      fetchUnitProgress();
     };
 
-    fetchUnitProgress();
-  }, [unitId]);
+    const handleModuleChanged = () => {
+      console.log('UnitProgressCard: Module changed event received, refreshing...');
+      fetchUnitProgress();
+    };
+
+    const handleWindowFocus = () => {
+      console.log('UnitProgressCard: Window focus, refreshing...');
+      fetchUnitProgress();
+    };
+
+    window.addEventListener('lessonCompleted', handleLessonCompleted);
+    window.addEventListener('moduleChanged', handleModuleChanged);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      window.removeEventListener('lessonCompleted', handleLessonCompleted);
+      window.removeEventListener('moduleChanged', handleModuleChanged);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [fetchUnitProgress]);
 
   if (loading) {
     return (

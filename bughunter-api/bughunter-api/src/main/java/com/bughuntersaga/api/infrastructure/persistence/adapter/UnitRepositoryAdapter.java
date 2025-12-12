@@ -30,6 +30,12 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
     private final ContentPersistenceMapper mapper;
 
     @Override
+    public Optional<Unit> findById(Integer unitId) {
+        return unitJpaRepository.findById(unitId)
+                .map(this::mapUnitWithLessons);
+    }
+
+    @Override
     public Optional<Unit> findFirstUnitByModuleCode(String moduleCode) {
         return unitJpaRepository.findByModuleCodeOrderByUnitNumber(moduleCode).stream()
                 .findFirst()
@@ -53,7 +59,6 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
         // Cargar lecciones
         List<LessonEntity> lessonEntities = lessonJpaRepository
                 .findByUnitIdOrderByPositionAsc(unitEntity.getId());
-
 
         List<Lesson> lessons = lessonEntities.stream()
                 .map(mapper::lessonToDomain)

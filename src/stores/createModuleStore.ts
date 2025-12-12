@@ -26,6 +26,8 @@ export const createModuleSlice: BoundStateCreator<ModuleSlice> = (set, get) => {
       // Persistir en sessionStorage
       if (typeof window !== "undefined") {
         sessionStorage.setItem("bh_module", JSON.stringify(newModule));
+        // Disparar evento para que UnitProgressCard se actualice
+        window.dispatchEvent(new Event('moduleChanged'));
       }
       // Carga preguntas para el módulo seleccionado
       void get().loadQuestions(newModule.code);

@@ -20,6 +20,7 @@ public interface ContentApiMapper {
     @Mapping(source = "name", target = "shortName")
     ModuleResponseDTO toModuleResponseDTO(Module module);
 
+    @Mapping(target = "unitId", source = "id")
     @Mapping(target = "backgroundColor", constant = "bg-blue-500")
     @Mapping(target = "textColor", constant = "text-white")
     @Mapping(target = "borderColor", constant = "border-blue-700")
@@ -30,12 +31,22 @@ public interface ContentApiMapper {
     LessonTileDTO toLessonTileDTO(Lesson lesson);
 
     @Mapping(target = "answers", expression = "java(mapAnswers(problem))")
+    @Mapping(target = "testCases", expression = "java(mapTestCases(problem))")
     ProblemDTO toProblemDTO(Problem problem);
 
     default java.util.List<ProblemDTO.AnswerOption> mapAnswers(Problem problem) {
-        if (problem.getAnswers() == null) return null;
+        if (problem.getAnswers() == null)
+            return null;
         return problem.getAnswers().stream()
                 .map(answer -> new ProblemDTO.AnswerOption(answer.getName()))
+                .collect(Collectors.toList());
+    }
+
+    default java.util.List<ProblemDTO.TestCase> mapTestCases(Problem problem) {
+        if (problem.getTestCases() == null)
+            return null;
+        return problem.getTestCases().stream()
+                .map(tc -> new ProblemDTO.TestCase(tc.getInput(), tc.getExpectedOutput(), tc.getDescription()))
                 .collect(Collectors.toList());
     }
 }

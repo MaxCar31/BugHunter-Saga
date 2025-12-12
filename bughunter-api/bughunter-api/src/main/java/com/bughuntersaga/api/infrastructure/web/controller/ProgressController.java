@@ -7,6 +7,7 @@ import com.bughuntersaga.api.application.port.in.ClaimTreasureUseCase;
 import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
 import com.bughuntersaga.api.application.port.in.CompleteLessonUseCase;
 import com.bughuntersaga.api.application.port.out.LessonRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UnitRepositoryPort;
 import com.bughuntersaga.api.application.port.out.UserLessonProgressRepositoryPort;
 import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
 import com.bughuntersaga.api.domain.exception.UserNotFoundException;
@@ -35,6 +36,7 @@ public class ProgressController {
     private final UserRepositoryPort userRepositoryPort;
     private final LessonRepositoryPort lessonRepositoryPort;
     private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
+    private final UnitRepositoryPort unitRepositoryPort;
 
     /**
      * Endpoint para registrar la finalización de una lección (Fase 3).
@@ -84,6 +86,10 @@ public class ProgressController {
         User currentUser = userRepositoryPort.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
 
+        // Obtener la unidad para conseguir su unit_number
+        var unitOpt = unitRepositoryPort.findById(unitId);
+        int unitNumber = unitOpt.map(u -> u.getUnitNumber()).orElse(unitId);
+
         // Obtener todas las lecciones de la unidad
         var lessonsInUnit = lessonRepositoryPort.findByUnitId(unitId);
         int totalLessons = lessonsInUnit.size();
@@ -92,7 +98,7 @@ public class ProgressController {
             // Unidad vacía o no existe
             return ResponseEntity.ok(UnitProgressResponse.builder()
                     .unitId(unitId)
-                    .unitTitle("Unidad " + unitId)
+                    .unitTitle("Unidad " + unitNumber)
                     .currentXp(0)
                     .totalXpNeeded(0)
                     .completedLessons(0)
@@ -125,7 +131,7 @@ public class ProgressController {
 
         UnitProgressResponse response = UnitProgressResponse.builder()
                 .unitId(unitId)
-                .unitTitle("Unidad " + unitId) // TODO: Obtener título real de la unidad
+                .unitTitle("Unidad " + unitNumber)
                 .currentXp(currentXp)
                 .totalXpNeeded(totalXpNeeded)
                 .completedLessons(completedLessons)

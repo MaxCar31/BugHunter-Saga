@@ -9,7 +9,7 @@ import type React from "react";
 /**
  * Tipos de problemas/lecciones disponibles
  */
-export type LessonType = "INFO" | "MULTIPLE_CHOICE" | "FILL_IN_THE_BLANK" | "MATCH_PAIRS";
+export type LessonType = "INFO" | "MULTIPLE_CHOICE" | "FILL_IN_THE_BLANK" | "MATCH_PAIRS" | "CODE_EXERCISE" | "CODE_CHALLENGE";
 
 /**
  * Tipo base para todos los problemas de lección
@@ -46,6 +46,20 @@ export interface LessonFillInTheBlank extends BaseLessonProblem {
     question?: string;
     answerTiles?: string[];
     correctAnswerIndices?: number[];
+    // Para ejercicios de código
+    content?: string | {
+        type: "FILL_IN_THE_BLANK";
+        question?: string;
+        codeTemplate?: string;
+        expectedAnswer?: string;
+        hint?: string;
+        explanation?: string;
+        testCases?: Array<{
+            input: string;
+            expectedOutput: string;
+            description: string;
+        }>;
+    };
 }
 
 /**
@@ -58,9 +72,49 @@ export interface LessonMatchPairs extends BaseLessonProblem {
 }
 
 /**
+ * Lección de ejercicio de código (new type)
+ */
+export interface LessonCodeExercise extends BaseLessonProblem {
+    type: "CODE_EXERCISE";
+    content?: string | {
+        type: "CODE_EXERCISE";
+        question?: string;
+        codeTemplate?: string;
+        expectedAnswer?: string;
+        hint?: string;
+        explanation?: string;
+        testCases?: Array<{
+            input: string;
+            expectedOutput: string;
+            description: string;
+        }>;
+    };
+}
+
+/**
+ * Lección de desafío de código (CODE_CHALLENGE) - Módulo C
+ */
+export interface LessonCodeChallenge extends BaseLessonProblem {
+    type: "CODE_CHALLENGE";
+    content?: string | {
+        type: "CODE_CHALLENGE";
+        question?: string;
+        codeTemplate?: string;
+        expectedAnswer?: string;
+        hint?: string;
+        explanation?: string;
+        testCases?: Array<{
+            input: string;
+            expectedOutput: string;
+            description: string;
+        }>;
+    };
+}
+
+/**
  * Unión de todos los tipos de lecciones
  */
-export type ModuleLesson = LessonInfo | LessonMultipleChoice | LessonFillInTheBlank | LessonMatchPairs;
+export type ModuleLesson = LessonInfo | LessonMultipleChoice | LessonFillInTheBlank | LessonMatchPairs | LessonCodeExercise | LessonCodeChallenge;
 
 // ==================== LESSON COMPLETION ====================
 
@@ -91,7 +145,7 @@ export interface LessonCompletionResponse {
 /**
  * Tipos de problemas como vienen del backend
  */
-export type BackendProblemType = "INFO" | "SELECT_1_OF_3" | "MULTIPLE_CHOICE" | "FILL_IN_THE_BLANK" | "MATCH_PAIRS";
+export type BackendProblemType = "INFO" | "SELECT_1_OF_3" | "MULTIPLE_CHOICE" | "FILL_IN_THE_BLANK" | "MATCH_PAIRS" | "CODE_CHALLENGE" | "CODE_EXERCISE";
 
 /**
  * Estructura genérica de problema del backend
@@ -107,4 +161,14 @@ export interface BackendProblem {
     answerTiles?: string[];
     correctAnswerIndices?: number[];
     pairs?: Array<{ left: string; right: string }>;
+    // Para CODE_CHALLENGE
+    codeTemplate?: string;
+    expectedAnswer?: string;
+    hint?: string;
+    explanation?: string;
+    testCases?: Array<{
+        input: string;
+        expectedOutput: string;
+        description: string;
+    }>;
 }

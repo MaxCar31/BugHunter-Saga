@@ -25,6 +25,8 @@ export const mapBackendTypeToFrontend = (backendType: BackendProblemType): Lesso
             return "FILL_IN_THE_BLANK";
         case "MATCH_PAIRS":
             return "MATCH_PAIRS";
+        case "CODE_CHALLENGE":
+            return "CODE_EXERCISE";
         default:
             console.warn(`Unknown problem type: ${String(backendType)}, defaulting to INFO`);
             return "INFO";
@@ -46,6 +48,22 @@ export const mapBackendProblemToFrontend = (backendProblem: BackendProblem): Mod
         normalizedProblem.objectives = Array.isArray(normalizedProblem.objectives)
             ? normalizedProblem.objectives
             : [normalizedProblem.objectives];
+    }
+
+    // Para CODE_EXERCISE, estructurar el contenido dentro de 'content'
+    if (type === "CODE_EXERCISE") {
+        return {
+            type: "CODE_EXERCISE",
+            content: {
+                type: "CODE_EXERCISE",
+                question: backendProblem.question,
+                codeTemplate: backendProblem.codeTemplate,
+                expectedAnswer: backendProblem.expectedAnswer,
+                hint: backendProblem.hint,
+                explanation: backendProblem.explanation,
+                testCases: backendProblem.testCases,
+            },
+        };
     }
 
     return normalizedProblem as ModuleLesson;

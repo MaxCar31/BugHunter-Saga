@@ -30,6 +30,7 @@ export interface Tile {
  * Estructura de una unidad educativa (Response de GET /api/content/modules/{moduleCode}/unit)
  */
 export interface Unit {
+    unitId: number;
     unitNumber: number;
     description: string;
     backgroundColor: `bg-${string}`;

@@ -14,6 +14,7 @@ import { completeLessonAPI, type LessonCompletionRequest } from "~/services/less
 import { ReviewLesson } from "~/components/lessons/ReviewLesson";
 import { ProblemInfo } from "~/components/lessons/ProblemInfo";
 import { FillInTheBlankQuestion } from "~/components/lessons/FillInTheBlankQuestion";
+import { CodeExerciseQuestion } from "~/components/lessons/CodeExerciseQuestion";
 import { MultipleChoiceQuestion } from "~/components/lessons/MultipleChoiceQuestion";
 
 const numbersEqual = (a: readonly number[], b: readonly number[]): boolean => {
@@ -52,10 +53,12 @@ const Lesson: NextPage = () => {
   const [correctAnswerShown, setCorrectAnswerShown] = useState(false);
   const [quitMessageShown, setQuitMessageShown] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
+  const [userCode, setUserCode] = useState<string>("");
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
   const [reviewLessonShown, setReviewLessonShown] = useState(false);
   const [isStartingLesson, setIsStartingLesson] = useState(true);
   const [isWaitingForModule, setIsWaitingForModule] = useState(false);
+  const [branchCoverage, setBranchCoverage] = useState<{ covered: number; total: number; percentage: number } | null>(null);
 
   const startTime = useRef(Date.now());
   const endTime = useRef(startTime.current + 1000 * 60 * 3 + 1000 * 33);
@@ -162,7 +165,34 @@ const Lesson: NextPage = () => {
       ? 3 - incorrectAnswerCount
       : null;
 
+  // Función para normalizar código (quitar espacios extra, minúsculas)
+  const normalizeCode = (code: string) => {
+    return code.trim().replace(/\s+/g, " ").toLowerCase();
+  };
 
+  // Función para calcular cobertura de ramas basada en test cases
+  const calculateBranchCoverage = (userAnswer: string, testCases: Array<{ input: string; expectedOutput: string; description: string }>) => {
+    if (!testCases || testCases.length === 0) {
+      return { covered: 0, total: 0, percentage: 0 };
+    }
+
+    const normalizedAnswer = normalizeCode(userAnswer);
+    let coveredCount = 0;
+
+    testCases.forEach((tc) => {
+      // Extraer el nombre de la función y el parámetro del input
+      // Ejemplo: "obtenerTrimestre(3)" -> buscamos si el usuario escribió algo similar
+      const normalizedInput = normalizeCode(tc.input);
+      
+      // Verificar si el input del test case está presente en la respuesta del usuario
+      if (normalizedAnswer.includes(normalizedInput)) {
+        coveredCount++;
+      }
+    });
+
+    const percentage = Math.round((coveredCount / testCases.length) * 100);
+    return { covered: coveredCount, total: testCases.length, percentage };
+  };
 
   const isAnswerCorrect = (() => {
     if (!problem || problem.type === "INFO") {
@@ -173,6 +203,21 @@ const Lesson: NextPage = () => {
     }
     if (problem.type === "FILL_IN_THE_BLANK") {
       return numbersEqual(selectedAnswers, problem.correctAnswerIndices || []);
+    }
+    if (problem.type === "CODE_EXERCISE") {
+      // Calcular cobertura de ramas basada en test cases
+      const content = problem.content;
+      if (content && typeof content === "object" && "testCases" in content) {
+        const testCases = content.testCases || [];
+        const coverage = calculateBranchCoverage(userCode, testCases);
+        // Correcto si cubre >= 50% de las ramas
+        return coverage.percentage >= 50;
+      }
+      // Fallback: comparar con expectedAnswer si no hay testCases
+      if (content && typeof content === "object" && "expectedAnswer" in content) {
+        return normalizeCode(userCode) === normalizeCode(content.expectedAnswer || "");
+      }
+      return false;
     }
     return false;
   })();
@@ -212,12 +257,38 @@ const Lesson: NextPage = () => {
           correctResponse: (problem.correctAnswerIndices || []).map((i) => problem.answerTiles?.[i] || "").join(" "),
         },
       ]);
+    } else if (problem.type === "CODE_EXERCISE" || problem.type === "CODE_CHALLENGE") {
+      const content = problem.content;
+      const testCases = content && typeof content === "object" && "testCases" in content 
+        ? content.testCases || [] 
+        : [];
+      const questionText = content && typeof content === "object" && "question" in content 
+        ? content.question || "Ejercicio de Código" 
+        : "Ejercicio de Código";
+      const expectedAnswer = content && typeof content === "object" && "expectedAnswer" in content 
+        ? content.expectedAnswer || "No disponible" 
+        : "No disponible";
+      
+      // Calcular cobertura de ramas
+      const coverage = calculateBranchCoverage(userCode, testCases);
+      setBranchCoverage(coverage);
+      
+      setQuestionResults((questionResults) => [
+        ...questionResults,
+        {
+          question: questionText,
+          yourResponse: userCode || "(Sin respuesta)",
+          correctResponse: expectedAnswer,
+        },
+      ]);
     }
   };
 
   const onFinish = () => {
     setSelectedAnswer(null);
     setSelectedAnswers([]);
+    setUserCode("");
+    setBranchCoverage(null);
     setCorrectAnswerShown(false);
 
     // Solo avanzar al siguiente problema, sin reiniciar con módulo
@@ -324,6 +395,8 @@ const Lesson: NextPage = () => {
     setCorrectAnswerShown(false);
     setQuitMessageShown(false);
     setSelectedAnswers([]);
+    setUserCode("");
+    setBranchCoverage(null);
     setQuestionResults([]);
     setReviewLessonShown(false);
     setIsStartingLesson(true);
@@ -417,6 +490,28 @@ const Lesson: NextPage = () => {
           correctAnswerShown={correctAnswerShown}
           setQuitMessageShown={setQuitMessageShown}
           isAnswerCorrect={isAnswerCorrect}
+          onCheckAnswer={onCheckAnswer}
+          onFinish={onFinish}
+          onSkip={onSkip}
+          hearts={hearts}
+        />
+      );
+    }
+
+    case "CODE_EXERCISE":
+    case "CODE_CHALLENGE": {
+      return (
+        <CodeExerciseQuestion
+          problem={problem}
+          answeredQuestionsCount={currentProgressCount}
+          totalQuestionsCount={totalQuestionsCount}
+          userCode={userCode}
+          setUserCode={setUserCode}
+          quitMessageShown={quitMessageShown}
+          correctAnswerShown={correctAnswerShown}
+          setQuitMessageShown={setQuitMessageShown}
+          isAnswerCorrect={isAnswerCorrect}
+          branchCoverage={branchCoverage}
           onCheckAnswer={onCheckAnswer}
           onFinish={onFinish}
           onSkip={onSkip}
@@ -543,6 +638,9 @@ const LessonComplete = ({
       setLingots(response.newTotalLingots);
       setStreak(response.newStreak);
       addToday();
+
+      // Disparar evento para que UnitProgressCard se actualice
+      window.dispatchEvent(new Event('lessonCompleted'));
 
       // NO guardamos nada localmente - todo viene del backend
       // El progreso se sincronizará automáticamente cuando regresemos a /learn

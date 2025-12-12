@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.util.List;
 
-
 /**
  * Entidad de dominio Problem.
  * Contiene campos específicos según el tipo de problema.
@@ -35,6 +34,13 @@ public class Problem {
     private List<String> answerTiles;
     private List<Integer> correctAnswerIndices;
 
+    // Campos para CODE_CHALLENGE
+    private String codeTemplate;
+    private String expectedAnswer;
+    private String hint;
+    private String explanation;
+    private List<TestCase> testCases;
+
     /**
      * Opción de respuesta.
      */
@@ -45,5 +51,19 @@ public class Problem {
     @AllArgsConstructor
     public static class AnswerOption {
         private String name;
+    }
+
+    /**
+     * Caso de prueba para CODE_CHALLENGE.
+     */
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TestCase {
+        private String input;
+        private String expectedOutput;
+        private String description;
     }
 }

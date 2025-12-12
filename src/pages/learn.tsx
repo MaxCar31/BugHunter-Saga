@@ -225,7 +225,7 @@ const UnitSection = ({
   const completedInUnit = unit.tiles.filter(t => t.status === 'COMPLETE').length;
 
   return (
-    <div data-unit-number={unit.unitNumber}>
+    <div data-unit-number={unit.unitNumber} data-unit-id={unit.unitId}>
       <UnitHeader
         unitNumber={unit.unitNumber}
         description={unit.description}
@@ -407,6 +407,9 @@ const Learn: NextPage = () => {
           const updateCache = useBoundStore.getState().updateCompletedLessonsCache;
           updateCache(currentModule.code, completedLessonIds);
         }
+
+        // Disparar evento para que UnitProgressCard se actualice
+        window.dispatchEvent(new Event('moduleChanged'));
       } catch (err) {
         console.error("❌ Error loading units:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
