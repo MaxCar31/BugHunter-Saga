@@ -280,7 +280,7 @@ const TileTooltip = ({
         </div>
         {status === "ACTIVE" ? (
           <Link
-            href="/lesson"
+            href={`/lesson?lessonId=${tile.lessonId}`}
             className="flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase text-blue-600 font-bold hover:bg-gray-50 transition-colors"
           >
             Iniciar +10 XP
@@ -294,7 +294,7 @@ const TileTooltip = ({
           </button>
         ) : (
           <Link
-            href="/lesson"
+            href={`/lesson?lessonId=${tile.lessonId}&practice=true`}
             className="flex w-full items-center justify-center rounded-xl border-b-4 border-yellow-200 bg-white p-3 uppercase text-yellow-400"
           >
             Practicar +5 XP

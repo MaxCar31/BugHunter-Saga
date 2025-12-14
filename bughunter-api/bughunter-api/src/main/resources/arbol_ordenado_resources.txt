@@ -15,6 +15,7 @@
 │   │   │   ├── 📄 V8__Seed_Module_C_Statement_Testing.sql
 │   │   │   ├── 📄 V9__add_performance_indexes.sql
 │   ├── 📁 static/
+│   ├── 📁 templates/
 
 
 ================================================================================
@@ -22,7 +23,7 @@
 ================================================================================
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V1__Create_Users_table.sql
+📄 CONTENIDO DE: db\migration\V1__Create_Users_table.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V1__Create_Users_Table.sql
@@ -51,7 +52,7 @@ CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
 
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V2__Create_UserProfile_table.sql
+📄 CONTENIDO DE: db\migration\V2__Create_UserProfile_table.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V2__Create_User_Profiles_Table.sql
@@ -77,7 +78,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     );
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V3__Create_Content_Tables.sql
+📄 CONTENIDO DE: db\migration\V3__Create_Content_Tables.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V3__Create_Content_Tables.sql
@@ -161,7 +162,7 @@ CREATE INDEX idx_problems_lesson_id ON problems(lesson_id);
 CREATE INDEX idx_problems_position ON problems(lesson_id, position);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V4__add_gamification_tables.sql
+📄 CONTENIDO DE: db\migration\V4__add_gamification_tables.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V4__add_gamification_tables.sql
@@ -235,7 +236,7 @@ INSERT INTO leagues (name, min_xp, max_xp, icon) VALUES
                                                      ('Oro', 1501, 3000, '🥇');
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V5__add_password_reset_to_users.sql
+📄 CONTENIDO DE: db\migration\V5__add_password_reset_to_users.sql
 ================================================================================
 -- Añade columnas para el flujo de "olvidé mi contraseña"
 ALTER TABLE users
@@ -246,7 +247,7 @@ ADD COLUMN password_reset_expires TIMESTAMPTZ NULL;
 CREATE INDEX IF NOT EXISTS idx_users_password_reset_token ON users(password_reset_token);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V6__Seed_Module_A_EP_BVA.sql
+📄 CONTENIDO DE: db\migration\V6__Seed_Module_A_EP_BVA.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V6__Seed_Module_A_EP_BVA.sql
@@ -301,7 +302,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
                                                               (8, 'SELECT_1_OF_3', '{"question": "Un campo de texto debe tener una longitud de 5 a 10 caracteres. ¿Cuál NO es un valor límite a probar?", "options": [{"id": "a", "text": "Una cadena de 4 caracteres"}, {"id": "b", "text": "Una cadena de 11 caracteres"}, {"id": "c", "text": "Una cadena de 7 caracteres"}], "correctAnswer": "c", "explanation": "7 caracteres es un valor ''en medio'' de la partición válida. No es un límite."}', 3);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V7__Seed_Module_B_Decision_Table.sql
+📄 CONTENIDO DE: db\migration\V7__Seed_Module_B_Decision_Table.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V5__Seed_Module_B_Decision_Tables.sql
@@ -335,7 +336,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
                                                               (11, 'INFO', '{"title": "Simplificación de Reglas", "content": "A veces, el valor de una condición no importa (se marca con ''-'')...", "example": "Regla: (Condición: VIP = NO, Condición: Compra > 100 = ''-''), Acción: (Acceso Denegado = SÍ)"}', 3);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V8__Seed_Module_C_Statement_Testing.sql
+📄 CONTENIDO DE: db\migration\V8__Seed_Module_C_Statement_Testing.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V8__Seed_Module_C_Statement_Testing.sql
@@ -368,7 +369,7 @@ INSERT INTO problems (lesson_id, type, content, position) VALUES
                                                               (14, 'SELECT_1_OF_3', '{"question": "Usando el mismo código, ¿qué caso de prueba logra la MENOR cobertura de sentencia?", "options": [{"id": "a", "text": "x = 10, y = 2"}, {"id": "b", "text": "x = 2, y = 2"}], "correctAnswer": "b", "explanation": "El caso (2, 2) ejecuta S1, S2 y S4 (3 de 4 sentencias). El caso (10, 2) ejecuta las 4 sentencias."}', 2);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V9__add_performance_indexes.sql
+📄 CONTENIDO DE: db\migration\V9__add_performance_indexes.sql
 ================================================================================
 /*
  * Índices de rendimiento para las Fases 4 y 6.

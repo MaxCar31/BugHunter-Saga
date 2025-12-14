@@ -18,7 +18,7 @@ INSERT INTO units (module_id, unit_number, description) VALUES
 INSERT INTO lessons (unit_id, type, description, position) VALUES
                                                                (5, 'book', 'Introducción a Tablas de Decisión', 1),
                                                                (5, 'star', 'Crea tu Primera Tabla', 2),
-                                                               (5, 'fast-forward', 'Desafío Rápido: Reglas Complejas', 3);
+                                                               (5, 'trophy', 'Desafío Rápido: Reglas Complejas', 3);
 
 -- 4. CREAR PROBLEMAS
 INSERT INTO problems (lesson_id, type, content, position) VALUES

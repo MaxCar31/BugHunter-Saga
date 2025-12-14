@@ -1,29 +1,36 @@
 import React from "react";
 import { apiBase } from "./config";
 
+// Agrega lessonId a los tipos base o al tipo unión
+export type LessonBase = {
+    lessonId: number; // <--- AGREGAR ESTO
+    id?: number;
+    position?: number;
+}
+
 // Definición de tipos para las lecciones del Módulo B
-export type LessonInfo = {
+export type LessonInfo = LessonBase & { // Extender de LessonBase
     type: "INFO";
     moduleTitle?: string;
     introduction?: string;
     objectives?: string[];
 };
 
-export type LessonMultipleChoice = {
+export type LessonMultipleChoice = LessonBase & { // Extender de LessonBase
     type: "MULTIPLE_CHOICE";
     question?: string;
     answers?: Array<{ name: string; icon?: React.ReactNode }>;
     correctAnswer?: number;
 };
 
-export type LessonFillInTheBlank = {
+export type LessonFillInTheBlank = LessonBase & { // Extender de LessonBase
     type: "FILL_IN_THE_BLANK";
     question?: string;
     answerTiles?: string[];
     correctAnswerIndices?: number[];
 };
 
-export type LessonMatchPairs = {
+export type LessonMatchPairs = LessonBase & { // Extender de LessonBase
     type: "MATCH_PAIRS";
     // Agregar propiedades específicas según sea necesario
     question?: string;
@@ -84,6 +91,28 @@ export const fetchModuleProblems = async (moduleCode: string, token?: string): P
         return mappedProblems;
     } catch (error) {
         console.error(`Error fetching problems for module ${moduleCode}:`, error);
+        throw error;
+    }
+};
+
+export const fetchProblemsByLessonId = async (lessonId: number, token?: string): Promise<ModuleLesson[]> => {
+    try {
+        // Usamos el endpoint específico que creaste en el Backend
+        const response = await fetch(`${apiBase}/api/content/modules/lessons/${lessonId}/problems`, {
+            headers: {
+                accept: "*/*",
+                ...(token && { Authorization: `Bearer ${token}` }),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status} fetching problems for lesson ${lessonId}`);
+        }
+
+        const data = await response.json();
+        return data.map(mapBackendProblemToFrontend);
+    } catch (error) {
+        console.error(`Error fetching problems for lesson ${lessonId}:`, error);
         throw error;
     }
 };

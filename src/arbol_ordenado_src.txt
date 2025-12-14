@@ -44,6 +44,8 @@
 │   │   │   ├── 📄 account.tsx
 │   │   │   ├── 📄 coach.tsx
 │   │   │   ├── 📄 sound.tsx
+│   ├── 📁 services/
+│   │   ├── 📄 lessonService.ts
 │   ├── 📁 stores/
 │   │   ├── 📄 createGoalXpStore.ts
 │   │   ├── 📄 createLessonStore.ts
@@ -59,11 +61,7 @@
 │   │   ├── 📄 array-utils.ts
 │   │   ├── 📄 config.ts
 │   │   ├── 📄 dateString.ts
-│   │   ├── 📄 fakeUsers.ts
 │   │   ├── 📄 lessons.ts
-│   │   ├── 📄 moduleA-lessons.ts
-│   │   ├── 📄 moduleB-lessons.ts
-│   │   ├── 📄 moduleC-lessons.ts
 │   │   ├── 📄 modules.ts
 │   │   ├── 📄 units.ts
 
@@ -81,7 +79,7 @@ declare module '*.svg' {
 }
 
 ================================================================================
-📄 CONTENIDO DE: components/BottomBar.tsx
+📄 CONTENIDO DE: components\BottomBar.tsx
 ================================================================================
 import Link from "next/link";
 import { useBoundStore } from "~/hooks/useBoundStore";
@@ -265,7 +263,7 @@ export const BottomBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/Calendar.tsx
+📄 CONTENIDO DE: components\Calendar.tsx
 ================================================================================
 import dayjs from "dayjs";
 import { useBoundStore } from "~/hooks/useBoundStore";
@@ -373,7 +371,7 @@ export const Calendar = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components/Flag.tsx
+📄 CONTENIDO DE: components\Flag.tsx
 ================================================================================
 import type { StaticImageData } from "next/image";
 import _flagsSvg from "../../public/flags.svg";
@@ -402,7 +400,7 @@ export const Flag = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components/LeftBar.tsx
+📄 CONTENIDO DE: components\LeftBar.tsx
 ================================================================================
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -488,7 +486,7 @@ export const LeftBar = ({ selectedTab }: { selectedTab: Tab | null }) => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/LoginScreen.tsx
+📄 CONTENIDO DE: components\LoginScreen.tsx
 ================================================================================
 import Link from "next/link";
 import { CloseSvg } from "./Svgs";
@@ -769,7 +767,7 @@ export const LoginScreen = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components/ModuleCarousel.tsx
+📄 CONTENIDO DE: components\ModuleCarousel.tsx
 ================================================================================
 import Link from "next/link";
 import { ChevronLeftSvg, ChevronRightSvg } from "./Svgs";
@@ -914,7 +912,7 @@ export const ModuleCarousel = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/ModuleDropDown.tsx
+📄 CONTENIDO DE: components\ModuleDropDown.tsx
 ================================================================================
 import Link from "next/link";
 import { useState } from "react";
@@ -925,6 +923,10 @@ import { ModuleIcon } from "./ModuleIcon";
 export const ModuleDropDown = () => {
   const module = useBoundStore((x) => x.module);
   const [modulesShown, setModulesShown] = useState(false);
+
+  if (!module) {
+    return null; // or a loading state
+  }
 
   return (
     <div className="relative">
@@ -963,7 +965,7 @@ export const ModuleDropDown = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/ModuleHeader.tsx
+📄 CONTENIDO DE: components\ModuleHeader.tsx
 ================================================================================
 import Link from "next/link";
 import { ModuleDropDown } from "./ModuleDropDown";
@@ -988,7 +990,7 @@ export const ModuleHeader = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/ModuleIcon.tsx
+📄 CONTENIDO DE: components\ModuleIcon.tsx
 ================================================================================
 import type { Module } from "~/utils/modules";
 
@@ -996,7 +998,7 @@ export const ModuleIcon = ({
   module,
   width = 82,
 }: {
-  module: Module;
+  module: Module | null;
   width?: number;
 }) => {
   const getModuleIcon = (moduleCode: string) => {
@@ -1055,11 +1057,30 @@ export const ModuleIcon = ({
     }
   };
 
+  if (!module) {
+    const height = Math.round((width * 66) / 82);
+    return (
+      <svg width={width} viewBox="0 0 82 66" fill="none">
+        <rect width="82" height="66" rx="8" fill="#999" />
+        <text
+          x="41"
+          y="40"
+          textAnchor="middle"
+          fill="white"
+          fontSize="24"
+          fontWeight="bold"
+        >
+          ?
+        </text>
+      </svg>
+    );
+  }
+
   return getModuleIcon(module.code);
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/RightBar.tsx
+📄 CONTENIDO DE: components\RightBar.tsx
 ================================================================================
 import Link from "next/link";
 import type { ComponentProps } from "react";
@@ -1088,7 +1109,7 @@ export const RightBar = () => {
   const streak = useBoundStore((x) => x.streak);
   const module = useBoundStore((x) => x.module);
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  
+
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
@@ -1112,7 +1133,7 @@ export const RightBar = () => {
             tabIndex={0}
           >
             <ModuleIcon module={module} width={45} />
-            <div>{module.name}</div>
+            <div>{module?.name}</div>
             <div
               className="absolute top-full z-10 rounded-2xl border-2 border-gray-300 bg-white"
               style={{
@@ -1126,7 +1147,7 @@ export const RightBar = () => {
               </h2>
               <button className="flex w-full items-center gap-3 border-t-2 border-gray-300 bg-blue-100 px-5 py-3 text-left font-bold">
                 <ModuleIcon module={module} width={45} />
-                <span className="text-blue-500">{module.name}</span>
+                <span className="text-blue-500">{module?.name}</span>
               </button>
               <Link
                 className="flex w-full items-center gap-3 rounded-b-2xl border-t-2 border-gray-300 px-5 py-3 text-left font-bold hover:bg-gray-100"
@@ -1231,7 +1252,7 @@ export const RightBar = () => {
 
 const UnlockLeaderboardsSection = () => {
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  
+
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
@@ -1243,7 +1264,7 @@ const UnlockLeaderboardsSection = () => {
   const lessonsNeededToUnlockLeaderboards = 10 - totalLessonsCompleted;
 
   return (
-  <></>
+    <></>
   );
 };
 
@@ -1347,7 +1368,7 @@ const XpProgressSection = () => {
                 }}
               ></div>
             </div>
-            <LightningProgressSvg/>
+            <LightningProgressSvg />
           </div>
           <span className="text-sm font-normal text-gray-500">
             {xpToday}/{goalXp} XP
@@ -1362,7 +1383,7 @@ const XpProgressSection = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/SettingsRightNav.tsx
+📄 CONTENIDO DE: components\SettingsRightNav.tsx
 ================================================================================
 import Link from "next/link";
 import React from "react";
@@ -1411,7 +1432,7 @@ export const SettingsRightNav = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components/Svgs.tsx
+📄 CONTENIDO DE: components\Svgs.tsx
 ================================================================================
 import type { ComponentProps } from "react";
 import React from "react";
@@ -5270,7 +5291,7 @@ export const WomanSvg = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: components/TopBar.tsx
+📄 CONTENIDO DE: components\TopBar.tsx
 ================================================================================
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -5407,7 +5428,7 @@ export const TopBar = ({
                       <div className="rounded-2xl border-4 border-blue-400">
                         <ModuleIcon module={currentModule} width={80} />
                       </div>
-                      <span className="font-bold">{currentModule.code}</span>
+                      <span className="font-bold">{currentModule?.code}</span>
                     </div>
                     <Link
                       className="flex flex-col items-center justify-between gap-2"
@@ -5499,7 +5520,7 @@ export const TopBar = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components/TopBarNew.tsx
+📄 CONTENIDO DE: components\TopBarNew.tsx
 ================================================================================
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -5636,7 +5657,7 @@ export const TopBar = ({
                       <div className="rounded-2xl border-4 border-blue-400">
                         <ModuleIcon module={module} width={80} />
                       </div>
-                      <span className="font-bold">{module.name}</span>
+                      <span className="font-bold">{module?.name}</span>
                     </div>
                     <Link
                       className="flex flex-col items-center justify-between gap-2"
@@ -5728,7 +5749,7 @@ export const TopBar = ({
 
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/CheckAnswer.tsx
+📄 CONTENIDO DE: components\lessons\CheckAnswer.tsx
 ================================================================================
 import React from "react";
 import { BigCloseSvg, DoneSvg } from "~/components/Svgs";
@@ -5825,7 +5846,7 @@ export const CheckAnswer = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/FillInTheBlankQuestion.tsx
+📄 CONTENIDO DE: components\lessons\FillInTheBlankQuestion.tsx
 ================================================================================
 import React from "react";
 import Image from "next/image";
@@ -5836,8 +5857,8 @@ import type { ModuleLesson } from "~/utils/lessons";
 
 export const FillInTheBlankQuestion = ({
     problem,
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     selectedAnswers,
     setSelectedAnswers,
     quitMessageShown,
@@ -5850,8 +5871,8 @@ export const FillInTheBlankQuestion = ({
     hearts,
 }: {
     problem: ModuleLesson;
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     selectedAnswers: number[];
     setSelectedAnswers: React.Dispatch<React.SetStateAction<number[]>>;
     correctAnswerShown: boolean;
@@ -5875,8 +5896,8 @@ export const FillInTheBlankQuestion = ({
             <div className="flex grow flex-col items-center gap-5">
                 <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
                     <ProgressBar
-                        correctAnswerCount={correctAnswerCount}
-                        totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+                        answeredQuestionsCount={answeredQuestionsCount}
+                        totalQuestionsCount={totalQuestionsCount}
                         setQuitMessageShown={setQuitMessageShown}
                         hearts={hearts}
                     />
@@ -5890,7 +5911,7 @@ export const FillInTheBlankQuestion = ({
                         <div className="flex items-center gap-2 px-2">
                             <Image src="/logo.svg" alt="" width={92} height={115} />
                             <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
-                                {question}
+                                {question || "Pregunta no disponible"}
                                 <div
                                     className="absolute h-4 w-4 rotate-45 border-b-2 border-l-2 border-gray-200 bg-white"
                                     style={{
@@ -5913,14 +5934,14 @@ export const FillInTheBlankQuestion = ({
                                             });
                                         }}
                                     >
-                                        {answerTiles[i]}
+                                        {answerTiles?.[i] || ""}
                                     </button>
                                 );
                             })}
                         </div>
                     </div>
                     <div className="flex flex-wrap justify-center gap-1">
-                        {answerTiles.map((answerTile, i) => {
+                        {answerTiles?.map((answerTile, i) => {
                             return (
                                 <button
                                     key={i}
@@ -5942,13 +5963,21 @@ export const FillInTheBlankQuestion = ({
                                     {answerTile}
                                 </button>
                             );
-                        })}
+                        }) || (
+                                <div className="text-center text-gray-500">
+                                    No hay opciones disponibles
+                                </div>
+                            )}
                     </div>
                 </section>
             </div>
 
             <CheckAnswer
-                correctAnswer={correctAnswerIndices.map((i) => answerTiles[i]).join(" ")}
+                correctAnswer={
+                    correctAnswerIndices && answerTiles
+                        ? correctAnswerIndices.map((i) => answerTiles[i]).join(" ")
+                        : ""
+                }
                 correctAnswerShown={correctAnswerShown}
                 isAnswerCorrect={isAnswerCorrect}
                 isAnswerSelected={selectedAnswers.length > 0}
@@ -5966,7 +5995,7 @@ export const FillInTheBlankQuestion = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/MultipleChoiceQuestion.tsx
+📄 CONTENIDO DE: components\lessons\MultipleChoiceQuestion.tsx
 ================================================================================
 import React from "react";
 import { ProgressBar } from "./ProgressBar";
@@ -5976,8 +6005,8 @@ import type { ModuleLesson } from "~/utils/lessons";
 
 export const MultipleChoiceQuestion = ({
     problem,
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     selectedAnswer,
     setSelectedAnswer,
     quitMessageShown,
@@ -5990,8 +6019,8 @@ export const MultipleChoiceQuestion = ({
     hearts,
 }: {
     problem: ModuleLesson;
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     selectedAnswer: number | null;
     setSelectedAnswer: React.Dispatch<React.SetStateAction<number | null>>;
     correctAnswerShown: boolean;
@@ -6015,21 +6044,21 @@ export const MultipleChoiceQuestion = ({
             <div className="flex grow flex-col items-center gap-5">
                 <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
                     <ProgressBar
-                        correctAnswerCount={correctAnswerCount}
-                        totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+                        answeredQuestionsCount={answeredQuestionsCount}
+                        totalQuestionsCount={totalQuestionsCount}
                         setQuitMessageShown={setQuitMessageShown}
                         hearts={hearts}
                     />
                 </div>
                 <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-24 sm:px-5">
                     <h1 className="self-start text-2xl font-bold sm:text-3xl">
-                        {question}
+                        {question || "Pregunta no disponible"}
                     </h1>
                     <div
                         className="grid grid-cols-2 gap-2 sm:grid-cols-3"
                         role="radiogroup"
                     >
-                        {answers.map((answer, i) => {
+                        {answers?.map((answer, i) => {
                             return (
                                 <div
                                     key={i}
@@ -6047,13 +6076,17 @@ export const MultipleChoiceQuestion = ({
                                     <h2 className="text-center">{answer.name}</h2>
                                 </div>
                             );
-                        })}
+                        }) || (
+                                <div className="col-span-full text-center text-gray-500">
+                                    No hay opciones disponibles
+                                </div>
+                            )}
                     </div>
                 </section>
             </div>
 
             <CheckAnswer
-                correctAnswer={answers[correctAnswer]?.name ?? ""}
+                correctAnswer={answers && correctAnswer !== undefined ? answers[correctAnswer]?.name ?? "" : ""}
                 correctAnswerShown={correctAnswerShown}
                 isAnswerCorrect={isAnswerCorrect}
                 isAnswerSelected={selectedAnswer !== null}
@@ -6071,7 +6104,7 @@ export const MultipleChoiceQuestion = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/ProblemInfo.tsx
+📄 CONTENIDO DE: components\lessons\ProblemInfo.tsx
 ================================================================================
 import React from "react";
 import { ProgressBar } from "./ProgressBar";
@@ -6080,16 +6113,16 @@ import type { ModuleLesson } from "~/utils/lessons";
 
 export const ProblemInfo = ({
     problem,
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     quitMessageShown,
     setQuitMessageShown,
     onFinish,
     hearts,
 }: {
     problem: ModuleLesson;
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     quitMessageShown: boolean;
     setQuitMessageShown: React.Dispatch<React.SetStateAction<boolean>>;
     onFinish: () => void;
@@ -6107,8 +6140,8 @@ export const ProblemInfo = ({
             <div className="flex grow flex-col items-center gap-5">
                 <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
                     <ProgressBar
-                        correctAnswerCount={correctAnswerCount}
-                        totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+                        answeredQuestionsCount={answeredQuestionsCount}
+                        totalQuestionsCount={totalQuestionsCount}
                         setQuitMessageShown={setQuitMessageShown}
                         hearts={hearts}
                     />
@@ -6116,24 +6149,38 @@ export const ProblemInfo = ({
                 <section className="flex max-w-4xl grow flex-col gap-8 self-center sm:items-center sm:justify-center sm:px-5">
                     <div className="text-center">
                         <h1 className="mb-4 text-3xl font-bold text-[#f2a445] sm:text-4xl">
-                            {moduleTitle}
+                            {moduleTitle || "Información del Módulo"}
                         </h1>
                         <div className="mb-6 text-left text-lg leading-relaxed text-gray-700 sm:text-center">
-                            {introduction.split('\n').map((line, i) => (
+                            {introduction?.split('\n').map((line, i) => (
                                 <p key={i} className="mb-3">{line}</p>
-                            ))}
+                            )) || (
+                                    <p className="mb-3 text-gray-500">No hay introducción disponible.</p>
+                                )}
                         </div>
                     </div>
 
                     <div className="w-full max-w-2xl">
                         <h2 className="mb-4 text-xl font-bold text-gray-800">Objetivos del Nivel:</h2>
                         <ul className="space-y-3">
-                            {objectives.map((objective, i) => (
+                            {objectives?.map((objective, i) => (
                                 <li key={i} className="flex items-start gap-3">
                                     <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#f2a445]"></div>
                                     <span className="text-gray-700">{objective}</span>
                                 </li>
-                            ))}
+                            )) || (
+                                    // Objetivos por defecto si no vienen del backend
+                                    [
+                                        "Comprender los conceptos fundamentales del tema",
+                                        "Aplicar las técnicas aprendidas en ejercicios prácticos",
+                                        "Desarrollar habilidades de análisis y resolución de problemas"
+                                    ].map((objective, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#f2a445]"></div>
+                                            <span className="text-gray-700">{objective}</span>
+                                        </li>
+                                    ))
+                                )}
                         </ul>
                     </div>
                 </section>
@@ -6159,26 +6206,29 @@ export const ProblemInfo = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/ProgressBar.tsx
+📄 CONTENIDO DE: components\lessons\ProgressBar.tsx
 ================================================================================
 import React from "react";
 import Link from "next/link";
 import { CloseSvg, LessonTopBarEmptyHeart, LessonTopBarHeart } from "~/components/Svgs";
 
 export const ProgressBar = ({
-    correctAnswerCount,
-    totalCorrectAnswersNeeded,
+    answeredQuestionsCount,
+    totalQuestionsCount,
     setQuitMessageShown,
     hearts,
 }: {
-    correctAnswerCount: number;
-    totalCorrectAnswersNeeded: number;
+    answeredQuestionsCount: number;
+    totalQuestionsCount: number;
     setQuitMessageShown: (isShown: boolean) => void;
     hearts: null | number;
 }) => {
+    // Asegurar que el progreso nunca supere el 100%
+    const progressPercentage = Math.min(100, (answeredQuestionsCount / Math.max(1, totalQuestionsCount)) * 100);
+
     return (
         <header className="flex items-center gap-4">
-            {correctAnswerCount === 0 ? (
+            {answeredQuestionsCount === 0 ? (
                 <Link href="/learn" className="text-gray-400">
                     <CloseSvg />
                     <span className="sr-only">Exit lesson</span>
@@ -6197,15 +6247,15 @@ export const ProgressBar = ({
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={1}
-                aria-valuenow={correctAnswerCount / totalCorrectAnswersNeeded}
+                aria-valuenow={answeredQuestionsCount / Math.max(1, totalQuestionsCount)}
             >
                 <div
                     className={
                         "h-full rounded-full bg-green-500 transition-all duration-700 " +
-                        (correctAnswerCount > 0 ? "px-2 pt-1 " : "")
+                        (answeredQuestionsCount > 0 ? "px-2 pt-1 " : "")
                     }
                     style={{
-                        width: `${(correctAnswerCount / totalCorrectAnswersNeeded) * 100}%`,
+                        width: `${progressPercentage}%`,
                     }}
                 >
                     <div className="h-[5px] w-full rounded-full bg-green-400"></div>
@@ -6223,7 +6273,7 @@ export const ProgressBar = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/QuitMessage.tsx
+📄 CONTENIDO DE: components\lessons\QuitMessage.tsx
 ================================================================================
 import React from "react";
 import Link from "next/link";
@@ -6284,7 +6334,7 @@ export const QuitMessage = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: components/lessons/ReviewLesson.tsx
+📄 CONTENIDO DE: components\lessons\ReviewLesson.tsx
 ================================================================================
 import React, { useState } from "react";
 import { BigCloseSvg, DoneSvg } from "~/components/Svgs";
@@ -6393,7 +6443,7 @@ export const ReviewLesson = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: hooks/useBoundStore.ts
+📄 CONTENIDO DE: hooks\useBoundStore.ts
 ================================================================================
 import type { StateCreator } from "zustand";
 import { create } from "zustand";
@@ -6445,7 +6495,7 @@ export const useBoundStore = create<BoundState>((...args) => ({
   ...createQuestionsSlice(...args),
 }));
 
-// Inicializar las preguntas del módulo actual (solo si hay window)
+
 if (typeof window !== "undefined") {
   const currentModule = useBoundStore.getState().module;
   if (currentModule?.code) {
@@ -6455,31 +6505,85 @@ if (typeof window !== "undefined") {
 
 
 ================================================================================
-📄 CONTENIDO DE: hooks/useLeaderboard.ts
+📄 CONTENIDO DE: hooks\useLeaderboard.ts
 ================================================================================
-import { fakeUsers } from "~/utils/fakeUsers";
 import { useBoundStore } from "~/hooks/useBoundStore";
+import { useState, useEffect } from "react";
+import { apiBase } from "~/utils/config";
+
+// Tipos según el contrato API
+type LeaderboardEntry = {
+  rank: number;
+  name: string;
+  xp: number;
+  isCurrentUser: boolean;
+};
+
+type LeaderboardData = {
+  leagueName: string;
+  timeUntilEnd: string;
+  users: LeaderboardEntry[];
+};
+
+// Función para obtener el leaderboard desde la API
+const fetchLeaderboard = async (token?: string): Promise<LeaderboardData> => {
+  try {
+    const response = await fetch(`${apiBase}/api/leaderboard`, {
+      headers: {
+        accept: "*/*",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status} fetching leaderboard`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    throw error;
+  }
+};
 
 export const useLeaderboardUsers = () => {
-  const xpThisWeek = useBoundStore((x) => x.xpThisWeek());
-  const name = useBoundStore((x) => x.name);
-  const userInfo = {
-    name,
-    xp: xpThisWeek,
-    isCurrentUser: true,
-  } as const;
-  return [...fakeUsers, userInfo].sort((a, b) => b.xp - a.xp);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadLeaderboard = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const token = localStorage.getItem("bh_token");
+        const data = await fetchLeaderboard(token || undefined);
+        setLeaderboardData(data.users);
+      } catch (err) {
+        setError("Failed to load leaderboard");
+        console.error("Leaderboard error:", err);
+        // Fallback: usar datos vacíos en caso de error
+        setLeaderboardData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadLeaderboard();
+  }, []);
+
+  return { users: leaderboardData, isLoading, error };
 };
 
 export const useLeaderboardRank = () => {
-  const leaderboardUsers = useLeaderboardUsers();
-  const index = leaderboardUsers.findIndex((user) => user.isCurrentUser);
-  return index === -1 ? null : index + 1;
+  const { users } = useLeaderboardUsers();
+  const currentUser = users.find((user) => user.isCurrentUser);
+  return currentUser?.rank || null;
 };
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/_app.tsx
+📄 CONTENIDO DE: pages\_app.tsx
 ================================================================================
 import { type AppType } from "next/dist/shared/lib/utils";
 import Head from "next/head";
@@ -6510,7 +6614,7 @@ export default MyApp;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/forgot-password.tsx
+📄 CONTENIDO DE: pages\forgot-password.tsx
 ================================================================================
 import type { NextPage } from "next";
 import Link from "next/link";
@@ -6619,7 +6723,7 @@ export default ForgotPassword;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/index.tsx
+📄 CONTENIDO DE: pages\index.tsx
 ================================================================================
 import { type NextPage } from "next";
 import React from "react";
@@ -6673,7 +6777,7 @@ export default Home;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/leaderboard.tsx
+📄 CONTENIDO DE: pages\leaderboard.tsx
 ================================================================================
 import type { NextPage } from "next";
 import React, { useEffect } from "react";
@@ -6796,7 +6900,7 @@ const Leaderboard: NextPage = () => {
   const loggedIn = useBoundStore((x) => x.loggedIn);
 
   const getLessonsCompletedForModule = useBoundStore((x) => x.getLessonsCompletedForModule);
-  
+
   // Calculamos el total de lecciones completadas en todos los módulos
   const totalLessonsCompleted = ["mod-a", "mod-b", "mod-c"]
     .reduce((total, moduleCode) => total + getLessonsCompletedForModule(moduleCode), 0);
@@ -6814,7 +6918,7 @@ const Leaderboard: NextPage = () => {
 
   const leaderboardLeague = "Bronze League";
 
-  const leaderboardUsers = useLeaderboardUsers();
+  const { users: leaderboardUsers, isLoading, error } = useLeaderboardUsers();
 
   return (
     <div>
@@ -6864,7 +6968,17 @@ const Leaderboard: NextPage = () => {
                 <div className="w-full border-b-2 border-gray-200"></div>
               </div>
               <div className="w-full">
-                {leaderboardUsers.map((user, i) => {
+                {isLoading && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-gray-500">Loading leaderboard...</p>
+                  </div>
+                )}
+                {error && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-red-500">Failed to load leaderboard</p>
+                  </div>
+                )}
+                {!isLoading && !error && leaderboardUsers.map((user, i) => {
                   return (
                     <LeaderboardProfile
                       key={user.name}
@@ -6890,7 +7004,7 @@ export default Leaderboard;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/learn.tsx
+📄 CONTENIDO DE: pages\learn.tsx
 ================================================================================
 import { type NextPage } from "next";
 import Link from "next/link";
@@ -6927,8 +7041,24 @@ import { LeftBar } from "~/components/LeftBar";
 import { LoginScreen, useLoginScreen } from "~/components/LoginScreen";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import type { Tile, TileType, Unit } from "~/utils/units";
+import { fetchModuleUnit } from "~/utils/units";
+import { useRouter } from "next/router";
 
 type TileStatus = "LOCKED" | "ACTIVE" | "COMPLETE";
+
+const tileStatus = (tile: Tile, lessonsCompleted: number, currentUnit: Unit | null): TileStatus => {
+  const lessonsPerTile = 4;
+  const tilesCompleted = Math.floor(lessonsCompleted / lessonsPerTile);
+  const tileIndex = currentUnit?.tiles.findIndex((t) => t === tile) ?? -1;
+
+  if (tileIndex < tilesCompleted) {
+    return "COMPLETE";
+  }
+  if (tileIndex > tilesCompleted) {
+    return "LOCKED";
+  }
+  return "ACTIVE";
+};
 
 const TileIcon = ({
   tileType,
@@ -6989,6 +7119,7 @@ const TileIcon = ({
   }
 };
 
+// Nuevo componente que envuelve el icono con una barra de progreso circular
 const tileLeftClassNames = [
   "left-0",
   "left-[-45px]",
@@ -7044,9 +7175,9 @@ const getTileTooltipLeftOffset = ({
     unitNumber % 2 === 1
       ? tileTooltipLeftOffsets
       : [
-          ...tileTooltipLeftOffsets.slice(4),
-          ...tileTooltipLeftOffsets.slice(0, 4),
-        ];
+        ...tileTooltipLeftOffsets.slice(4),
+        ...tileTooltipLeftOffsets.slice(0, 4),
+      ];
 
   return offsets[index % offsets.length] ?? tileTooltipLeftOffsets[0];
 };
@@ -7078,6 +7209,7 @@ const TileTooltip = ({
   description,
   status,
   closeTooltip,
+  tile,
 }: {
   selectedTile: number | null;
   index: number;
@@ -7085,6 +7217,7 @@ const TileTooltip = ({
   description: string;
   status: TileStatus;
   closeTooltip: () => void;
+  tile: Tile;
 }) => {
   const tileTooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -7155,11 +7288,8 @@ const TileTooltip = ({
         </div>
         {status === "ACTIVE" ? (
           <Link
-            href="/lesson"
-            className={[
-              "flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase",
-              unit.textColor,
-            ].join(" ")}
+            href={`/lesson?lessonId=${tile.lessonId}`}
+            className="flex w-full items-center justify-center rounded-xl border-b-4 border-gray-200 bg-white p-3 uppercase text-blue-600 font-bold hover:bg-gray-50 transition-colors"
           >
             Iniciar +10 XP
           </Link>
@@ -7172,7 +7302,7 @@ const TileTooltip = ({
           </button>
         ) : (
           <Link
-            href="/lesson"
+            href={`/lesson?lessonId=${tile.lessonId}&practice=true`}
             className="flex w-full items-center justify-center rounded-xl border-b-4 border-yellow-200 bg-white p-3 uppercase text-yellow-400"
           >
             Practicar +5 XP
@@ -7199,7 +7329,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
   const increaseLessonsCompleted = useBoundStore((x) => x.increaseLessonsCompleted);
   const increaseLingots = useBoundStore((x) => x.increaseLingots);
 
-  const lessonsCompleted = getLessonsCompletedForModule(currentModule.code);
+  const lessonsCompleted = getLessonsCompletedForModule(currentModule?.code || '');
 
   // Mostrar skeleton mientras se carga
   if (!unit) {
@@ -7219,11 +7349,11 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
         backgroundColor={unit.backgroundColor}
         borderColor={unit.borderColor}
       />
-      <div className="relative mb-8 mt-[67px] flex max-w-2xl flex-col items-center gap-4">
+      <div className="relative mb-12 mt-8 flex max-w-2xl flex-col items-center gap-6 px-4">
         {unit.tiles.map((tile, i): JSX.Element => {
-          // Ahora usamos el status que viene de la API
-          const status = tile.status;
-          
+          // Calcular el estado real basado en el progreso del usuario
+          const status = tileStatus(tile, lessonsCompleted, unit);
+
           return (
             <Fragment key={i}>
               {(() => {
@@ -7280,7 +7410,8 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                               tile.type === "fast-forward" &&
                               status === "LOCKED"
                             ) {
-                              increaseLessonsCompleted(currentModule.code, i * 4);
+                              // Saltar directamente al tile fast-forward en el módulo actual
+                              increaseLessonsCompleted(currentModule?.code || '', i * 4);
                               return;
                             }
                             setSelectedTile(i);
@@ -7304,7 +7435,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                         ].join(" ")}
                         onClick={() => {
                           if (status === "ACTIVE") {
-                            increaseLessonsCompleted(currentModule.code, 4);
+                            increaseLessonsCompleted(currentModule?.code || '', 4);
                             increaseLingots(1);
                           }
                         }}
@@ -7343,6 +7474,7 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
                 })()}
                 status={status}
                 closeTooltip={closeTooltip}
+                tile={tile}
               />
             </Fragment>
           );
@@ -7355,40 +7487,30 @@ const UnitSection = ({ unit }: { unit: Unit | null }): JSX.Element => {
 const Learn: NextPage = () => {
   const { loginScreenState, setLoginScreenState } = useLoginScreen();
   const currentModule = useBoundStore((x) => x.module);
+  const router = useRouter();
 
   // --- CARGA DINÁMICA DE LA UNIDAD ---
   const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState(0);
 
-  const apiBase = "http://localhost:8080";
-
+  // Hook para cargar la unidad
   useEffect(() => {
-    const fetchUnit = async () => {
+    const loadUnit = async () => {
+      // Si no hay módulo, no intentar cargar
       if (!currentModule?.code) {
         setIsLoading(false);
-        setError("No se ha seleccionado ningún módulo.");
         return;
       }
 
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("bh_token");
-      
-      try {
-        const response = await fetch(
-          `${apiBase}/api/content/modules/${currentModule.code}/unit`,
-          {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`Error ${response.status} cargando la unidad`);
-        }
 
-        const data: Unit = await response.json();
-        setCurrentUnit(data);
+      try {
+        const token = localStorage.getItem("bh_token");
+        const unit = await fetchModuleUnit(currentModule.code, token || undefined);
+        setCurrentUnit(unit);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
       } finally {
@@ -7396,11 +7518,19 @@ const Learn: NextPage = () => {
       }
     };
 
-    fetchUnit();
+    void loadUnit();
   }, [currentModule?.code]);
 
-  // Verificar si hay módulo seleccionado
-  if (!currentModule || !currentModule.code) {
+  // Hook para scroll
+  useEffect(() => {
+    const updateScrollY = () => setScrollY(globalThis.scrollY ?? scrollY);
+    updateScrollY();
+    document.addEventListener("scroll", updateScrollY);
+    return () => document.removeEventListener("scroll", updateScrollY);
+  }, [scrollY]);
+
+  // Early returns después de todos los hooks
+  if (!currentModule?.code) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -7419,17 +7549,37 @@ const Learn: NextPage = () => {
     );
   }
 
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const updateScrollY = () => setScrollY(globalThis.scrollY ?? scrollY);
-    updateScrollY();
-    document.addEventListener("scroll", updateScrollY);
-    return () => document.removeEventListener("scroll", updateScrollY);
-  }, [scrollY]);
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg">
+          <h1 className="text-xl font-bold mb-6 text-gray-800">Cargando módulo...</h1>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md">
+          <h1 className="text-xl font-bold mb-4 text-red-600">Error al cargar</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const topBarColors = {
-    backgroundColor: currentModule.backgroundColor,
-    borderColor: currentModule.borderColor,
+    backgroundColor: currentModule?.uiConfig?.backgroundColor as `bg-${string}` || 'bg-blue-500' as `bg-${string}`,
+    borderColor: currentModule?.uiConfig?.borderColor as `border-${string}` || 'border-blue-700' as `border-${string}`,
   };
 
   return (
@@ -7440,14 +7590,20 @@ const Learn: NextPage = () => {
       />
       <LeftBar selectedTab="Aprender" />
 
-      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
-        <div className="flex max-w-2xl grow flex-col">
+      <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12 min-h-screen bg-gray-50">
+        <div className="flex max-w-2xl grow flex-col px-4 sm:px-0">
           {isLoading && <UnitSection unit={null} />}
-          {error && <p className="text-center text-red-500">{error}</p>}
+          {error && (
+            <div className="flex justify-center py-8">
+              <p className="text-center text-red-500 bg-red-50 px-4 py-3 rounded-lg border border-red-200">
+                {error}
+              </p>
+            </div>
+          )}
           {!isLoading && !error && currentUnit && (
             <UnitSection unit={currentUnit} key={currentUnit.unitNumber} />
           )}
-          
+
           <div className="sticky bottom-28 left-0 right-0 flex items-end justify-between">
             <Link
               href="/lesson?practice"
@@ -7525,7 +7681,7 @@ const HoverLabel = ({
 
   return (
     <div
-      className={`absolute z-10 w-max animate-bounce rounded-lg border-2 border-gray-200 bg-white px-3 py-2 font-bold uppercase ${textColor}`}
+      className="absolute z-10 w-max animate-bounce rounded-lg border-2 border-gray-200 bg-white px-3 py-2 font-bold uppercase text-gray-700 shadow-lg"
       style={{
         top: "-25%",
         left: `calc(50% - ${width / 2}px)`,
@@ -7555,19 +7711,19 @@ const UnitHeader = ({
   const currentModule = useBoundStore((x) => x.module);
   return (
     <article
-      className={["max-w-2xl text-white sm:rounded-xl", backgroundColor].join(
+      className={["max-w-2xl text-white sm:rounded-xl shadow-lg", backgroundColor].join(
         " ",
       )}
     >
-      <header className="flex items-center justify-between gap-4 p-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold">Unidad {unitNumber}</h2>
-          <p className="text-lg">{description}</p>
+      <header className="flex items-center justify-between gap-4 p-6">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-3xl font-bold">Unidad {unitNumber}</h2>
+          <p className="text-xl opacity-90">{description}</p>
         </div>
         <Link
-          href={`/guidebook/${currentModule.code}/${unitNumber}`}
+          href={`/guidebook/${currentModule?.code || ''}/${unitNumber}`}
           className={[
-            "flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 transition hover:text-gray-100",
+            "flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 transition hover:bg-white hover:bg-opacity-20 text-white",
             borderColor,
           ].join(" ")}
         >
@@ -7582,7 +7738,7 @@ const UnitHeader = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: pages/lesson.tsx
+📄 CONTENIDO DE: pages\lesson.tsx
 ================================================================================
 import type { NextPage } from "next";
 import Image from "next/image";
@@ -7600,7 +7756,8 @@ import {
 } from "~/components/Svgs";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
-import { type ModuleLesson } from "~/utils/lessons";
+import { type ModuleLesson, fetchProblemsByLessonId } from "~/utils/lessons"; // Importar la nueva función
+import { completeLessonAPI, type LessonCompletionRequest } from "~/services/lessonService";
 
 // Importar componentes refactorizados
 import { ProgressBar } from "~/components/lessons/ProgressBar";
@@ -7629,61 +7786,82 @@ const formatTime = (timeMs: number): string => {
 };
 
 const Lesson: NextPage = () => {
+  // --- TODOS LOS HOOKS AL PRINCIPIO ---
   const router = useRouter();
+  
+  // 1. OBTENER ID DE LA URL
+  const activeLessonId = Number(router.query.lessonId);
+  const isPractice = "practice" in router.query;
+
   const currentModule = useBoundStore((x) => x.module);
-  const getQuestionsForModule = useBoundStore((x) => x.getQuestionsForModule);
-  const loadQuestions = useBoundStore((x) => x.loadQuestions);
+  
+  // 2. NUEVO ESTADO PARA PREGUNTAS LOCALES
+  const [lessonProblems, setLessonProblems] = useState<ModuleLesson[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Carga preguntas dinámicamente al montar o cambiar módulo
-  useEffect(() => {
-    if (currentModule.code) {
-      loadQuestions(currentModule.code);
-    }
-  }, [currentModule.code, loadQuestions]);
-
-  // Obtiene preguntas del módulo actual desde el store
-  const lessonProblems = getQuestionsForModule(currentModule.code);
-
-  // Verificación: Si no hay preguntas, mostrar mensaje de carga
-  if (lessonProblems.length === 0) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Cargando preguntas...</h1>
-          <p className="text-gray-600">Por favor, espera mientras se cargan las lecciones para el módulo {currentModule.name}.</p>
-          <p className="text-sm text-gray-500 mt-2">Si el problema persiste, verifica que el archivo {currentModule.code}_lesson.ts exista en ~/utils/.</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Estados existentes...
   const [lessonProblem, setLessonProblem] = useState(0);
+  const [lessonFinished, setLessonFinished] = useState(false);
   const [correctAnswerCount, setCorrectAnswerCount] = useState(0);
   const [incorrectAnswerCount, setIncorrectAnswerCount] = useState(0);
+  const [answeredQuestionsCount, setAnsweredQuestionsCount] = useState(0); // Nueva variable para el progreso total
   const [selectedAnswer, setSelectedAnswer] = useState<null | number>(null);
   const [correctAnswerShown, setCorrectAnswerShown] = useState(false);
   const [quitMessageShown, setQuitMessageShown] = useState(false);
-
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
+  const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
+  const [reviewLessonShown, setReviewLessonShown] = useState(false);
+  const [isStartingLesson, setIsStartingLesson] = useState(true);
 
   const startTime = useRef(Date.now());
   const endTime = useRef(startTime.current + 1000 * 60 * 3 + 1000 * 33);
 
-  const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
-  const [reviewLessonShown, setReviewLessonShown] = useState(false);
+  // 3. EFECTO PARA CARGAR SOLO LA LECCIÓN ACTUAL
+  useEffect(() => {
+    const loadSpecificLesson = async () => {
+      if (!router.isReady || !activeLessonId) return;
+      
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("bh_token");
+        // Usamos la nueva función que llama al backend por ID
+        const problems = await fetchProblemsByLessonId(activeLessonId, token || undefined);
+        setLessonProblems(problems);
+        setLessonProblem(0); // Reiniciar al principio de la lección
+      } catch (error) {
+        console.error("Error cargando lección:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadSpecificLesson();
+  }, [router.isReady, activeLessonId]);
+
+  // --- LÓGICA CONDICIONAL DESPUÉS DE TODOS LOS HOOKS ---
+
+  // Validaciones
+  if (!currentModule) return <div className="flex min-h-screen items-center justify-center">Cargando módulo...</div>;
+  if (isLoading) return <div className="flex min-h-screen items-center justify-center">Cargando lección...</div>;
+  if (lessonProblems.length === 0) return <div className="flex min-h-screen items-center justify-center">No se encontraron preguntas para esta lección.</div>;
 
   const problem = lessonProblems[lessonProblem] ?? lessonProblems[0]!;
 
-  // Solo contar problemas que no sean INFO
+  // Solo contar problemas que no sean INFO para el cálculo de XP
   const totalCorrectAnswersNeeded = lessonProblems.filter(p => p.type !== "INFO").length;
+  // Para la barra de progreso, usar todos los problemas
+  const totalQuestionsCount = lessonProblems.length;
+  
+  // 🎯 PROGRESO CONSISTENTE: Siempre basado en la posición actual + 1
+  const currentProgressCount = lessonProblem + 1;
 
-  // Si no hay preguntas no-INFO, mostrar mensaje de error
-  if (totalCorrectAnswersNeeded === 0) {
+  // Si no hay preguntas en absoluto, mostrar mensaje de error
+  if (lessonProblems.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">No hay preguntas disponibles</h1>
-          <p className="text-gray-600">El módulo {currentModule.name} no tiene lecciones configuradas.</p>
+          <p className="text-gray-600">El módulo {currentModule!.name} no tiene lecciones configuradas.</p>
           <Link
             href="/learn"
             className="mt-4 inline-block rounded-2xl border-b-4 border-blue-500 bg-blue-400 px-6 py-3 font-bold uppercase text-white transition hover:brightness-110"
@@ -7695,7 +7873,6 @@ const Lesson: NextPage = () => {
     );
   }
 
-  const [isStartingLesson, setIsStartingLesson] = useState(true);
   const hearts =
     "fast-forward" in router.query &&
       !isNaN(Number(router.query["fast-forward"]))
@@ -7705,17 +7882,17 @@ const Lesson: NextPage = () => {
 
 
   const isAnswerCorrect = (() => {
-      if (!problem || problem.type === "INFO") {
-        return false;
-      }
-      if (problem.type === "MULTIPLE_CHOICE") {
-        return selectedAnswer === problem.correctAnswer;
-      }
-      if (problem.type === "FILL_IN_THE_BLANK") {
-        return numbersEqual(selectedAnswers, problem.correctAnswerIndices);
-      }
+    if (!problem || problem.type === "INFO") {
       return false;
-    })();
+    }
+    if (problem.type === "MULTIPLE_CHOICE") {
+      return selectedAnswer === problem.correctAnswer;
+    }
+    if (problem.type === "FILL_IN_THE_BLANK") {
+      return numbersEqual(selectedAnswers, problem.correctAnswerIndices || []);
+    }
+    return false;
+  })();
 
   const onCheckAnswer = () => {
     // No hay verificación de respuesta para pantallas INFO
@@ -7724,6 +7901,9 @@ const Lesson: NextPage = () => {
     }
 
     setCorrectAnswerShown(true);
+    // Incrementar el contador de preguntas respondidas (correctas e incorrectas)
+    setAnsweredQuestionsCount((x) => x + 1);
+
     if (isAnswerCorrect) {
       setCorrectAnswerCount((x) => x + 1);
     } else {
@@ -7735,18 +7915,18 @@ const Lesson: NextPage = () => {
       setQuestionResults((questionResults) => [
         ...questionResults,
         {
-          question: problem.question,
-          yourResponse: problem.answers[selectedAnswer ?? 0]?.name ?? "",
-          correctResponse: problem.answers[problem.correctAnswer]?.name ?? "",
+          question: problem.question || "Pregunta no disponible",
+          yourResponse: problem.answers?.[selectedAnswer ?? 0]?.name ?? "",
+          correctResponse: problem.answers?.[problem.correctAnswer ?? 0]?.name ?? "",
         },
       ]);
     } else if (problem.type === "FILL_IN_THE_BLANK") {
       setQuestionResults((questionResults) => [
         ...questionResults,
         {
-          question: problem.question,
-          yourResponse: selectedAnswers.map((i) => problem.answerTiles[i]).join(" "),
-          correctResponse: problem.correctAnswerIndices.map((i) => problem.answerTiles[i]).join(" "),
+          question: problem.question || "Pregunta no disponible",
+          yourResponse: selectedAnswers.map((i) => problem.answerTiles?.[i] || "").join(" "),
+          correctResponse: (problem.correctAnswerIndices || []).map((i) => problem.answerTiles?.[i] || "").join(" "),
         },
       ]);
     }
@@ -7756,7 +7936,38 @@ const Lesson: NextPage = () => {
     setSelectedAnswer(null);
     setSelectedAnswers([]);
     setCorrectAnswerShown(false);
-    setLessonProblem((x) => (x + 1) % lessonProblems.length);
+
+    // Solo avanzar al siguiente problema, sin reiniciar con módulo
+    const nextProblemIndex = lessonProblem + 1;
+    if (nextProblemIndex < lessonProblems.length) {
+      setLessonProblem(nextProblemIndex);
+    } else {
+      // Si no hay más problemas, marcar como terminada
+      setLessonFinished(true);
+    }
+
+    endTime.current = Date.now();
+  };
+
+  // Función especial para preguntas INFO que no cuentan como preguntas respondidas
+  const onFinishInfo = () => {
+    console.log("onFinishInfo called - Current problem:", lessonProblem, "Total problems:", lessonProblems.length);
+    setSelectedAnswer(null);
+    setSelectedAnswers([]);
+    setCorrectAnswerShown(false);
+
+    // Solo avanzar al siguiente problema
+    const nextProblemIndex = lessonProblem + 1;
+    console.log("Next problem index:", nextProblemIndex);
+    if (nextProblemIndex < lessonProblems.length) {
+      setLessonProblem(nextProblemIndex);
+      console.log("Advanced to problem:", nextProblemIndex);
+    } else {
+      console.log("Reached end of problems, marking lesson as finished");
+      // Si no hay más problemas, marcar como terminada
+      setLessonFinished(true);
+    }
+
     endTime.current = Date.now();
   };
 
@@ -7782,7 +7993,7 @@ const Lesson: NextPage = () => {
     hearts !== null &&
     hearts >= 0 &&
     !correctAnswerShown &&
-    correctAnswerCount >= totalCorrectAnswersNeeded
+    answeredQuestionsCount >= totalQuestionsCount
   ) {
     return (
       <LessonFastForwardEndPass
@@ -7803,7 +8014,16 @@ const Lesson: NextPage = () => {
     );
   }
 
-  if (correctAnswerCount >= totalCorrectAnswersNeeded && !correctAnswerShown) {
+  // Mostrar LessonComplete cuando:
+  // 1. Hemos respondido todas las preguntas no-INFO, O
+  // 2. Se marcó explícitamente como terminada (para lecciones que terminan en INFO), O
+  // 3. Hemos llegado al final de todos los problemas
+  const shouldShowLessonComplete = 
+    lessonFinished ||
+    (totalCorrectAnswersNeeded > 0 && answeredQuestionsCount >= totalCorrectAnswersNeeded) ||
+    (lessonProblem >= lessonProblems.length);
+
+  if (shouldShowLessonComplete && !correctAnswerShown) {
     return (
       <LessonComplete
         correctAnswerCount={correctAnswerCount}
@@ -7813,6 +8033,7 @@ const Lesson: NextPage = () => {
         reviewLessonShown={reviewLessonShown}
         setReviewLessonShown={setReviewLessonShown}
         questionResults={questionResults}
+        currentLessonId={activeLessonId} // <--- PASAR EL ID REAL AQUÍ
       />
     );
   }
@@ -7822,11 +8043,11 @@ const Lesson: NextPage = () => {
       return (
         <ProblemInfo
           problem={problem}
-          correctAnswerCount={correctAnswerCount}
-          totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+          answeredQuestionsCount={currentProgressCount}
+          totalQuestionsCount={totalQuestionsCount}
           quitMessageShown={quitMessageShown}
           setQuitMessageShown={setQuitMessageShown}
-          onFinish={onFinish}
+          onFinish={onFinishInfo}
           hearts={hearts}
         />
       );
@@ -7836,8 +8057,8 @@ const Lesson: NextPage = () => {
       return (
         <MultipleChoiceQuestion
           problem={problem}
-          correctAnswerCount={correctAnswerCount}
-          totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+          answeredQuestionsCount={currentProgressCount}
+          totalQuestionsCount={totalQuestionsCount}
           selectedAnswer={selectedAnswer}
           setSelectedAnswer={setSelectedAnswer}
           quitMessageShown={quitMessageShown}
@@ -7856,8 +8077,8 @@ const Lesson: NextPage = () => {
       return (
         <FillInTheBlankQuestion
           problem={problem}
-          correctAnswerCount={correctAnswerCount}
-          totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+          answeredQuestionsCount={currentProgressCount}
+          totalQuestionsCount={totalQuestionsCount}
           selectedAnswers={selectedAnswers}
           setSelectedAnswers={setSelectedAnswers}
           quitMessageShown={quitMessageShown}
@@ -7871,15 +8092,67 @@ const Lesson: NextPage = () => {
         />
       );
     }
+
+    case "MATCH_PAIRS": {
+      // Por ahora, tratar MATCH_PAIRS como INFO hasta que se implemente
+      return (
+        <ProblemInfo
+          problem={{
+            type: "INFO",
+            moduleTitle: "Ejercicio de Emparejamiento",
+            introduction: "Este tipo de ejercicio aún está en desarrollo. Continuando..."
+          }}
+          answeredQuestionsCount={currentProgressCount}
+          totalQuestionsCount={totalQuestionsCount}
+          quitMessageShown={quitMessageShown}
+          setQuitMessageShown={setQuitMessageShown}
+          onFinish={onFinishInfo}
+          hearts={hearts}
+        />
+      );
+    }
+
+    default: {
+      console.error("Unknown problem type:", (problem as any).type, problem);
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Tipo de pregunta no reconocido</h1>
+            <p className="text-gray-600">Tipo: {(problem as any).type}</p>
+            <button
+              onClick={onFinish}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+      );
+    }
   }
+  };
+
+// Función helper para obtener el lessonId actual basado en el módulo
+// Mapeo temporal basado en unit.json - cada módulo tiene sus propios lessonIds
+// ESTA FUNCIÓN YA NO ES NECESARIA
+/*
+const getCurrentLessonId = (moduleCode: string): number => {
+  const moduleToLessonId: Record<string, number> = {
+    "moduleA": 1, // Equivale al primer lessonId del moduleA
+    "moduleB": 2, // Equivale al primer lessonId del moduleB  
+    "moduleC": 3, // Equivale al primer lessonId del moduleC
+    "moduleD": 4, // etc...
+    "moduleE": 5,
+  };
+  
+  return moduleToLessonId[moduleCode] || 1;
 };
+*/
 
-export default Lesson;
-
-const MultipleChoiceQuestion = ({
+export default Lesson;const MultipleChoiceQuestion = ({
   problem,
-  correctAnswerCount,
-  totalCorrectAnswersNeeded,
+  answeredQuestionsCount,
+  totalQuestionsCount,
   selectedAnswer,
   setSelectedAnswer,
   quitMessageShown,
@@ -7892,8 +8165,8 @@ const MultipleChoiceQuestion = ({
   hearts,
 }: {
   problem: ModuleLesson;
-  correctAnswerCount: number;
-  totalCorrectAnswersNeeded: number;
+  answeredQuestionsCount: number;
+  totalQuestionsCount: number;
   selectedAnswer: number | null;
   setSelectedAnswer: React.Dispatch<React.SetStateAction<number | null>>;
   correctAnswerShown: boolean;
@@ -7910,15 +8183,15 @@ const MultipleChoiceQuestion = ({
     return null;
   }
 
-  const { question, answers, correctAnswer } = problem;
+  const { question, answers = [], correctAnswer } = problem;
 
   return (
     <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
       <div className="flex grow flex-col items-center gap-5">
         <div className="w-full max-w-5xl sm:mt-8 sm:px-5">
           <ProgressBar
-            correctAnswerCount={correctAnswerCount}
-            totalCorrectAnswersNeeded={totalCorrectAnswersNeeded}
+            answeredQuestionsCount={answeredQuestionsCount}
+            totalQuestionsCount={totalQuestionsCount}
             setQuitMessageShown={setQuitMessageShown}
             hearts={hearts}
           />
@@ -7955,7 +8228,7 @@ const MultipleChoiceQuestion = ({
       </div>
 
       <CheckAnswer
-        correctAnswer={answers[correctAnswer]?.name ?? ""}
+        correctAnswer={correctAnswer !== undefined ? answers[correctAnswer]?.name ?? "" : ""}
         correctAnswerShown={correctAnswerShown}
         isAnswerCorrect={isAnswerCorrect}
         isAnswerSelected={selectedAnswer !== null}
@@ -7980,6 +8253,7 @@ const LessonComplete = ({
   reviewLessonShown,
   setReviewLessonShown,
   questionResults,
+  currentLessonId, // <--- Recibirlo
 }: {
   correctAnswerCount: number;
   incorrectAnswerCount: number;
@@ -7988,17 +8262,102 @@ const LessonComplete = ({
   reviewLessonShown: boolean;
   setReviewLessonShown: React.Dispatch<React.SetStateAction<boolean>>;
   questionResults: QuestionResult[];
+  currentLessonId: number;
 }) => {
   const router = useRouter();
   const isPractice = "practice" in router.query;
 
+  // Estados para el API call
+  const [isCompletingLesson, setIsCompletingLesson] = useState(false);
+  const [lessonCompleted, setLessonCompleted] = useState(false);
+  
+  // 🎯 NUEVO: Estado para almacenar la respuesta del backend
+  const [backendResponse, setBackendResponse] = useState<{
+    xpEarned: number;
+    lingotsEarned: number;
+    newTotalLingots: number;
+    newStreak: number;
+  } | null>(null);
+
+  // Store methods
   const increaseXp = useBoundStore((x) => x.increaseXp);
   const addToday = useBoundStore((x) => x.addToday);
-  const increaseLingots = useBoundStore((x) => x.increaseLingots);
+  const setLingots = useBoundStore((x) => x.setLingots);
+  const setStreak = useBoundStore((x) => x.setStreak);
+  const currentStreak = useBoundStore((x) => x.streak);
   const increaseLessonsCompleted = useBoundStore(
     (x) => x.increaseLessonsCompleted,
   );
   const currentModule = useBoundStore((x) => x.module);
+
+  const handleContinue = async () => {
+    if (lessonCompleted || isCompletingLesson) {
+      // Si ya se completó, solo navegar
+      await router.push("/learn");
+      return;
+    }
+
+    setIsCompletingLesson(true);
+
+    try {
+      // Preparar la request
+      const request: LessonCompletionRequest = {
+        lessonId: currentLessonId, // Usa el ID real
+        correctAnswerCount,
+        incorrectAnswerCount,
+        timeTakenMs: endTime.current - startTime.current,
+        isPractice,
+      };
+
+      // Llamar al backend
+      const response = await completeLessonAPI(request);
+
+      // 🎯 GUARDAR la respuesta para mostrarla en la UI
+      setBackendResponse(response);
+
+      // Actualizar el store con los datos del backend
+      increaseXp(response.xpEarned);
+      setLingots(response.newTotalLingots);
+      setStreak(response.newStreak);
+      addToday();
+
+      if (!isPractice) {
+        increaseLessonsCompleted(currentModule?.code || '', 1);
+      }
+
+      setLessonCompleted(true);
+      
+      // Navegar a /learn
+      await router.push("/learn");
+
+    } catch (error) {
+      console.error("Error completing lesson:", error);
+      
+      // En caso de error, usar fallback con datos locales
+      setBackendResponse({
+        xpEarned: correctAnswerCount,
+        lingotsEarned: isPractice ? 0 : 5,
+        newTotalLingots: useBoundStore.getState().lingots + (isPractice ? 0 : 5),
+        newStreak: currentStreak + 1,
+      });
+      
+      // Actualizar store con fallback local
+      increaseXp(correctAnswerCount);
+      addToday();
+      const currentLingots = useBoundStore.getState().lingots;
+      setLingots(currentLingots + (isPractice ? 0 : 5));
+      if (!isPractice) {
+        increaseLessonsCompleted(currentModule?.code || '', 1);
+      }
+      
+      // Mostrar mensaje de error pero permitir continuar
+      alert("Error guardando progreso en el servidor, pero se guardó localmente.");
+      await router.push("/learn");
+    } finally {
+      setIsCompletingLesson(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col gap-5 px-4 py-5 sm:px-0 sm:py-0">
       <div className="flex grow flex-col items-center justify-center gap-8 font-bold">
@@ -8009,7 +8368,7 @@ const LessonComplete = ({
           <div className="min-w-[110px] rounded-xl border-2 border-yellow-400 bg-yellow-400">
             <h2 className="py-1 text-center text-white">Total XP</h2>
             <div className="flex justify-center rounded-xl bg-white py-4 text-yellow-400">
-              {correctAnswerCount}
+              {backendResponse?.xpEarned || correctAnswerCount}
             </div>
           </div>
           <div className="min-w-[110px] rounded-xl border-2 border-blue-400 bg-blue-400">
@@ -8029,6 +8388,22 @@ const LessonComplete = ({
               %
             </div>
           </div>
+          {/* Mostrar lingots ganados solo si no es práctica */}
+          {!isPractice && (
+            <div className="min-w-[110px] rounded-xl border-2 border-purple-400 bg-purple-400">
+              <h2 className="py-1 text-center text-white">Puntos QA</h2>
+              <div className="flex justify-center rounded-xl bg-white py-4 text-purple-400">
+                +{backendResponse?.lingotsEarned || 5}
+              </div>
+            </div>
+          )}
+          {/* Mostrar nueva racha */}
+          <div className="min-w-[110px] rounded-xl border-2 border-orange-400 bg-orange-400">
+            <h2 className="py-1 text-center text-white">Racha</h2>
+            <div className="flex justify-center rounded-xl bg-white py-4 text-orange-400">
+              {backendResponse?.newStreak || (currentStreak + 1)}
+            </div>
+          </div>
         </div>
       </div>
       <section className="border-gray-200 sm:border-t-2 sm:p-10">
@@ -8039,22 +8414,18 @@ const LessonComplete = ({
           >
             Review lesson
           </button>
-          <Link
-            className={
-              "flex w-full items-center justify-center rounded-2xl border-b-4 border-green-600 bg-green-500 p-3 font-bold uppercase text-white transition hover:brightness-105 sm:min-w-[150px] sm:max-w-fit"
-            }
-            href="/learn"
-            onClick={() => {
-              increaseXp(correctAnswerCount);
-              addToday();
-              increaseLingots(isPractice ? 0 : 1);
-              if (!isPractice) {
-                increaseLessonsCompleted(currentModule.code);
-              }
-            }}
+          <button
+            className={[
+              "flex w-full items-center justify-center rounded-2xl border-b-4 p-3 font-bold uppercase text-white transition sm:min-w-[150px] sm:max-w-fit",
+              isCompletingLesson 
+                ? "border-gray-400 bg-gray-300 cursor-not-allowed" 
+                : "border-green-600 bg-green-500 hover:brightness-105"
+            ].join(" ")}
+            onClick={handleContinue}
+            disabled={isCompletingLesson}
           >
-            Continue
-          </Link>
+            {isCompletingLesson ? "Saving..." : "Continue"}
+          </button>
         </div>
       </section>
       <ReviewLesson
@@ -8204,7 +8575,7 @@ const LessonFastForwardEndPass = ({
 };
 
 ================================================================================
-📄 CONTENIDO DE: pages/profile.tsx
+📄 CONTENIDO DE: pages\profile.tsx
 ================================================================================
 import type { NextPage } from "next";
 import { BottomBar } from "~/components/BottomBar";
@@ -8238,7 +8609,7 @@ const Profile: NextPage = () => {
         </div>
       </div>
       <div className="pt-[90px]"></div>
-      <BottomBar selectedTab="Profile" />
+      <BottomBar selectedTab="Perfil" />
     </div>
   );
 };
@@ -8338,7 +8709,7 @@ const ProfileStatsSection = () => {
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/register.tsx
+📄 CONTENIDO DE: pages\register.tsx
 ================================================================================
 import type { NextPage } from "next";
 import Link from "next/link";
@@ -8349,7 +8720,8 @@ import _bgSnow from "../../public/bg-snow.svg";
 import type { StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
 import type { Module } from "~/utils/modules";
-import { apiBase } from "~/utils/config";
+import { fetchModules } from "~/utils/modules";
+
 const bgSnow = _bgSnow as unknown as StaticImageData;
 
 const Register: NextPage = () => {
@@ -8362,13 +8734,10 @@ const Register: NextPage = () => {
 
 
   useEffect(() => {
-    const fetchModules = async () => {
+    const loadModules = async () => {
       try {
-        const response = await fetch(`${apiBase}/api/content/modules`);
-        if (!response.ok) {
-          throw new Error("No se pudieron cargar los módulos desde la API.");
-        }
-        const data: Module[] = await response.json();
+        const token = localStorage.getItem("bh_token");
+        const data = await fetchModules(token || undefined);
         setModules(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -8377,7 +8746,7 @@ const Register: NextPage = () => {
       }
     };
 
-    fetchModules();
+    void loadModules();
   }, []);
 
   return (
@@ -8390,15 +8759,15 @@ const Register: NextPage = () => {
         <h1 className="mt-20 text-center text-3xl font-extrabold tracking-tight text-white">
           Selecciona tu módulo de Testing...
         </h1>
-        
+
         {isLoading && (
           <div className="text-xl">Cargando módulos...</div>
         )}
-        
+
         {error && (
           <div className="text-xl text-red-300">Error: {error}</div>
         )}
-        
+
         {!isLoading && !error && (
           <section className="mx-auto flex w-full max-w-2xl grow flex-col gap-4">
             {modules.map((module) => (
@@ -8429,7 +8798,7 @@ const Register: NextPage = () => {
 export default Register;
 
 ================================================================================
-📄 CONTENIDO DE: pages/shop.tsx
+📄 CONTENIDO DE: pages\shop.tsx
 ================================================================================
 import type { NextPage } from "next";
 import type { ComponentProps } from "react";
@@ -8775,7 +9144,7 @@ const Shop: NextPage = () => {
   return (
     <div>
       <TopBar />
-      <LeftBar selectedTab="Shop" />
+      <LeftBar selectedTab="Tienda" />
       <div className="flex justify-center gap-3 pt-14 sm:p-6 sm:pt-10 md:ml-24 lg:ml-64 lg:gap-12">
         <div className="px-4 pb-20">
           <div className="py-7">
@@ -8834,7 +9203,7 @@ const Shop: NextPage = () => {
         </div>
         <RightBar />
       </div>
-      <BottomBar selectedTab="Shop" />
+      <BottomBar selectedTab="Tienda" />
     </div>
   );
 };
@@ -8843,7 +9212,7 @@ export default Shop;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/settings/account.tsx
+📄 CONTENIDO DE: pages\settings\account.tsx
 ================================================================================
 import type { NextPage } from "next";
 import React, { useState } from "react";
@@ -8917,7 +9286,7 @@ export default Account;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/settings/coach.tsx
+📄 CONTENIDO DE: pages\settings\coach.tsx
 ================================================================================
 import type { NextPage } from "next";
 import type { ComponentProps } from "react";
@@ -9123,7 +9492,7 @@ export default Coach;
 
 
 ================================================================================
-📄 CONTENIDO DE: pages/settings/sound.tsx
+📄 CONTENIDO DE: pages\settings\sound.tsx
 ================================================================================
 import type { NextPage } from "next";
 import React, { useState } from "react";
@@ -9239,7 +9608,54 @@ export default Sound;
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createGoalXpStore.ts
+📄 CONTENIDO DE: services\lessonService.ts
+================================================================================
+import { apiBase } from "~/utils/config";
+
+// Tipos basados en tu contrato
+export interface LessonCompletionRequest {
+  lessonId: number;
+  correctAnswerCount: number;
+  incorrectAnswerCount: number;
+  timeTakenMs: number;
+  isPractice: boolean;
+}
+
+export interface LessonCompletionResponse {
+  xpEarned: number;
+  lingotsEarned: number;
+  newTotalLingots: number;
+  newStreak: number;
+}
+
+export const completeLessonAPI = async (
+  request: LessonCompletionRequest
+): Promise<LessonCompletionResponse> => {
+  const token = localStorage.getItem("bh_token");
+  
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(`${apiBase}/api/progress/lesson`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to complete lesson: ${errorText}`);
+  }
+
+  return response.json();
+};
+
+================================================================================
+📄 CONTENIDO DE: stores\createGoalXpStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9257,7 +9673,7 @@ export const createGoalXpSlice: BoundStateCreator<GoalXpSlice> = (set) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createLessonStore.ts
+📄 CONTENIDO DE: stores\createLessonStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9269,7 +9685,7 @@ export type LessonSlice = {
 
 export const createLessonSlice: BoundStateCreator<LessonSlice> = (set, get) => ({
   lessonsCompletedByModule: {},
-  getLessonsCompletedForModule: (moduleCode: string) => 
+  getLessonsCompletedForModule: (moduleCode: string) =>
     get().lessonsCompletedByModule[moduleCode] ?? 0,
   increaseLessonsCompleted: (moduleCode: string, by = 1) =>
     set(({ lessonsCompletedByModule }) => ({
@@ -9282,58 +9698,55 @@ export const createLessonSlice: BoundStateCreator<LessonSlice> = (set, get) => (
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createLingotStore.ts
+📄 CONTENIDO DE: stores\createLingotStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
 export type LingotSlice = {
   lingots: number;
   increaseLingots: (by: number) => void;
+  setLingots: (value: number) => void;
 };
 
 export const createLingotSlice: BoundStateCreator<LingotSlice> = (set) => ({
   lingots: 0,
   increaseLingots: (by: number) =>
     set(({ lingots }) => ({ lingots: lingots + by })),
+  setLingots: (value: number) =>
+    set(() => ({ lingots: value })),
 });
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createModuleStore.ts
+📄 CONTENIDO DE: stores\createModuleStore.ts
 ================================================================================
-import modules, { type Module } from "~/utils/modules";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
+import type { Module } from "~/utils/modules";
 
 export type ModuleSlice = {
-  module: Module;
+  module: Module | null;
   setModule: (newModule: Module) => void;
 };
 
-const defaultModuleIndex = 0; // Módulo A por defecto
-
 export const createModuleSlice: BoundStateCreator<ModuleSlice> = (set, get) => {
-  const defaultModule = modules[defaultModuleIndex];
   const slice = {
-    module: defaultModule,
+    module: null,
     setModule: (newModule: Module) => {
       set({ module: newModule });
       // Carga preguntas para el módulo seleccionado
-      get().loadQuestions(newModule.code);
+      void get().loadQuestions(newModule.code);
     },
   };
-
-  // Carga preguntas para el módulo por defecto (Módulo A) al inicializar el slice
-  // get().loadQuestions(defaultModule.code);
 
   return slice;
 };
 
 ================================================================================
-📄 CONTENIDO DE: stores/createQuestionsSlice.ts
+📄 CONTENIDO DE: stores\createQuestionsSlice.ts
 ================================================================================
 import type { StateCreator } from "zustand";
 import type { ModuleLesson } from "~/utils/lessons";
-import { apiBase } from "~/utils/config";
+import { fetchModuleProblems } from "~/utils/lessons";
 export interface QuestionsSlice {
   questions: Record<string, ModuleLesson[]>;
   loadQuestions: (moduleCode: string) => Promise<void>;
@@ -9348,52 +9761,36 @@ export const createQuestionsSlice: StateCreator<
   QuestionsSlice
 > = (set, get) => ({
   questions: {},
-  
-  loadQuestions: async (moduleCode: string) => {
 
-  if ((get().questions[moduleCode]?.length ?? 0) > 0) {
-    return;
-  }
+  loadQuestions: async (moduleCode: string) => {
+    // Si ya tenemos preguntas para este módulo, no las cargamos de nuevo
+    if ((get().questions[moduleCode]?.length ?? 0) > 0) {
+      return;
+    }
 
     try {
-      // Obtenemos el token de autenticación del localStorage
       const token = localStorage.getItem("bh_token");
-      
-      const response = await fetch(
-        `${apiBase}/api/content/modules/${moduleCode}/problems`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.error("Error 401: Token no válido o expirado.");
-        }
-        throw new Error(`Error ${response.status} cargando preguntas de ${moduleCode}`);
-      }
-
-      const data: ModuleLesson[] = await response.json();
+      const problems = await fetchModuleProblems(moduleCode, token || undefined);
 
       set((state) => ({
-        questions: { ...state.questions, [moduleCode]: data },
+        questions: { ...state.questions, [moduleCode]: problems },
       }));
     } catch (error) {
-      console.error(`Error cargando preguntas para ${moduleCode} desde la API:`, error);
+      console.error(`Error loading questions for ${moduleCode}:`, error);
+
+      // Mantener array vacío en caso de error
       set((state) => ({
         questions: { ...state.questions, [moduleCode]: [] },
       }));
     }
   },
 
-  getQuestionsForModule: (moduleCode: string) => 
+  getQuestionsForModule: (moduleCode: string) =>
     get().questions[moduleCode] || [],
 });
 
 ================================================================================
-📄 CONTENIDO DE: stores/createSoundSettingsStore.ts
+📄 CONTENIDO DE: stores\createSoundSettingsStore.ts
 ================================================================================
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
 
@@ -9421,7 +9818,7 @@ export const createSoundSettingsSlice: BoundStateCreator<SoundSettingsSlice> = (
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createStreakStore.ts
+📄 CONTENIDO DE: stores\createStreakStore.ts
 ================================================================================
 import dayjs from "dayjs";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9453,6 +9850,7 @@ export type StreakSlice = {
   streak: number;
   isActiveDay: (day: dayjs.Dayjs) => boolean;
   addToday: () => void;
+  setStreak: (value: number) => void;
 };
 
 export const createStreakSlice: BoundStateCreator<StreakSlice> = (
@@ -9466,11 +9864,12 @@ export const createStreakSlice: BoundStateCreator<StreakSlice> = (
     const activeDays = addActiveDay(get().activeDays, dayjs());
     set({ activeDays, streak: getCurrentStreak(activeDays) });
   },
+  setStreak: (value: number) => set({ streak: value }),
 });
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createUserStore.ts
+📄 CONTENIDO DE: stores\createUserStore.ts
 ================================================================================
 import dayjs from "dayjs";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9499,7 +9898,7 @@ export const createUserSlice: BoundStateCreator<UserSlice> = (set) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: stores/createXpStore.ts
+📄 CONTENIDO DE: stores\createXpStore.ts
 ================================================================================
 import dayjs from "dayjs";
 import type { BoundStateCreator } from "~/hooks/useBoundStore";
@@ -9546,7 +9945,7 @@ export const createXpSlice: BoundStateCreator<XpSlice> = (set, get) => ({
 
 
 ================================================================================
-📄 CONTENIDO DE: utils/array-utils.ts
+📄 CONTENIDO DE: utils\array-utils.ts
 ================================================================================
 export const range = (lo: number, hi: number): number[] => {
   const result = Array<number>(hi - lo);
@@ -9566,12 +9965,12 @@ export const sum = (numbers: number[]): number => {
 
 
 ================================================================================
-📄 CONTENIDO DE: utils/config.ts
+📄 CONTENIDO DE: utils\config.ts
 ================================================================================
 export const apiBase = process.env.NEXT_PUBLIC_API_URL  || "http://localhost:8080";
 
 ================================================================================
-📄 CONTENIDO DE: utils/dateString.ts
+📄 CONTENIDO DE: utils\dateString.ts
 ================================================================================
 import type dayjs from "dayjs";
 
@@ -9586,377 +9985,189 @@ export const toDateString = (day: dayjs.Dayjs): DateString => {
 
 
 ================================================================================
-📄 CONTENIDO DE: utils/fakeUsers.ts
+📄 CONTENIDO DE: utils\lessons.ts
 ================================================================================
-export const fakeUsers = [
-  { name: "Aaron", xp: 424, isCurrentUser: false },
-  { name: "Bobby", xp: 378, isCurrentUser: false },
-  { name: "Cathy", xp: 249, isCurrentUser: false },
-  { name: "Derek", xp: 216, isCurrentUser: false },
-  { name: "Ellen", xp: 211, isCurrentUser: false },
-  { name: "Freddy", xp: 177, isCurrentUser: false },
-  { name: "George", xp: 152, isCurrentUser: false },
-  { name: "Helen", xp: 87, isCurrentUser: false },
-  { name: "Isaac", xp: 82, isCurrentUser: false },
-  { name: "Jacob", xp: 77, isCurrentUser: false },
-  { name: "Kevin", xp: 72, isCurrentUser: false },
-  { name: "Luke", xp: 71, isCurrentUser: false },
-  { name: "Mark", xp: 65, isCurrentUser: false },
-  { name: "Norm", xp: 62, isCurrentUser: false },
-  { name: "Olivia", xp: 59, isCurrentUser: false },
-  { name: "Perry", xp: 52, isCurrentUser: false },
-  { name: "Quentin", xp: 51, isCurrentUser: false },
-  { name: "Ryan", xp: 45, isCurrentUser: false },
-  { name: "Steve", xp: 40, isCurrentUser: false },
-  { name: "Theo", xp: 30, isCurrentUser: false },
-  { name: "Uma", xp: 20, isCurrentUser: false },
-  { name: "Vincent", xp: 10, isCurrentUser: false },
-  { name: "Will", xp: 10, isCurrentUser: false },
-  { name: "Xavier", xp: 10, isCurrentUser: false },
-  { name: "Yan", xp: 10, isCurrentUser: false },
-  { name: "Zachary", xp: 10, isCurrentUser: false },
-  { name: "Arnold", xp: 10, isCurrentUser: false },
-  { name: "Bruno", xp: 10, isCurrentUser: false },
-  { name: "Carl", xp: 10, isCurrentUser: false },
-] as const;
+import React from "react";
+import { apiBase } from "./config";
 
+// Agrega lessonId a los tipos base o al tipo unión
+export type LessonBase = {
+    lessonId: number; // <--- AGREGAR ESTO
+    id?: number;
+    position?: number;
+}
 
-================================================================================
-📄 CONTENIDO DE: utils/lessons.ts
-================================================================================
 // Definición de tipos para las lecciones del Módulo B
-export type LessonInfo = {
+export type LessonInfo = LessonBase & { // Extender de LessonBase
     type: "INFO";
-    moduleTitle: string;
-    introduction: string;
-    objectives: string[];
+    moduleTitle?: string;
+    introduction?: string;
+    objectives?: string[];
 };
 
-export type LessonMultipleChoice = {
+export type LessonMultipleChoice = LessonBase & { // Extender de LessonBase
     type: "MULTIPLE_CHOICE";
-    question: string;
-    answers: Array<{ name: string }>;
-    correctAnswer: number;
+    question?: string;
+    answers?: Array<{ name: string; icon?: React.ReactNode }>;
+    correctAnswer?: number;
 };
 
-export type LessonFillInTheBlank = {
+export type LessonFillInTheBlank = LessonBase & { // Extender de LessonBase
     type: "FILL_IN_THE_BLANK";
-    question: string;
-    answerTiles: string[];
-    correctAnswerIndices: number[];
+    question?: string;
+    answerTiles?: string[];
+    correctAnswerIndices?: number[];
 };
 
-export type ModuleLesson = LessonInfo | LessonMultipleChoice | LessonFillInTheBlank;
+export type LessonMatchPairs = LessonBase & { // Extender de LessonBase
+    type: "MATCH_PAIRS";
+    // Agregar propiedades específicas según sea necesario
+    question?: string;
+    pairs?: Array<{ left: string; right: string }>;
+};
 
+export type ModuleLesson = LessonInfo | LessonMultipleChoice | LessonFillInTheBlank | LessonMatchPairs;
 
-================================================================================
-📄 CONTENIDO DE: utils/moduleA-lessons.ts
-================================================================================
-import { ModuleLesson } from "./lessons";
+// Función para mapear tipos del backend a tipos del frontend
+const mapBackendProblemToFrontend = (backendProblem: any): ModuleLesson => {
+    // Mapear tipos del backend a tipos del frontend
+    let type: "INFO" | "MULTIPLE_CHOICE" | "FILL_IN_THE_BLANK" | "MATCH_PAIRS" = "INFO";
 
-// Lecciones del Módulo A - Nivel 1: Introducción a Particiones de Equivalencia
-export const moduleALevel1Lessons: readonly ModuleLesson[] = [
-    {
-        type: "INFO",
-        moduleTitle: "Módulo A – Particiones de Equivalencia",
-        introduction: `Las Particiones de Equivalencia son una técnica de testing que divide el dominio de entrada de un sistema en clases de equivalencia válidas e inválidas. Cada clase representa un conjunto de valores que deberían comportarse de manera similar.
-
-Esta técnica es especialmente útil en testing para:
-• Reducir el número de casos de prueba sin perder cobertura
-• Identificar clases válidas e inválidas de entrada
-• Optimizar el esfuerzo de testing
-• Detectar errores en límites y valores extremos`,
-        objectives: [
-            "Comprender qué son las particiones de equivalencia",
-            "Identificar clases válidas e inválidas",
-            "Construir particiones para casos simples",
-            "Generar casos de prueba efectivos"
-        ]
-    },
-    // ...existing code...
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Qué es la técnica de Partición de Equivalencia (EP)?",
-        answers: [
-            { name: "Un método para dividir los datos de entrada en grupos que se procesan de manera similar." },
-            { name: "Un enfoque para probar todas las combinaciones posibles de entradas." },
-            { name: "Una técnica de pruebas de caja blanca basada en el código." },
-            { name: "Un método para diseñar la arquitectura del sistema." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Por qué se utiliza la técnica de Partición de Equivalencia?",
-        answers: [
-            { name: "Para reducir la cantidad de casos de prueba sin perder efectividad." },
-            { name: "Para ejecutar pruebas más rápidas sin necesidad de documentación." },
-            { name: "Para asegurar que el código fuente esté bien estructurado." },
-            { name: "Para probar únicamente los valores inválidos." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Qué característica define a una partición de equivalencia?",
-        answers: [
-            { name: "Los valores dentro de la partición se espera que sean procesados de la misma forma." },
-            { name: "Los valores de la partición son siempre distintos entre sí." },
-            { name: "Cada partición contiene tanto datos válidos como inválidos mezclados." },
-            { name: "Los valores de la partición cambian en cada ejecución." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Qué ocurre si un defecto es encontrado en un valor dentro de una partición?",
-        answers: [
-            { name: "Se asume que otros valores de la misma partición también podrían revelar el mismo defecto." },
-            { name: "Es necesario probar nuevamente todos los valores posibles de entrada." },
-            { name: "El defecto se limita únicamente a ese valor específico." },
-            { name: "El defecto no tiene relación con la partición." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Qué es una partición válida?",
-        answers: [
-            { name: "Conjunto de valores que el sistema acepta y procesa." },
-            { name: "Conjunto de valores que siempre producen errores." },
-            { name: "Valores no definidos en la especificación." },
-            { name: "Conjunto de datos irrelevantes para la prueba." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Qué es una partición inválida?",
-        answers: [
-            { name: "Valores que el sistema debe rechazar o para los cuales no existe un procesamiento definido." },
-            { name: "Conjunto de datos que siempre generan resultados correctos." },
-            { name: "Datos que no influyen en la ejecución del software." },
-            { name: "Valores que siempre forman parte de una partición válida." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "Para lograr una cobertura completa (100%) con Partición de Equivalencia, es necesario:",
-        answers: [
-            { name: "Probar al menos un valor representativo de cada partición, válida e inválida." },
-            { name: "Probar absolutamente todos los valores de entrada posibles." },
-            { name: "Ejecutar únicamente las particiones válidas." },
-            { name: "Considerar solo los parámetros principales del sistema." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Cómo se mide la cobertura en la técnica de Partición de Equivalencia?",
-        answers: [
-            { name: "Número de particiones ejercidas ÷ número total de particiones identificadas." },
-            { name: "Número de errores encontrados ÷ número de valores probados." },
-            { name: "Número de casos de prueba ejecutados ÷ número de líneas de código." },
-            { name: "Número de entradas inválidas ÷ número de entradas válidas." }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "Verdadero o Falso: Una partición de equivalencia puede ser continua o discreta, finita o infinita.",
-        answers: [
-            { name: "Verdadero" },
-            { name: "Falso" }
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "Verdadero o Falso: Las particiones de equivalencia pueden superponerse entre sí.",
-        answers: [
-            { name: "Verdadero" },
-            { name: "Falso" }
-        ],
-        correctAnswer: 1,
-    },
-    // ...existing code...
-] as const;
-
-
-// Exporta por defecto para que coincida con el import en createQuestionsSlice.ts
-export default moduleALevel1Lessons;
-
-
-// Función helper para obtener lecciones por nivel
-export const getModuleALessons = (level: number): readonly ModuleLesson[] => {
-    switch (level) {
-        case 1:
-            return moduleALevel1Lessons;
+    switch (backendProblem.type) {
+        case "INFO":
+            type = "INFO";
+            break;
+        case "SELECT_1_OF_3":
+        case "MULTIPLE_CHOICE":
+            type = "MULTIPLE_CHOICE";
+            break;
+        case "FILL_IN_THE_BLANK":
+            type = "FILL_IN_THE_BLANK";
+            break;
+        case "MATCH_PAIRS":
+            type = "MATCH_PAIRS";
+            break;
         default:
-            return moduleALevel1Lessons;
+            console.warn(`Unknown problem type: ${backendProblem.type}, defaulting to INFO`);
+            type = "INFO";
+    }
+
+    return {
+        ...backendProblem,
+        type,
+    } as ModuleLesson;
+};
+
+// Nueva función para cargar lecciones desde el backend
+export const fetchModuleProblems = async (moduleCode: string, token?: string): Promise<ModuleLesson[]> => {
+    try {
+        const response = await fetch(`${apiBase}/api/content/modules/${moduleCode}/problems`, {
+            headers: {
+                accept: "*/*",
+                ...(token && { Authorization: `Bearer ${token}` }),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status} fetching problems for module ${moduleCode}`);
+        }
+
+        const data = await response.json();
+
+        // Mapear cada problema del backend al formato del frontend
+        const mappedProblems = data.map(mapBackendProblemToFrontend);
+
+        return mappedProblems;
+    } catch (error) {
+        console.error(`Error fetching problems for module ${moduleCode}:`, error);
+        throw error;
     }
 };
 
+export const fetchProblemsByLessonId = async (lessonId: number, token?: string): Promise<ModuleLesson[]> => {
+    try {
+        // Usamos el endpoint específico que creaste en el Backend
+        const response = await fetch(`${apiBase}/api/content/modules/lessons/${lessonId}/problems`, {
+            headers: {
+                accept: "*/*",
+                ...(token && { Authorization: `Bearer ${token}` }),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status} fetching problems for lesson ${lessonId}`);
+        }
+
+        const data = await response.json();
+        return data.map(mapBackendProblemToFrontend);
+    } catch (error) {
+        console.error(`Error fetching problems for lesson ${lessonId}:`, error);
+        throw error;
+    }
+};
+
+
 ================================================================================
-📄 CONTENIDO DE: utils/moduleB-lessons.ts
+📄 CONTENIDO DE: utils\modules.ts
 ================================================================================
-import { ModuleLesson } from "./lessons";
+import { apiBase } from "./config";
 
-// Lecciones del Módulo B - Nivel 1: Introducción a Tablas de Decisión
-export const moduleBLevel1Lessons: readonly ModuleLesson[] = [
-  {
-    type: "INFO",
-    moduleTitle: "Módulo B – Tablas de Decisión",
-    introduction: `Las Tablas de Decisión son una técnica de análisis y documentación que permite representar de manera clara y estructurada las diferentes combinaciones de condiciones y sus correspondientes acciones o resultados.
+export type Module = {
+  id: number;
+  code: string;
+  name: string;
+  shortName: string;
+  description: string;
+  uiConfig: {
+    backgroundColor: string;
+    color: string;
+    borderColor?: string;
+    icon: string;
+    textColor?: string;
+  };
+  viewBox?: string; // Para compatibilidad con Flag.tsx
+};
 
-Esta técnica es especialmente útil en testing para:
-• Identificar todos los casos de prueba posibles
-• Garantizar cobertura completa de combinaciones
-• Simplificar lógica compleja de negocio
-• Documentar reglas de decisión de forma clara`,
-    objectives: [
-      "Comprender qué son las tablas de decisión",
-      "Identificar componentes: condiciones, acciones y reglas",
-      "Construir tablas básicas para casos simples",
-      "Generar casos de prueba efectivos"
-    ]
-  },
-  {
-    type: "MULTIPLE_CHOICE",
-    question: "¿Qué representa una fila en una tabla de decisión?",
-    answers: [
-      { name: "Una regla de decisión" },
-      { name: "Una condición individual" },
-      { name: "Una acción específica" },
-    ],
-    correctAnswer: 0,
-  },
-  {
-    type: "FILL_IN_THE_BLANK",
-    question: "Una tabla de decisión representa combinaciones de _____ y sus correspondientes _____",
-    answerTiles: ["condiciones", "acciones", "reglas", "resultados", "decisiones", "casos"],
-    correctAnswer: [0, 3], // ["condiciones", "resultados"]
-  },
-] as const;
+export const fetchModules = async (token?: string): Promise<Module[]> => {
+  try {
+    const response = await fetch(`${apiBase}/api/content/modules`, {
+      headers: {
+        accept: "*/*",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
 
+    if (!response.ok) {
+      throw new Error(`Error ${response.status} fetching modules`);
+    }
 
-// Exporta por defecto para que coincida con el import en createQuestionsSlice.ts
-export default moduleBLevel1Lessons;
+    const modules: Module[] = await response.json();
 
-// Función helper para obtener lecciones por nivel
-export const getModuleBLessons = (level: number): readonly ModuleLesson[] => {
-  switch (level) {
-    case 1:
-      return moduleBLevel1Lessons;
-    default:
-      return moduleBLevel1Lessons;
+    return modules.map((module) => ({
+      ...module,
+      viewBox: "0 0 24 19", // Default viewBox para Flag component
+      uiConfig: {
+        ...module.uiConfig,
+        backgroundColor: module.uiConfig.backgroundColor as `bg-${string}`,
+        borderColor: (module.uiConfig.borderColor ?? `border-${module.uiConfig.color}-600`) as `border-${string}`,
+        textColor: (module.uiConfig.textColor ?? `text-${module.uiConfig.color}-500`) as `text-${string}`,
+      },
+    }));
+  } catch (error) {
+    console.error("Error fetching modules:", error);
+    throw error;
   }
 };
 
-
-================================================================================
-📄 CONTENIDO DE: utils/moduleC-lessons.ts
-================================================================================
-import type { ModuleLesson } from "./lessons";
-
-// Lecciones del Módulo C - Nivel 1: Introducción a Pruebas de Sentencia
-export const moduleCLevel1Lessons: readonly ModuleLesson[] = [
-    {
-        type: "INFO",
-        moduleTitle: "Módulo C – Pruebas de Sentencia",
-        introduction: `Las Pruebas de Sentencia miden la cobertura de sentencias en el código, es decir, el porcentaje de sentencias ejecutadas durante las pruebas. Esta técnica asegura que cada línea de código se haya ejecutado al menos una vez.
-
-Esta técnica es especialmente útil en testing para:
-• Medir qué partes del código se han ejecutado
-• Identificar código no alcanzado
-• Mejorar la calidad del testing
-• Detectar errores en sentencias específicas`,
-        objectives: [
-            "Comprender qué es la cobertura de sentencias",
-            "Identificar sentencias ejecutadas y no ejecutadas",
-            "Generar casos de prueba para cobertura completa",
-            "Analizar resultados de cobertura"
-        ]
-    },
-    {
-        type: "MULTIPLE_CHOICE",
-        question: "¿Qué mide la cobertura de sentencias?",
-        answers: [
-            { name: "El porcentaje de sentencias ejecutadas" },
-            { name: "El número de líneas de código" },
-            { name: "La complejidad ciclomática" },
-        ],
-        correctAnswer: 0,
-    },
-    {
-        type: "FILL_IN_THE_BLANK",
-        question: "La cobertura de sentencias mide el porcentaje de ______ que han sido ejecutadas durante las pruebas.",
-        answerTiles: ["sentencias", "líneas", "código", "ejecutadas"],
-        correctAnswer: [0, 3], // ["sentencias", "ejecutadas"]
-    },
-] as const;
-
-// Exporta por defecto para que coincida con el import en createQuestionsSlice.ts
-export default moduleCLevel1Lessons;
-
-// Función helper para obtener lecciones por nivel
-export const getModuleCLessons = (level: number): readonly ModuleLesson[] => {
-    switch (level) {
-        case 1:
-            return moduleCLevel1Lessons;
-        default:
-            return moduleCLevel1Lessons;
-    }
-};
-
-================================================================================
-📄 CONTENIDO DE: utils/modules.ts
-================================================================================
-export type Module = (typeof modules)[number];
-
-const modules = [
-  {
-    name: "Módulo A – Equivalencia",
-    shortName: "Equivalencia",
-    description: "Partición de Equivalencia y Valores Límite",
-    viewBox: "0 0 82 66", // Icono personalizado para QA
-    code: "moduleA",
-    color: "#58cc02", // Verde para módulo A
-    backgroundColor: "bg-[#58cc02]",
-    textColor: "text-[#58cc02]",
-    borderColor: "border-[#46a302]",
-  },
-  {
-    name: "Módulo B – Decisión",
-    shortName: "Decisión",
-    description: "Tablas de Decisión",
-    viewBox: "0 66 82 66",
-    code: "moduleB",
-    color: "#ce82ff", // Morado para módulo B
-    backgroundColor: "bg-[#ce82ff]",
-    textColor: "text-[#ce82ff]",
-    borderColor: "border-[#a568cc]",
-  },
-  {
-    name: "Módulo C – Sentencia",
-    shortName: "Sentencia",
-    description: "Pruebas de Sentencia",
-    viewBox: "0 132 82 66",
-    code: "moduleC",
-    color: "#00cd9c", // Azul verdoso para módulo C
-    backgroundColor: "bg-[#00cd9c]",
-    textColor: "text-[#00cd9c]",
-    borderColor: "border-[#00a47d]",
-  },
-] as const;
+const modules: Module[] = [];
 
 export default modules;
 
+================================================================================
+📄 CONTENIDO DE: utils\units.ts
+================================================================================
+import { apiBase } from "./config";
 
-================================================================================
-📄 CONTENIDO DE: utils/units.ts
-================================================================================
 export type Unit = {
   unitNumber: number;
   description: string;
@@ -9970,215 +10181,30 @@ export type Unit = {
 export type Tile = {
   type: "star" | "dumbbell" | "book" | "trophy" | "fast-forward" | "treasure";
   description: string;
-  lessonId: number; // Nuevo: viene de la API
-  status: "LOCKED" | "ACTIVE" | "COMPLETE"; // Nuevo: viene de la API
+  lessonId: number; // Viene de la API
+  status: "LOCKED" | "ACTIVE" | "COMPLETE"; // Viene de la API
 };
 
 export type TileType = Tile["type"];
 
-// Estos datos estáticos ya no se usan en learn.tsx, pero se mantienen por compatibilidad
-export const units: readonly Unit[] = [
-  {
-    unitNumber: 1,
-    description: "Fundamentos de Partición de Equivalencia",
-    backgroundColor: "bg-[#f2a445]",
-    textColor: "text-[#f2a445]",
-    borderColor: "border-[#d18a2a]",
-    tiles: [
-      {
-        type: "star",
-        description: "Introducción a Partición de Equivalencia",
-        lessonId: 1,
-        status: "ACTIVE"
+// Función para cargar unidades desde el backend
+export const fetchModuleUnit = async (moduleCode: string, token?: string): Promise<Unit> => {
+  try {
+    const response = await fetch(`${apiBase}/api/content/modules/${moduleCode}/unit`, {
+      headers: {
+        accept: "*/*",
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
-      {
-        type: "book",
-        description: "Conceptos básicos",
-        lessonId: 2,
-        status: "LOCKED"
-      },
-      {
-        type: "star",
-        description: "Valores límite",
-        lessonId: 3,
-        status: "LOCKED"
-      },
-      { 
-        type: "treasure",
-        description: "",
-        lessonId: 0,
-        status: "LOCKED"
-      },
-      { 
-        type: "book",
-        description: "Ejercicios prácticos",
-        lessonId: 4,
-        status: "LOCKED"
-      },
-      { 
-        type: "trophy",
-        description: "Evaluación Módulo A",
-        lessonId: 5,
-        status: "LOCKED"
-      },
-    ],
-  },
-  {
-    unitNumber: 1,
-    description: "Tablas de Decisión en Testing",
-    backgroundColor: "bg-[#f2a445]",
-    textColor: "text-[#f2a445]",
-    borderColor: "border-[#d18a2a]",
-    tiles: [
-      { 
-        type: "fast-forward",
-        description: "Introducción a Tablas de Decisión",
-        lessonId: 1,
-        status: "ACTIVE"
-      },
-      { 
-        type: "dumbbell",
-        description: "Práctica personalizada",
-        lessonId: 2,
-        status: "LOCKED"
-      },
-      { 
-        type: "book",
-        description: "Construcción de tablas",
-        lessonId: 3,
-        status: "LOCKED"
-      },
-      { 
-        type: "treasure",
-        description: "",
-        lessonId: 0,
-        status: "LOCKED"
-      },
-      { 
-        type: "star",
-        description: "Reglas de decisión",
-        lessonId: 4,
-        status: "LOCKED"
-      },
-      { 
-        type: "book",
-        description: "Casos de prueba complejos",
-        lessonId: 5,
-        status: "LOCKED"
-      },
-      { 
-        type: "star",
-        description: "Optimización de tablas",
-        lessonId: 6,
-        status: "LOCKED"
-      },
-      { 
-        type: "book",
-        description: "Validación completa",
-        lessonId: 7,
-        status: "LOCKED"
-      },
-      { 
-        type: "treasure",
-        description: "",
-        lessonId: 0,
-        status: "LOCKED"
-      },
-      { 
-        type: "dumbbell",
-        description: "Práctica personalizada",
-        lessonId: 8,
-        status: "LOCKED"
-      },
-      { 
-        type: "trophy",
-        description: "Evaluación Módulo B",
-        lessonId: 9,
-        status: "LOCKED"
-      },
-    ],
-  },
-  {
-    unitNumber: 1,
-    description: "Pruebas de Sentencia y Cobertura",
-    backgroundColor: "bg-[#f2a445]",
-    textColor: "text-[#f2a445]",
-    borderColor: "border-[#d18a2a]",
-    tiles: [
-      { 
-        type: "fast-forward",
-        description: "Introducción a Pruebas de Sentencia",
-        lessonId: 1,
-        status: "ACTIVE"
-      },
-      { 
-        type: "book",
-        description: "Análisis de código",
-        lessonId: 2,
-        status: "LOCKED"
-      },
-      { 
-        type: "star",
-        description: "Cobertura de sentencias",
-        lessonId: 3,
-        status: "LOCKED"
-      },
-      { 
-        type: "treasure",
-        description: "",
-        lessonId: 0,
-        status: "LOCKED"
-      },
-      { 
-        type: "book",
-        description: "Métricas de cobertura",
-        lessonId: 4,
-        status: "LOCKED"
-      },
-      { 
-        type: "star",
-        description: "Optimización de pruebas",
-        lessonId: 5,
-        status: "LOCKED"
-      },
-      { 
-        type: "treasure",
-        description: "",
-        lessonId: 0,
-        status: "LOCKED"
-      },
-      { 
-        type: "dumbbell",
-        description: "Práctica personalizada",
-        lessonId: 6,
-        status: "LOCKED"
-      },
-      { 
-        type: "book",
-        description: "Casos avanzados",
-        lessonId: 7,
-        status: "LOCKED"
-      },
-      { 
-        type: "trophy",
-        description: "Evaluación Módulo C",
-        lessonId: 8,
-        status: "LOCKED"
-      },
-    ],
-  },
-];
+    });
 
-// Esta función ya no se usa en learn.tsx, pero se mantiene por compatibilidad
-export const getUnitForModule = (moduleCode: string): Unit | null => {
-  switch (moduleCode) {
-    case "moduleA":
-      return units[0] ?? null;
-    case "moduleB":
-      return units[1] ?? null;
-    case "moduleC":
-      return units[2] ?? null;
-    default:
-      return null;
+    if (!response.ok) {
+      throw new Error(`Error ${response.status} fetching unit for module ${moduleCode}`);
+    }
+
+    const data = await response.json();
+    return data as Unit;
+  } catch (error) {
+    console.error(`Error fetching unit for module ${moduleCode}:`, error);
+    throw error;
   }
 };

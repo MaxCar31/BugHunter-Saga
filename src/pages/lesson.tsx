@@ -14,7 +14,7 @@ import {
 } from "~/components/Svgs";
 import { useBoundStore } from "~/hooks/useBoundStore";
 import { useRouter } from "next/router";
-import { type ModuleLesson } from "~/utils/lessons";
+import { type ModuleLesson, fetchProblemsByLessonId } from "~/utils/lessons"; // Importar la nueva función
 import { completeLessonAPI, type LessonCompletionRequest } from "~/services/lessonService";
 
 // Importar componentes refactorizados
@@ -46,10 +46,18 @@ const formatTime = (timeMs: number): string => {
 const Lesson: NextPage = () => {
   // --- TODOS LOS HOOKS AL PRINCIPIO ---
   const router = useRouter();
-  const currentModule = useBoundStore((x) => x.module);
-  const getQuestionsForModule = useBoundStore((x) => x.getQuestionsForModule);
-  const loadQuestions = useBoundStore((x) => x.loadQuestions);
+  
+  // 1. OBTENER ID DE LA URL
+  const activeLessonId = Number(router.query.lessonId);
+  const isPractice = "practice" in router.query;
 
+  const currentModule = useBoundStore((x) => x.module);
+  
+  // 2. NUEVO ESTADO PARA PREGUNTAS LOCALES
+  const [lessonProblems, setLessonProblems] = useState<ModuleLesson[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Estados existentes...
   const [lessonProblem, setLessonProblem] = useState(0);
   const [lessonFinished, setLessonFinished] = useState(false);
   const [correctAnswerCount, setCorrectAnswerCount] = useState(0);
@@ -66,48 +74,34 @@ const Lesson: NextPage = () => {
   const startTime = useRef(Date.now());
   const endTime = useRef(startTime.current + 1000 * 60 * 3 + 1000 * 33);
 
-  // Cargar preguntas cuando el componente se monta
+  // 3. EFECTO PARA CARGAR SOLO LA LECCIÓN ACTUAL
   useEffect(() => {
-    if (currentModule?.code) {
-      console.log("Loading questions for module:", currentModule?.code);
-      void loadQuestions(currentModule.code);
-    }
-  }, [currentModule?.code]); // Removido loadQuestions de las dependencias
+    const loadSpecificLesson = async () => {
+      if (!router.isReady || !activeLessonId) return;
+      
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("bh_token");
+        // Usamos la nueva función que llama al backend por ID
+        const problems = await fetchProblemsByLessonId(activeLessonId, token || undefined);
+        setLessonProblems(problems);
+        setLessonProblem(0); // Reiniciar al principio de la lección
+      } catch (error) {
+        console.error("Error cargando lección:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Redirigir si no hay módulo
-  useEffect(() => {
-    if (!currentModule && typeof window !== "undefined") {
-      void router.push('/register');
-    }
-  }, [currentModule, router]);
+    void loadSpecificLesson();
+  }, [router.isReady, activeLessonId]);
 
   // --- LÓGICA CONDICIONAL DESPUÉS DE TODOS LOS HOOKS ---
 
-  // Si no hay módulo, mostrar loading mientras se redirige
-  if (!currentModule) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-xl">Cargando módulo...</p>
-      </div>
-    );
-  }
-
-  // Obtiene preguntas del módulo actual desde el store
-  const lessonProblems = getQuestionsForModule(currentModule!.code);
-  // console.log("Lesson problems for", currentModule!.code, ":", lessonProblems);
-  // console.log("Current problem type:", lessonProblems[lessonProblem]?.type);
-
-  // Verificación: Si no hay preguntas, mostrar mensaje de carga
-  if (lessonProblems.length === 0) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Cargando preguntas...</h1>
-          <p className="text-gray-600">Por favor, espera mientras se cargan las lecciones para el módulo {currentModule!.name}.</p>
-        </div>
-      </div>
-    );
-  }
+  // Validaciones
+  if (!currentModule) return <div className="flex min-h-screen items-center justify-center">Cargando módulo...</div>;
+  if (isLoading) return <div className="flex min-h-screen items-center justify-center">Cargando lección...</div>;
+  if (lessonProblems.length === 0) return <div className="flex min-h-screen items-center justify-center">No se encontraron preguntas para esta lección.</div>;
 
   const problem = lessonProblems[lessonProblem] ?? lessonProblems[0]!;
 
@@ -297,6 +291,7 @@ const Lesson: NextPage = () => {
         reviewLessonShown={reviewLessonShown}
         setReviewLessonShown={setReviewLessonShown}
         questionResults={questionResults}
+        currentLessonId={activeLessonId} // <--- PASAR EL ID REAL AQUÍ
       />
     );
   }
@@ -397,6 +392,8 @@ const Lesson: NextPage = () => {
 
 // Función helper para obtener el lessonId actual basado en el módulo
 // Mapeo temporal basado en unit.json - cada módulo tiene sus propios lessonIds
+// ESTA FUNCIÓN YA NO ES NECESARIA
+/*
 const getCurrentLessonId = (moduleCode: string): number => {
   const moduleToLessonId: Record<string, number> = {
     "moduleA": 1, // Equivale al primer lessonId del moduleA
@@ -408,6 +405,7 @@ const getCurrentLessonId = (moduleCode: string): number => {
   
   return moduleToLessonId[moduleCode] || 1;
 };
+*/
 
 export default Lesson;const MultipleChoiceQuestion = ({
   problem,
@@ -513,6 +511,7 @@ const LessonComplete = ({
   reviewLessonShown,
   setReviewLessonShown,
   questionResults,
+  currentLessonId, // <--- Recibirlo
 }: {
   correctAnswerCount: number;
   incorrectAnswerCount: number;
@@ -521,6 +520,7 @@ const LessonComplete = ({
   reviewLessonShown: boolean;
   setReviewLessonShown: React.Dispatch<React.SetStateAction<boolean>>;
   questionResults: QuestionResult[];
+  currentLessonId: number;
 }) => {
   const router = useRouter();
   const isPractice = "practice" in router.query;
@@ -558,13 +558,9 @@ const LessonComplete = ({
     setIsCompletingLesson(true);
 
     try {
-      // Obtener lessonId basado en el módulo actual
-      // Por ahora uso un mapeo simple - esto se puede mejorar más tarde
-      const lessonId = getCurrentLessonId(currentModule?.code || '');
-      
       // Preparar la request
       const request: LessonCompletionRequest = {
-        lessonId,
+        lessonId: currentLessonId, // Usa el ID real
         correctAnswerCount,
         incorrectAnswerCount,
         timeTakenMs: endTime.current - startTime.current,
