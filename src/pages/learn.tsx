@@ -581,13 +581,13 @@ const Learn: NextPage = () => {
           ))}
 
           <div className="sticky bottom-20 left-0 right-0 flex items-end justify-between sm:bottom-24">
-            <Link
+            {/* <Link
               href="/lesson?practice"
               className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-16 sm:w-16"
             >
               <span className="sr-only">Practice exercise</span>
               <PracticeExerciseSvg className="h-7 w-7 sm:h-8 sm:w-8" />
-            </Link>
+            </Link> */}
             {scrollY > 100 && (
               <button
                 className="flex h-12 w-12 items-center justify-center self-end rounded-2xl border-2 border-b-4 border-gray-200 bg-white shadow-lg transition hover:bg-gray-50 hover:brightness-90 sm:h-14 sm:w-14"

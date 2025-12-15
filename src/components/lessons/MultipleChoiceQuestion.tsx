@@ -8,7 +8,7 @@ import type { ModuleLesson } from "~/types/lesson";
 const parseQuestionWithCode = (html: string): { text: string; code: string | null } => {
     // Buscar código entre <code>...</code>
     const codeMatch = html.match(/<code>([\s\S]*?)<\/code>/i);
-    
+
     if (codeMatch && codeMatch[1]) {
         // Separar el texto de la pregunta del código
         const text = html.replace(/<code>[\s\S]*?<\/code>/gi, '').replace(/<br\s*\/?>/gi, ' ').trim();
@@ -19,7 +19,7 @@ const parseQuestionWithCode = (html: string): { text: string; code: string | nul
             .replace(/&quot;/g, '"');
         return { text, code };
     }
-    
+
     return { text: html, code: null };
 };
 
@@ -27,7 +27,7 @@ const parseQuestionWithCode = (html: string): { text: string; code: string | nul
 const formatCode = (code: string): string => {
     // Limpiar espacios múltiples primero
     let formatted = code.replace(/\s+/g, ' ').trim();
-    
+
     // Dividir por palabras clave para crear líneas separadas
     formatted = formatted
         // else if en nueva línea
@@ -40,29 +40,29 @@ const formatCode = (code: string): string => {
         .replace(/\{\s*/g, ' {\n    ')
         // Antes de } quitar espacios y agregar nueva línea
         .replace(/\s*\}/g, '\n}');
-    
+
     // Aplicar indentación correcta
     const lines = formatted.split('\n');
     let indentLevel = 0;
     const indentedLines = lines.map(line => {
         const trimmedLine = line.trim();
         if (!trimmedLine) return '';
-        
+
         // Reducir indent antes de }
         if (trimmedLine.startsWith('}')) {
             indentLevel = Math.max(0, indentLevel - 1);
         }
-        
+
         const indentedLine = '    '.repeat(indentLevel) + trimmedLine;
-        
+
         // Aumentar indent después de {
         if (trimmedLine.endsWith('{')) {
             indentLevel++;
         }
-        
+
         return indentedLine;
     });
-    
+
     return indentedLines.filter(line => line.trim()).join('\n');
 };
 
@@ -101,7 +101,7 @@ export const MultipleChoiceQuestion = ({
     }
 
     const { question, answers, correctAnswer } = problem;
-    
+
     // Parsear la pregunta para separar texto y código
     const { text: questionText, code: questionCode } = parseQuestionWithCode(question || "Pregunta no disponible");
 
@@ -116,55 +116,55 @@ export const MultipleChoiceQuestion = ({
                         hearts={hearts}
                     />
                 </div>
-                <section className="flex max-w-2xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-12 sm:px-5 w-full">
+                <section className="flex max-w-5xl grow flex-col gap-6 self-center sm:items-start sm:justify-center sm:gap-10 sm:px-8 w-full">
                     {/* Pregunta (solo texto) */}
-                    <h1 
-                        className="self-start text-2xl font-bold sm:text-3xl"
+                    <h1
+                        className="self-start text-xl font-semibold leading-relaxed sm:text-2xl text-gray-800 w-full"
                         dangerouslySetInnerHTML={{ __html: questionText }}
                     />
-                    
+
                     {/* Bloque de Código (si existe) */}
                     {questionCode && (
-                        <div className="w-full rounded-xl border-2 border-gray-700 bg-gray-900 overflow-hidden">
+                        <div className="w-full rounded-xl border-2 border-gray-700 bg-gray-900 overflow-hidden shadow-lg">
                             {/* Barra de título */}
-                            <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 border-b border-gray-700">
+                            <div className="flex items-center gap-2 bg-gray-800 px-4 py-3 border-b border-gray-700">
                                 <div className="flex gap-1.5">
                                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
                                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                                 </div>
-                                <span className="text-gray-400 text-sm font-mono ml-2">📄 Código</span>
+                                <span className="text-gray-400 text-sm font-mono ml-2 font-medium">📄 Código</span>
                             </div>
                             {/* Código formateado */}
-                            <div className="p-4 overflow-x-auto">
-                                <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">
+                            <div className="p-5 overflow-x-auto">
+                                <pre className="text-base text-green-400 font-mono whitespace-pre-wrap leading-relaxed">
                                     <code>{formatCode(questionCode)}</code>
                                 </pre>
                             </div>
                         </div>
                     )}
-                    
+
                     {/* Opciones de respuesta */}
                     <div
-                        className="grid grid-cols-2 gap-2 sm:grid-cols-2 w-full"
+                        className="grid grid-cols-1 gap-3 sm:grid-cols-2 w-full sm:gap-4"
                         role="radiogroup"
                     >
                         {answers?.map((answer, i) => {
                             return (
                                 <div
                                     key={i}
-                                    className={`rounded-xl border-2 border-b-4 p-4 ${correctAnswerShown ? "cursor-not-allowed" : "cursor-pointer"} ${i === selectedAnswer ? "border-blue-300 bg-blue-100 text-blue-400" : "border-gray-200"} ${!correctAnswerShown && "hover:bg-gray-100"}`}
+                                    className={`rounded-xl border-2 border-b-4 p-5 transition-all ${correctAnswerShown ? "cursor-not-allowed" : "cursor-pointer"} ${i === selectedAnswer ? "border-blue-400 bg-blue-100 text-blue-500" : "border-gray-300 bg-white"} ${!correctAnswerShown && "hover:bg-gray-50 hover:border-gray-400"}`}
                                     role="radio"
                                     aria-checked={i === selectedAnswer}
                                     tabIndex={0}
                                     onClick={() => !correctAnswerShown && setSelectedAnswer(i)}
                                 >
                                     {answer.icon}
-                                    <h2 className="text-center">{answer.name}</h2>
+                                    <h2 className="text-center text-base font-medium leading-relaxed text-gray-800">{answer.name}</h2>
                                 </div>
                             );
                         }) || (
-                                <div className="col-span-full text-center text-gray-500">
+                                <div className="col-span-full text-center text-base text-gray-500 font-normal">
                                     No hay opciones disponibles
                                 </div>
                             )}

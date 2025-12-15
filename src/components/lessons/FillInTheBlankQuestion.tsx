@@ -7,17 +7,17 @@ import { CodeEditorQuestion } from "./CodeEditorQuestion";
 import type { ModuleLesson } from "~/types/lesson";
 
 interface ProblemContent {
-  type: string;
-  question?: string;
-  codeTemplate?: string;
-  expectedAnswer?: string;
-  hint?: string;
-  explanation?: string;
-  testCases?: Array<{
-    input: string;
-    expectedOutput: string;
-    description: string;
-  }>;
+    type: string;
+    question?: string;
+    codeTemplate?: string;
+    expectedAnswer?: string;
+    hint?: string;
+    explanation?: string;
+    testCases?: Array<{
+        input: string;
+        expectedOutput: string;
+        description: string;
+    }>;
 }
 
 export const FillInTheBlankQuestion = ({
@@ -50,7 +50,7 @@ export const FillInTheBlankQuestion = ({
     hearts: number | null;
 }) => {
     const [codeAnswerCorrect, setCodeAnswerCorrect] = useState(false);
-    
+
     // Type guard para asegurar que es una lección tipo FILL_IN_THE_BLANK o CODE_EXERCISE
     if (problem.type !== "FILL_IN_THE_BLANK" && problem.type !== "CODE_EXERCISE") {
         return null;
@@ -59,7 +59,7 @@ export const FillInTheBlankQuestion = ({
     // Parsear el contenido si es JSON (para ejercicios de código)
     let isCodeExercise = false;
     let contentData: ProblemContent | null = null;
-    
+
     try {
         if (typeof problem.content === "string") {
             contentData = JSON.parse(problem.content);
@@ -85,7 +85,7 @@ export const FillInTheBlankQuestion = ({
                         hearts={hearts}
                     />
                 </div>
-                <section className="flex max-w-4xl grow flex-col gap-5 self-center sm:items-center sm:justify-center sm:gap-6 w-full px-4">
+                <section className="flex max-w-5xl grow flex-col gap-6 self-center sm:items-center sm:justify-center sm:gap-8 w-full px-4 sm:px-8">
                     {/* Si es ejercicio de código */}
                     {isCodeExercise && contentData ? (
                         <CodeEditorQuestion
@@ -106,15 +106,15 @@ export const FillInTheBlankQuestion = ({
                     ) : (
                         /* Si es ejercicio tradicional de tiles */
                         <>
-                            <h1 className="mb-2 text-2xl font-bold sm:text-3xl">
+                            <h1 className="mb-3 text-xl font-semibold sm:text-2xl text-gray-800 self-start">
                                 Completa la definición
                             </h1>
 
                             <div className="w-full">
-                                <div className="flex items-center gap-2 px-2">
-                                    <Image src="/logo.svg" alt="" width={92} height={115} />
-                                    <div className="relative ml-2 w-fit rounded-2xl border-2 border-gray-200 p-4">
-                                        {question || "Pregunta no disponible"}
+                                <div className="flex items-start gap-3 px-2">
+                                    <Image src="/logo.svg" alt="" width={80} height={100} className="flex-shrink-0" />
+                                    <div className="relative ml-2 flex-1 rounded-2xl border-2 border-gray-200 p-5 bg-white shadow-sm">
+                                        <p className="text-base font-medium leading-relaxed text-gray-800">{question || "Pregunta no disponible"}</p>
                                         <div
                                             className="absolute h-4 w-4 rotate-45 border-b-2 border-l-2 border-gray-200 bg-white"
                                             style={{
@@ -125,12 +125,12 @@ export const FillInTheBlankQuestion = ({
                                     </div>
                                 </div>
 
-                                <div className="flex min-h-[60px] flex-wrap gap-1 border-b-2 border-t-2 border-gray-200 py-1">
+                                <div className="flex min-h-[70px] flex-wrap gap-2 border-b-2 border-t-2 border-gray-200 py-3 px-2">
                                     {selectedAnswers.map((i) => {
                                         return (
                                             <button
                                                 key={i}
-                                                className="rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700 disabled:cursor-not-allowed"
+                                                className="rounded-2xl border-2 border-b-4 border-gray-200 p-3 text-base font-medium text-gray-700 disabled:cursor-not-allowed hover:bg-gray-50 transition"
                                                 disabled={correctAnswerShown}
                                                 onClick={() => {
                                                     if (!correctAnswerShown) {
@@ -146,15 +146,15 @@ export const FillInTheBlankQuestion = ({
                                     })}
                                 </div>
                             </div>
-                            <div className="flex flex-wrap justify-center gap-1">
+                            <div className="flex flex-wrap justify-center gap-2">
                                 {answerTiles?.map((answerTile, i) => {
                                     return (
                                         <button
                                             key={i}
                                             className={
                                                 selectedAnswers.includes(i)
-                                                    ? "rounded-2xl border-2 border-b-4 border-gray-200 bg-gray-200 p-2 text-gray-200"
-                                                    : "rounded-2xl border-2 border-b-4 border-gray-200 p-2 text-gray-700"
+                                                    ? "rounded-2xl border-2 border-b-4 border-gray-300 bg-gray-200 p-3 text-base font-medium text-gray-300 cursor-not-allowed"
+                                                    : "rounded-2xl border-2 border-b-4 border-gray-300 bg-white p-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition"
                                             }
                                             disabled={correctAnswerShown || selectedAnswers.includes(i)}
                                             onClick={() => {
