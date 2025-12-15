@@ -1,0 +1,7 @@
+node_modules
+.next
+.git
+.env
+# IMPORTANTE: Ignora el backend cuando construyas el frontend
+bughunter-api
+bughunter-api/**

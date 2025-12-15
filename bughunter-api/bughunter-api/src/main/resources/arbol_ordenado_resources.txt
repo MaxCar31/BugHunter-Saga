@@ -5,6 +5,9 @@
 
 │   ├── 📁 db/
 │   │   ├── 📁 migration/
+│   │   │   ├── 📄 V10__add_user_lesson_progress_with_repeats.sql
+│   │   │   ├── 📄 V11__Seed_Shop_items.sql
+│   │   │   ├── 📄 V12__Seed_Module_A_Level_2_3.sql
 │   │   │   ├── 📄 V1__Create_Users_table.sql
 │   │   │   ├── 📄 V2__Create_UserProfile_table.sql
 │   │   │   ├── 📄 V3__Create_Content_Tables.sql
@@ -15,6 +18,7 @@
 │   │   │   ├── 📄 V8__Seed_Module_C_Statement_Testing.sql
 │   │   │   ├── 📄 V9__add_performance_indexes.sql
 │   ├── 📁 static/
+│   ├── 📁 templates/
 
 
 ================================================================================
@@ -22,7 +26,566 @@
 ================================================================================
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V1__Create_Users_table.sql
+📄 CONTENIDO DE: db\migration\V10__add_user_lesson_progress_with_repeats.sql
+================================================================================
+-- Migración V10: Crear tabla user_lesson_progress con estructura para repeticiones
+-- Esta tabla permite múltiples intentos de la misma lección por usuario
+
+CREATE TABLE user_lesson_progress (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    lesson_id INTEGER NOT NULL,
+    completed_at TIMESTAMPTZ DEFAULT NOW(),
+    score INTEGER,
+    attempt_number INTEGER DEFAULT 1 NOT NULL,
+    
+    -- Foreign keys
+    CONSTRAINT fk_user_lesson_progress_user 
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_lesson_progress_lesson 
+        FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
+);
+
+-- Índices para optimizar consultas
+CREATE INDEX idx_user_lesson_progress_user_id ON user_lesson_progress(user_id);
+CREATE INDEX idx_user_lesson_progress_lesson_id ON user_lesson_progress(lesson_id);
+CREATE INDEX idx_user_lesson_progress_user_lesson ON user_lesson_progress(user_id, lesson_id);
+CREATE INDEX idx_user_lesson_progress_attempt ON user_lesson_progress(user_id, lesson_id, attempt_number);
+
+-- Comentarios
+COMMENT ON TABLE user_lesson_progress IS 'Progreso de lecciones con soporte para múltiples intentos';
+COMMENT ON COLUMN user_lesson_progress.attempt_number IS 'Número de intento (1, 2, 3, ...)';
+
+================================================================================
+📄 CONTENIDO DE: db\migration\V11__Seed_Shop_items.sql
+================================================================================
+-- ============================================================================
+-- Migration: V12__Add_Badges_And_Titles_Shop_Items.sql
+-- Description: Sistema de badges y títulos para testing professionals
+-- Fecha: 2025-12-02
+-- Autor: BugHunter Saga Team
+-- ============================================================================
+
+-- 🔍 Explicación:
+-- Esta migración agrega items visuales permanentes (badges + títulos)
+-- relacionados con el mundo del testing y QA profesional.
+--
+-- Categorías:
+-- 1. Badges (5): Insignias coleccionables permanentes
+-- 2. Títulos (3): Texto personalizado bajo el nombre del usuario
+--
+-- IMPORTANTE:
+-- - Esta es data NUEVA, NO elimina items existentes (double-xp, etc.)
+-- - Si necesitas eliminar items antiguos, hazlo en una migración aparte
+-- - Los items son permanentes (NO consumibles)
+-- - Compra única por usuario (validado en backend)
+-- - NO requieren condiciones especiales (solo tener suficientes Puntos QA)
+
+-- ============================================================================
+-- 1. BADGES (INSIGNIAS TESTING-THEMED)
+-- ============================================================================
+
+-- 🧪 Badge 1: Maestro de Pruebas (60 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'badge-test-master',
+    'Maestro de Pruebas',
+    'Insignia permanente que demuestra tu dominio en testing de software. Solo se puede comprar una vez.',
+    60,
+    '🧪'
+);
+
+-- 🔍 Badge 2: Inspector de Calidad (120 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'badge-quality-inspector',
+    'Inspector de Calidad',
+    'Insignia permanente para inspectores de calidad expertos. Solo se puede comprar una vez.',
+    120,
+    '🔍'
+);
+
+-- 🏆 Badge 3: Gurú del Testing (250 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'badge-testing-guru',
+    'Gurú del Testing',
+    'Insignia permanente para maestros del testing. Máximo reconocimiento en BugHunter Saga.',
+    250,
+    '🏆'
+);
+
+-- 🔥 Badge 4: Tester Imparable (100 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'badge-unstoppable-tester',
+    'Tester Imparable',
+    'Insignia permanente para testers imparables. Solo se puede comprar una vez.',
+    100,
+    '🔥'
+);
+
+-- 🐛 Badge 5: Cazador de Bugs (30 Puntos QA)
+-- Badge de nivel inicial, disponible desde el principio
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'badge-bug-hunter',
+    'Cazador de Bugs',
+    'Tu primera insignia. Demuestra que has comenzado tu viaje en el mundo del testing.',
+    30,
+    '🐛'
+);
+
+-- ============================================================================
+-- 2. TÍTULOS PROFESIONALES (TESTING-THEMED)
+-- ============================================================================
+
+-- 🎯 Título 1: Cazador de Bugs (30 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'title-bug-hunter',
+    'Cazador de Bugs',
+    'Título profesional que se muestra bajo tu nombre en el perfil y leaderboard. Indica tu especialidad en encontrar defectos.',
+    30,
+    '🎯'
+);
+
+-- 👑 Título 2: Maestro QA (50 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'title-qa-master',
+    'Maestro QA',
+    'Título profesional que demuestra tu maestría en Quality Assurance. Se muestra bajo tu nombre en el perfil y leaderboard.',
+    50,
+    '👑'
+);
+
+-- ⭐ Título 3: Leyenda del Testing (80 Puntos QA)
+INSERT INTO shop_items (item_code, name, description, cost, icon)
+VALUES (
+    'title-tester-legend',
+    'Leyenda del Testing',
+    'Título profesional de élite que te distingue como una leyenda en el mundo del testing. Se muestra bajo tu nombre en el perfil.',
+    80,
+    '⭐'
+);
+
+-- ============================================================================
+-- VERIFICACIÓN DE INSERCIÓN
+-- ============================================================================
+
+-- Ejecutar manualmente para verificar:
+-- SELECT item_code, name, cost, icon FROM shop_items WHERE item_code LIKE 'badge-%' OR item_code LIKE 'title-%' ORDER BY cost ASC;
+--
+-- Resultado esperado (8 items):
+-- | item_code              | name                  | cost | icon |
+-- |------------------------|-----------------------|------|------|
+-- | title-bug-hunter       | Cazador de Bugs       | 30   | 🎯   |
+-- | badge-bug-hunter       | Cazador de Bugs       | 30   | 🐛   |
+-- | title-qa-master        | Maestro QA            | 50   | 👑   |
+-- | badge-test-master      | Maestro de Pruebas    | 60   | 🧪   |
+-- | title-tester-legend    | Leyenda del Testing   | 80   | ⭐   |
+-- | badge-unstoppable-tester| Tester Imparable     | 100  | 🔥   |
+-- | badge-quality-inspector| Inspector de Calidad  | 120  | 🔍   |
+-- | badge-testing-guru     | Gurú del Testing      | 250  | 🏆   |
+
+-- ============================================================================
+-- NOTAS DE IMPLEMENTACIÓN (Backend)
+-- ============================================================================
+
+-- BADGES Y TÍTULOS:
+-- - Son permanentes (NO se consumen después de comprar)
+-- - Compra única validada en PurchaseItemService:
+--   if (userInventoryRepository.existsByUserIdAndItemCode(userId, itemCode)) {
+--       throw new ItemAlreadyOwnedException("Ya posees este item");
+--   }
+-- - NO requieren validaciones extra (módulos completados, rachas, etc.)
+-- - SOLO se valida que el usuario tenga suficientes lingots (Puntos QA)
+-- - Se muestran en /profile como grid de insignias o texto bajo el nombre
+
+-- ECONOMÍA BALANCEADA:
+-- - Lección primera vez: 5 Puntos QA
+-- - Tesoro: 20 Puntos QA
+-- - Sesión típica (5 lecciones + 1 tesoro): ~45 Puntos QA
+--
+-- Distribución de precios:
+-- - Títulos básicos: 30-50 Puntos QA (1-2 sesiones)
+-- - Badges básicos: 30-60 Puntos QA (1-2 sesiones)
+-- - Badges intermedios: 100-120 Puntos QA (3-5 sesiones)
+-- - Badges premium: 250 Puntos QA (8-10 sesiones)
+
+-- ============================================================================
+-- Fin de la migración V12
+-- ============================================================================
+
+================================================================================
+📄 CONTENIDO DE: db\migration\V12__Seed_Module_A_Level_2_3.sql
+================================================================================
+-- ============================================================================
+-- Migration: V12__Seed_Module_A_Level_2_3.sql
+-- Description: Inserta el contenido COMPLETO del Nivel 2 (Unit 2) y Nivel 3 (Unit 3) del Módulo A
+-- Author: BugHunter Saga Team
+-- Date: 2025-12-07 (Versión Completa - Corregida)
+-- ============================================================================
+
+-- ============================================================================
+-- UNIT 2 - LESSON 1 (BOOK) - Formularios y validaciones básicas
+-- ============================================================================
+
+-- Bloque Recordatorio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'book' AND position = 1), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Fundamentos de Particiones de Equivalencia (EP)",
+  "introduction": "Las Particiones de Equivalencia (EP) dividen el dominio de entrada en clases de valores que generan el mismo comportamiento esperado del sistema. Estas clases se definen a partir de reglas, rangos, longitudes, formatos o conjuntos permitidos. Cada clase puede ser válida, cuando contiene valores aceptados por el sistema, o inválida, cuando agrupa valores que deben generar error o rechazo. Para cada clase se selecciona un valor representativo, lo que permite reducir pruebas redundantes sin perder cobertura. En esta lección, aplicarás EP a validaciones de formularios considerando distintos criterios de entrada.",
+  "objectives": [
+    "Recordar cómo EP divide el dominio en clases válidas e inválidas",
+    "Identificar valores representativos de cada clase de equivalencia",
+    "Aplicar EP a casos prácticos de validación"
+  ]
+}', 1);
+
+-- Pregunta 1: EP - longitud mínima de username
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema establece que el nombre de usuario debe tener entre 4 y 12 caracteres. Considerando la partición válida definida por esta regla, ¿cuál opción pertenece a esa clase de equivalencia?",
+  "answers": [
+    {"name": "AJ"},
+    {"name": "MARCO"},
+    {"name": "Q"},
+    {"name": "MARCO_GONZALEZ123"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- Pregunta 2: EP - formato de email
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema de registro valida emails con estas reglas: debe contener exactamente un símbolo @, tener al menos un carácter antes del @, y el dominio debe incluir al menos un punto. Dado el email válido de referencia: lucia.torres@miempresa.com.mx, ¿cuál de los siguientes emails genera el mismo comportamiento esperado del sistema?",
+  "answers": [
+    {"name": "pedro.ramirez@biblioteca.org"},
+    {"name": "usuario@correo"},
+    {"name": "@soporte.net"},
+    {"name": "admin@@sistema.com"}
+  ],
+  "correctAnswer": 0
+}', 3);
+
+-- Pregunta 3: EP - intentos de login
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Las particiones separan valores que generan el mismo comportamiento del sistema. Un sistema permite máximo 3 intentos de inicio de sesión. ¿Cuál opción pertenece a la partición inválida?",
+  "answers": [
+    {"name": "1 intento"},
+    {"name": "2 intentos"},
+    {"name": "3 intentos"},
+    {"name": "4 intentos"}
+  ],
+  "correctAnswer": 3
+}', 4);
+
+-- Pregunta 4: EP - métodos de pago
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Las categorías forman particiones claras y no se mezclan. Una tienda online acepta solo tarjeta, transferencia o wallet digital. Completa: Paypal pertenece a una clase ____ y puede usarse como valor ____ de todos los métodos no aceptados.",
+  "answerTiles": ["inválida", "válida", "representativo", "permitido"],
+  "correctAnswerIndices": [0, 2]
+}', 5);
+
+-- Pregunta 5: EP - cantidad de productos
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "En Particiones de Equivalencia, un solo valor puede representar el comportamiento de toda una clase. Un carrito de compras solo permite cantidades entre 1 y 99. Completa: El valor 0 pertenece a la clase ____, mientras que el valor ____ puede usarse como valor ____ de la clase válida.",
+  "answerTiles": ["válida", "inválida", "70", "100", "representativo", "límite"],
+  "correctAnswerIndices": [1, 2, 4]
+}', 6);
+
+-- ============================================================================
+-- UNIT 2 - LESSON 2 (DUMBBELL) - Análisis de Valores Frontera (BVA)
+-- ============================================================================
+
+-- Bloque Recordatorio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Análisis de Valores Frontera (BVA)",
+  "introduction": "El Análisis de Valores Frontera (BVA) se centra en los límites del dominio de entrada. Los puntos mínimos, máximos y los valores inmediatamente adyacentes a ellos suelen concentrar errores de implementación. BVA verifica que el sistema responda correctamente cuando una entrada cruza esos límites, validando las transiciones entre valores aceptados y no aceptados.",
+  "objectives": [
+    "Recordar qué son los valores frontera y por qué son críticos",
+    "Identificar límites mínimos, máximos y valores adyacentes",
+    "Aplicar BVA a casos prácticos de validación de rangos"
+  ]
+}', 1);
+
+-- Pregunta 1: BVA - edad mínima permitida
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "En BVA, el valor inmediatamente anterior al límite mínimo es un valor frontera inválido. Para registrarse en un sistema, la edad permitida va de 18 a 65 años. ¿Cuál valor representa el primer valor inválido?",
+  "answers": [
+    {"name": "17 años (justo antes del mínimo)"},
+    {"name": "18 años (límite mínimo válido)"},
+    {"name": "19 años (dentro del rango)"},
+    {"name": "16 años (muy por debajo del límite)"}
+  ],
+  "correctAnswer": 0
+}', 2);
+
+-- Pregunta 2: BVA - límite máximo de archivos adjuntos
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "En BVA, el valor inmediatamente posterior al límite máximo es un valor frontera crítico. Un sistema permite adjuntar entre 1 y 5 archivos en un formulario. ¿Cuál valor representa el límite superior externo (primer valor inválido)?",
+  "answers": [
+    {"name": "4 archivos (dentro del rango permitido)"},
+    {"name": "5 archivos (límite máximo válido)"},
+    {"name": "6 archivos (justo después del máximo)"},
+    {"name": "10 archivos (muy por encima del límite)"}
+  ],
+  "correctAnswer": 2
+}', 3);
+
+-- Pregunta 3: BVA - rango de archivos subidos (CORREGIDA)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un sistema permite subir entre 2 y 10 archivos en una sola operación. En BVA, los valores frontera incluyen los límites y sus valores adyacentes. Completa: El valor ____ está justo antes del mínimo (inválido), el valor ____ es el mínimo válido, el valor ____ es el máximo válido, y el valor ____ está justo después del máximo (inválido).",
+  "answerTiles": ["1", "2", "10", "11", "3", "9"],
+  "correctAnswerIndices": [0, 1, 2, 3]
+}', 4);
+
+-- Pregunta 4: BVA - límite de asientos en reserva (ORDEN MEZCLADO)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un sistema permite reservar entre 8 y 20 asientos por pedido. Los valores frontera incluyen los límites y sus adyacentes. Completa: El valor ____ está justo antes del mínimo (inválido), el valor ____ es el mínimo válido, el valor ____ es el máximo válido, y el valor ____ está justo después del máximo (inválido).",
+  "answerTiles": ["19", "21", "9", "7", "8", "20"],
+  "correctAnswerIndices": [3, 4, 5, 1]
+}', 5);
+
+-- Pregunta 5: BVA - límite de intentos de login
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema bloquea la cuenta después de 3 intentos fallidos. En BVA, ¿qué conjunto de valores cubre correctamente el límite máximo y sus valores adyacentes?",
+  "answers": [
+    {"name": "2 intentos, 3 intentos, 4 intentos"},
+    {"name": "1 intento, 2 intentos, 3 intentos"},
+    {"name": "3 intentos, 4 intentos, 5 intentos"},
+    {"name": "0 intentos, 3 intentos, 6 intentos"}
+  ],
+  "correctAnswer": 0
+}', 6);
+
+-- ============================================================================
+-- UNIT 2 - LESSON 3 (TROPHY) - Viajes, configuraciones y soporte técnico
+-- ============================================================================
+
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'trophy' AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Cómo se complementan EP y BVA",
+  "introduction": "Las Particiones de Equivalencia (EP) y el Análisis de Valores Frontera (BVA) trabajan juntas para cubrir el dominio de entrada de forma eficiente. EP permite dividir el dominio en clases que representan comportamientos distintos del sistema, mientras que BVA se enfoca en los puntos críticos donde una clase cambia a otra. Primero se identifican las particiones con EP, y luego se seleccionan los valores más sensibles de esas particiones usando BVA. Esta combinación reduce la cantidad de pruebas sin perder cobertura en los escenarios más propensos a fallos.",
+  "objectives": [
+    "Reconocer el rol de EP en la división del dominio de entrada",
+    "Reconocer el rol de BVA en la selección de valores críticos",
+    "Comprender el orden lógico de uso: EP primero, BVA después",
+    "Entender cómo ambas técnicas se refuerzan mutuamente"
+  ]
+}', 1);
+
+-- Pregunta 1: EP con matriz simple de soporte técnico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'trophy' AND position = 3), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "En EP, las combinaciones válidas se definen por reglas del sistema, y en BVA se analizan los límites de esas reglas. Un sistema de soporte técnico define: Incidente permite prioridad hasta Alta; Consulta permite prioridad hasta Media; Reclamo permite únicamente prioridad Alta. Considerando estas reglas, ¿qué combinación pertenece a una clase inválida por superar un límite definido?",
+  "answers": [
+    {"name": "Consulta + Baja"},
+    {"name": "Incidente + Alta"},
+    {"name": "Consulta + Alta"},
+    {"name": "Reclamo + Alta"}
+  ],
+  "correctAnswer": 2
+}', 2);
+
+-- Pregunta 2: BVA con gráfico de peso permitido por maleta
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'trophy' AND position = 3), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema de transporte permite hasta 28 kg cuando se viaja con 2 maletas. ¿Cuál es el primer valor que debería ser rechazado por superar ese límite?",
+  "answers": [
+    {"name": "27 kg"},
+    {"name": "28 kg"},
+    {"name": "29 kg"},
+    {"name": "20 kg"}
+  ],
+  "correctAnswer": 2
+}', 3);
+
+-- Pregunta 3: EP + BVA con gráfico simple de niveles de brillo
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Una app de configuración divide el brillo en tres zonas: Zona A (1–3), Zona B (4–7) y Zona C (8–10). Completa: El valor 3 pertenece a la partición ____ y actúa como un valor ____, mientras que el valor 4 pertenece a la partición ____ y representa el ____ de esa zona.",
+  "answerTiles": [
+    "Zona A",
+    "Zona B",
+    "Zona C",
+    "límite superior",
+    "límite inferior",
+    "valor interno"
+  ],
+  "correctAnswerIndices": [0, 3, 1, 4]
+}', 4);
+
+-- ============================================================================
+-- UNIT 3 - LESSON 1 (BOOK) - Análisis de Particiones Complejas (EP)
+-- ============================================================================
+
+-- Bloque Recordatorio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'book' AND position = 1), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Análisis de Particiones Complejas (EP)",
+  "introduction": "Las particiones complejas surgen cuando el comportamiento del sistema depende de múltiples reglas o del contexto de uso. En estos escenarios, las clases de equivalencia no se definen por un único campo, sino por la combinación de varios atributos, restricciones cruzadas o conjuntos cerrados de valores permitidos. El uso correcto de EP permite clasificar el dominio combinado de entradas en clases coherentes, incluso cuando existen dependencias entre campos o reglas condicionales.",
+  "objectives": [
+    "Aplicar EP en escenarios con dependencias entre múltiples campos",
+    "Identificar clases de equivalencia definidas por conjuntos cerrados de valores",
+    "Clasificar entradas según reglas contextuales y combinadas"
+  ]
+}', 1);
+
+-- Pregunta 1: EP - Formulario con dependencias (código postal según país)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un formulario valida direcciones donde el país determina el formato del código postal. Para Ecuador, el sistema acepta únicamente códigos numéricos de exactamente 6 dígitos. ¿Cuál de los siguientes valores pertenece a la clase válida para un usuario de Ecuador?",
+  "answers": [
+    {"name": "A92K4"},
+    {"name": "12345"},
+    {"name": "098761"},
+    {"name": "12-3456"}
+  ],
+  "correctAnswer": 2
+}', 2);
+
+-- Pregunta 2: EP - Sistema de streaming (validación combinada mime-type + marcado)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema de streaming procesa archivos de video solo si cumplen dos condiciones simultáneas: el mime-type debe ser uno de los permitidos (video/mp4 o video/webm), y el contenido debe estar marcado como video. El equipo de QA ha definido tres clases de equivalencia según estas reglas. ¿Cuál de los siguientes valores puede considerarse un representante de la clase válida?",
+  "answers": [
+    {"name": "audio/mp4 (contenido marcado como audio)"},
+    {"name": "video/avi (contenido marcado como video)"},
+    {"name": "video/webm (contenido marcado como video)"},
+    {"name": "application/mp4 (contenido marcado como video)"}
+  ],
+  "correctAnswer": 2
+}', 3);
+
+-- Pregunta 3: EP - Plataforma educativa (clasificación por dificultad con análisis completo de clases)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Una plataforma clasifica puntajes de tareas en tres niveles de dificultad: Básico (0-50), Medio (51-80) y Avanzado (81-100). El equipo de QA debe definir todas las clases de equivalencia del sistema, incluyendo una clase inválida para puntajes fuera del dominio permitido. Según la técnica de Particiones de Equivalencia, se identifican cuatro clases: Clase A (puntajes Básico), Clase B (puntajes Medio), Clase C (puntajes Avanzado) y Clase D (puntajes fuera del rango 0-100). Completa: El valor 45 es un representante de la Clase ____, el valor 78 pertenece a la Clase ____, el valor 95 representa la Clase ____, y el valor 120 es un representante de la Clase ____.",
+  "answerTiles": ["A", "B", "C", "D", "válida", "inválida"],
+  "correctAnswerIndices": [0, 1, 2, 3]
+}', 4);
+
+-- ============================================================================
+-- UNIT 3 - LESSON 2 (DUMBBELL) - Análisis de Valores Frontera (BVA)
+-- ============================================================================
+
+-- Bloque Recordatorio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Análisis de Valores Frontera (BVA)",
+  "introduction": "El Análisis de Valores Frontera (BVA) se enfoca en identificar y probar los límites críticos donde las condiciones del sistema cambian de estado. Los valores frontera incluyen los límites exactos, los valores inmediatamente superiores e inferiores, y los puntos de activación de reglas condicionales.",
+  "objectives": [
+    "Identificar valores antes y después de límites críticos",
+    "Reconocer valores frontera válidos en rangos inclusivos",
+    "Clasificar valores según zonas de estado del sistema"
+  ]
+}', 1);
+
+-- Pregunta 1: BVA - Prioridad de tickets según carga del servidor
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "El sistema prioriza tickets según el nivel de carga del servidor (0–100%). El flujo cambia al alcanzar el umbral crítico de 85%. Completa: Un ticket con nivel de carga 84% está ____ respecto al límite, se clasifica en la zona ____ y, según las reglas del flujo, este ticket se considera ____.",
+  "answerTiles": ["antes", "después", "normal", "crítica", "justo", "dentro", "fuera", "permitido", "bloqueado"],
+  "correctAnswerIndices": [0, 2, 7]
+}', 2);
+
+-- Pregunta 2: BVA - Gestión de inventario (valores frontera válidos)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un almacén procesa pedidos solo si el stock se encuentra dentro del rango 20–500 unidades (inclusive). Completa: Un pedido con 20 unidades está ____ respecto al límite inferior, pertenece a la zona ____ y se considera ____ según las reglas del sistema.",
+  "answerTiles": ["antes", "después", "igual", "normal", "crítica", "permitido", "bloqueado"],
+  "correctAnswerIndices": [2, 4, 5]
+}', 3);
+
+-- Pregunta 3: BVA - Sistema de bicicletas eléctricas (CORREGIDA)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un sistema de bicicletas eléctricas limita la activación según el nivel de batería: Disponible (≥35%), Reserva (20–34%), Bloqueada (<20%). Completa: Un nivel de batería de 34% se encuentra ____ respecto al límite de la zona Disponible, pertenece a la zona ____, es el límite ____ de esa zona, y el sistema lo considera ____.",
+  "answerTiles": ["por debajo", "por encima", "igual", "disponible", "reserva", "bloqueada", "superior", "inferior", "permitido", "bloqueado"],
+  "correctAnswerIndices": [0, 4, 6, 8]
+}', 4);
+
+-- ============================================================================
+-- UNIT 3 - LESSON 3 (TROPHY) - Flujos Secuenciales y Reglas Encadenadas
+-- ============================================================================
+
+-- Pregunta 1: EP/BVA - Flujo de aprobación de solicitudes académicas (TIPO: FILL_IN_THE_BLANK)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un portal académico procesa solicitudes según el promedio del estudiante. El sistema define tres estados: Revisión manual (promedio <60), Revisión prioritaria (60–79) y Aprobación directa (≥80). Completa: Un promedio de ____ pertenece a la partición ____, mientras que un promedio de ____ activa el estado ____ y representa el límite ____ de esa zona.",
+  "answerTiles": ["59", "60", "79", "80", "Revisión manual", "Revisión prioritaria", "Aprobación directa", "inferior", "superior"],
+  "correctAnswerIndices": [0, 4, 3, 6, 7]
+}', 1);
+-- Pregunta 2: EP/BVA - Control de temperatura en Smart Home
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un sistema de climatización inteligente clasifica la temperatura de una habitación en tramos de confort y seguridad. Completa: La temperatura se considera Fría cuando está por debajo de ____, el tramo Confort está entre ____ y ____, se considera Caliente a partir de ____ y un valor de 27°C se encuentra dentro del tramo ____.",
+  "answerTiles": ["18", "20", "21", "26", "27", "Muy Fría", "Fría", "Confort", "Caliente"],
+  "correctAnswerIndices": [1, 2, 3, 4, 8]
+}', 2);
+
+-- Pregunta 3: EP/BVA - Gamificación de logros diarios (CORREGIDA)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un juego asigna logros diarios según los puntos acumulados por el jugador. Completa: El tramo Bronze cubre desde ____ hasta ____ puntos, Silver inicia en ____ y termina en ____, y Gold se obtiene a partir de ____ puntos.",
+  "answerTiles": ["0", "99", "100", "149", "150", "Bronze", "Silver", "Gold"],
+  "correctAnswerIndices": [0, 1, 2, 3, 4]
+}', 3);
+
+-- Pregunta 4: EP/BVA + API - Validación de parámetro retryCount (CORREGIDA)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un endpoint POST /auth/login controla el número de intentos consecutivos con el parámetro retryCount, que debe cumplir un rango operativo definido en la tabla interna del backend. Completa: El valor mínimo permitido para retryCount es ____ y el valor máximo es ____. Un intento con retryCount=6 se considera ____ y activaría ____ en el sistema.",
+  "answerTiles": ["0", "5", "dentro del rango", "fuera del rango", "bloqueo temporal", "alerta de seguridad"],
+  "correctAnswerIndices": [0, 1, 3, 5]
+}', 4);
+
+-- ============================================================================
+-- FIN DE LA MIGRACIÓN
+-- ============================================================================
+
+================================================================================
+📄 CONTENIDO DE: db\migration\V1__Create_Users_table.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V1__Create_Users_Table.sql
@@ -51,7 +614,7 @@ CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
 
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V2__Create_UserProfile_table.sql
+📄 CONTENIDO DE: db\migration\V2__Create_UserProfile_table.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V2__Create_User_Profiles_Table.sql
@@ -77,7 +640,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     );
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V3__Create_Content_Tables.sql
+📄 CONTENIDO DE: db\migration\V3__Create_Content_Tables.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V3__Create_Content_Tables.sql
@@ -130,7 +693,7 @@ CREATE TABLE lessons (
                                  ON DELETE CASCADE,
 
                          CONSTRAINT chk_lesson_type
-                             CHECK (type IN ('star', 'book', 'trophy', 'treasure', 'fast-forward'))
+                             CHECK (type IN ('dumbbell', 'book', 'trophy', 'treasure', 'fast-forward'))
 );
 
 COMMENT ON TABLE lessons IS 'Lecciones individuales (tiles) en el camino de aprendizaje';
@@ -152,7 +715,7 @@ CREATE TABLE problems (
                                   ON DELETE CASCADE,
 
                           CONSTRAINT chk_problem_type
-                              CHECK (type IN ('INFO', 'SELECT_1_OF_3', 'FILL_IN_THE_BLANK', 'MATCH_PAIRS', 'CODE_CHALLENGE'))
+                              CHECK (type IN ('INFO', 'SELECT_1_OF_3', 'FILL_IN_THE_BLANK', 'MULTIPLE_CHOICE', 'CODE_CHALLENGE'))
 );
 
 COMMENT ON TABLE problems IS 'Contenido específico de cada lección (problemas/pantallas)';
@@ -161,7 +724,7 @@ CREATE INDEX idx_problems_lesson_id ON problems(lesson_id);
 CREATE INDEX idx_problems_position ON problems(lesson_id, position);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V4__add_gamification_tables.sql
+📄 CONTENIDO DE: db\migration\V4__add_gamification_tables.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V4__add_gamification_tables.sql
@@ -235,7 +798,7 @@ INSERT INTO leagues (name, min_xp, max_xp, icon) VALUES
                                                      ('Oro', 1501, 3000, '🥇');
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V5__add_password_reset_to_users.sql
+📄 CONTENIDO DE: db\migration\V5__add_password_reset_to_users.sql
 ================================================================================
 -- Añade columnas para el flujo de "olvidé mi contraseña"
 ALTER TABLE users
@@ -246,129 +809,1583 @@ ADD COLUMN password_reset_expires TIMESTAMPTZ NULL;
 CREATE INDEX IF NOT EXISTS idx_users_password_reset_token ON users(password_reset_token);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V6__Seed_Module_A_EP_BVA.sql
+📄 CONTENIDO DE: db\migration\V6__Seed_Module_A_EP_BVA.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V6__Seed_Module_A_EP_BVA.sql
--- Description: Inserta el contenido del Módulo A (Equivalencia y Valores Límite)
+-- Description: Inserta el contenido teórico del Módulo A (Equivalencia y Valores Límite)
+--              VERSIÓN CORREGIDA - Sin símbolos < > <= en JSON
 -- Author: BugHunter Saga Team
+-- Date: 2025-12-14
 -- ============================================================================
 
 -- 1. CREAR MÓDULO A
 INSERT INTO modules (code, name, description, ui_config) VALUES
-    ('moduleA', 'Particion de Equivalencia y Valores Limite',
-     'Aprende a dividir el dominio y probar los bordes donde ocurren los errores.',
-     '{"backgroundColor": "bg-blue-500", "icon": "🎯", "color": "blue"}');
+('moduleA', 'Partición de Equivalencia y Valores Límite',
+ 'Comprende los fundamentos teóricos y prácticos de las técnicas que optimizan el diseño de pruebas funcionales.',
+ '{
+   "icon": "🎯",
+   "color": "blue",
+   "backgroundColor": "bg-blue-500",
+   "borderColor": "border-blue-700",
+   "textColor": "text-white"
+ }');
 
--- 2. CREAR UNIDADES
+-- ============================================================================
+-- 2. CREAR UNIDADES (3 UNITS)
+-- ============================================================================
 INSERT INTO units (module_id, unit_number, description) VALUES
-                                                            (1, 1, 'Introducción a la Equivalencia'),
-                                                            (1, 2, 'Particiones Válidas e Inválidas'),
-                                                            (1, 3, 'Fundamentos de Valores Límite'),
-                                                            (1, 4, 'Límites Robustos');
+((SELECT id FROM modules WHERE code = 'moduleA'), 1, 'Técnicas Fundamentales: Particiones de Equivalencia y Análisis de Valores Frontera'),
+((SELECT id FROM modules WHERE code = 'moduleA'), 2, 'Aplicación Básica de Clases de Equivalencia y Valores Frontera'),
+((SELECT id FROM modules WHERE code = 'moduleA'), 3, 'Análisis Avanzado y Casos Prácticos de EP y BVA');
 
--- 3. CREAR LECCIONES
--- Lecciones EP (Unidades 1, 2)
+-- ============================================================================
+-- 3. CREAR LECCIONES (4 POR UNIDAD)
+-- ============================================================================
+
+-- UNIT 1
 INSERT INTO lessons (unit_id, type, description, position) VALUES
-                                                               (1, 'book', '¿Qué es la Equivalencia de Particiones?', 1),
-                                                               (1, 'star', 'Identifica Clases de Equivalencia', 2),
-                                                               (1, 'trophy', 'Revisión de Unidad 1', 3),
-                                                               (2, 'book', 'Particiones Válidas vs Inválidas', 1),
-                                                               (2, 'star', 'Ejercicio: Validación de Email', 2);
--- Lecciones BVA (Unidades 3, 4)
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'book', 'Fundamentos del Dominio y su Rol en Particiones & Valores Frontera', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'dumbbell', 'Introducción a las Particiones de Equivalencia', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'trophy', 'Introducción al Análisis de Valores Frontera', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
+
+-- UNIT 2
 INSERT INTO lessons (unit_id, type, description, position) VALUES
-                                                               (3, 'book', 'Introducción a Valores Límite', 1),
-                                                               (3, 'star', 'Identifica los Límites', 2),
-                                                               (4, 'treasure', 'Cofre de Bonus: Límites Robustos', 1);
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'book', 'Tipos Teóricos y Aplicaciones de Clases de Equivalencia', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'dumbbell', 'Ejercicios Prácticos: Clases Válidas e Inválidas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'trophy', 'Evaluación: Casos Prácticos de Equivalencia', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
 
--- 4. CREAR PROBLEMAS
--- Problemas de Equivalencia (Lecciones 1, 2, 5)
-INSERT INTO problems (lesson_id, type, content, position) VALUES
-                                                              (1, 'INFO', '{"title": "Bienvenido a Equivalencia de Particiones", "content": "La Equivalencia de Particiones es una técnica de caja negra...", "image": "/assets/ep-intro.png"}', 1),
-                                                              (1, 'INFO', '{"title": "¿Por qué es importante?", "content": "En lugar de probar TODOS los valores posibles (imposible)...", "example": "Para un campo que acepta edades 0-120..."}', 2),
-                                                              (2, 'SELECT_1_OF_3', '{"question": "Un sistema acepta códigos promocionales de 5-10 caracteres. ¿Cuántas clases de equivalencia hay?", "options": [{"id": "a", "text": "2 clases..."}, {"id": "b", "text": "3 clases: menor a 5, 5-10, mayor a 10"}, {"id": "c", "text": "6 clases..."}], "correctAnswer": "b", "explanation": "Correcto! Tenemos 3 clases: < 5 chars (inválida), 5-10 chars (válida), > 10 chars (inválida)"}', 1),
-                                                              (2, 'SELECT_1_OF_3', '{"question": "¿Cuál NO es un beneficio de la Equivalencia de Particiones?", "options": [{"id": "a", "text": "Reduce el número de casos de prueba"}, {"id": "b", "text": "Garantiza encontrar todos los bugs"}, {"id": "c", "text": "Cubre rangos completos de valores"}], "correctAnswer": "b", "explanation": "Correcto! La EP reduce casos de prueba y cubre rangos, pero NO garantiza encontrar todos los bugs."}', 2),
-                                                              (5, 'FILL_IN_THE_BLANK', '{"question": "Para validar un email, identifica las clases de equivalencia. Un email tiene formato: ___@___.___", "blanks": ["usuario", "dominio", "extension"], "correctAnswers": ["texto", "dominio", "com"], "hint": "Piensa en las partes que componen un email válido"}', 1);
+-- UNIT 3
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'book', 'Aplicación de EP y BVA en Pruebas de Software', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'dumbbell', 'Aplicación y Relación entre Equivalencia y BVA', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'trophy', 'Evaluación: BVA y Análisis Robusto', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
 
--- Problemas de Valores Límite (Lecciones 6, 7, 8)
+-- ============================================================================
+-- 4. CREAR PROBLEMAS - UNIT 1
+-- ============================================================================
+
+-- ==================== UNIT 1 - LESSON 1 (BOOK) ====================
+-- Bloque Teórico 1: Qué son las pruebas de caja negra
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-                                                              (6, 'INFO', '{"title": "¿Qué son los Valores Límite?", "content": "Los errores suelen ocurrir en los BORDES de las clases de equivalencia...", "image": "/assets/bva-intro.png"}', 1),
-                                                              (6, 'INFO', '{"title": "Ejemplo Práctico", "content": "Para un campo de edad válido entre 18-65 años, prueba: 17, 18, 19, 64, 65, 66", "tip": "Regla de oro: min-1, min, min+1, max-1, max, max+1"}', 2),
-                                                              (7, 'SELECT_1_OF_3', '{"question": "Un campo acepta enteros válidos de 10 a 50. ¿Cuál set de pruebas usa BVA de 3 puntos?", "options": [{"id": "a", "text": "10, 30, 50"}, {"id": "b", "text": "9, 10, 11, 49, 50, 51"}, {"id": "c", "text": "9, 51"}], "correctAnswer": "b", "explanation": "BVA de 3 puntos prueba min-1, min, min+1, max-1, max, y max+1."}', 1),
-                                                              (7, 'FILL_IN_THE_BLANK', '{"question": "BVA se enfoca en los ___ de las particiones de equivalencia, donde es más probable encontrar errores.", "blanks": ["respuesta"], "correctAnswers": ["bordes"], "hint": "También se les llama ''límites'' o ''fronteras''."}', 2),
-                                                              (8, 'INFO', '{"title": "¿Qué es BVA Robusto?", "content": "El BVA ''robusto'' es una expansión del BVA normal... considera valores ''muy'' inválidos.", "example": "Para el rango [10, 50], un BVA robusto podría incluir 9, 10, 11... y también -100 y 1000."}', 1),
-                                                              (8, 'MATCH_PAIRS', '{"title": "Empareja el Valor con el Término BVA", "prompt": "Para un descuento válido en compras de $25 a $100:", "pairs": [{"id": "p1", "prompt": "Valor: $24"}, {"id": "p2", "prompt": "Valor: $25"}, {"id": "p3", "prompt": "Valor: $99"}, {"id": "p4", "prompt": "Valor: $101"}], "answers": [{"id": "a1", "text": "Límite Mínimo (min)"}, {"id": "a2", "text": "Justo Debajo del Mínimo (min-1)"}, {"id": "a3", "text": "Justo Encima del Máximo (max+1)"}, {"id": "a4", "text": "Justo Debajo del Máximo (max-1)"}], "correctMapping": {"p1": "a2", "p2": "a1", "p3": "a4", "p4": "a3"}}', 2),
-                                                              (8, 'SELECT_1_OF_3', '{"question": "Un campo de texto debe tener una longitud de 5 a 10 caracteres. ¿Cuál NO es un valor límite a probar?", "options": [{"id": "a", "text": "Una cadena de 4 caracteres"}, {"id": "b", "text": "Una cadena de 11 caracteres"}, {"id": "c", "text": "Una cadena de 7 caracteres"}], "correctAnswer": "c", "explanation": "7 caracteres es un valor ''en medio'' de la partición válida. No es un límite."}', 3);
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Qué son las pruebas de caja negra",
+  "introduction": "Las pruebas de caja negra evalúan cómo responde un sistema a sus entradas sin considerar el funcionamiento interno o el código. El tester se enfoca únicamente en los datos que ingresan y los resultados que el sistema produce, analizando el comportamiento visible.",
+  "objectives": ["Comprender el concepto de pruebas de caja negra", "Diferenciar entre entradas y salidas del sistema"]
+}', 1),
+
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Las pruebas de caja negra se enfocan en las ____ y ____ del sistema sin analizar su implementación interna.",
+  "answerTiles": ["entradas", "clases", "rutas", "salidas"],
+  "correctAnswerIndices": [0, 3]
+}', 2);
+
+-- Bloque Teórico 2: El dominio de entrada
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "El dominio de entrada",
+  "introduction": "El dominio de entrada representa todos los valores, rangos y condiciones que un sistema puede recibir. Incluye datos válidos e inválidos, longitudes permitidas, estados lógicos y cualquier forma de entrada posible. Comprender este dominio es el primer paso para aplicar técnicas de diseño de pruebas.",
+  "objectives": ["Definir el dominio de entrada", "Identificar valores válidos e inválidos"]
+}', 3),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál opción describe correctamente el dominio de entrada?",
+  "answers": [
+    {"name": "La lista de casos de prueba escritos por un tester."},
+    {"name": "Todos los valores posibles que pueden llegar al sistema."},
+    {"name": "El conjunto de datos usados por los desarrolladores."},
+    {"name": "Las rutas internas del código."}
+  ],
+  "correctAnswer": 1
+}', 4),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "El dominio de entrada incluye todos los valores, ____ y ____ que un sistema puede recibir.",
+  "answerTiles": ["valores", "rangos", "comandos",  "condiciones"],
+  "correctAnswerIndices": [1, 3]
+}', 5);
+
+-- Bloque Teórico 3: Qué es una Partición de Equivalencia (EP)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Qué es una Partición de Equivalencia (EP)",
+  "introduction": "Una Partición de Equivalencia divide el dominio de entrada en grupos donde cada valor produce el mismo tipo de comportamiento esperado. Estos grupos se llaman clases de equivalencia. La técnica permite seleccionar un solo valor representativo por clase para reducir pruebas sin perder cobertura.",
+  "objectives": ["Definir una partición de equivalencia", "Identificar clases de equivalencia"]
+}', 6),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál de las siguientes opciones describe correctamente una clase de equivalencia?",
+  "answers": [
+    {"name": "Valores que siempre producen resultados distintos."},
+    {"name": "Un conjunto de valores que comparten comportamiento equivalente."},
+    {"name": "Valores que deben ser procesados en orden secuencial."},
+    {"name": "Valores usados solo por el sistema operativo."}
+  ],
+  "correctAnswer": 1
+}', 7);
+
+-- Bloque Teórico 4: Qué es el Análisis de Valores Frontera (BVA)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Qué es el Análisis de Valores Frontera (BVA)",
+  "introduction": "El Análisis de Valores Frontera se centra en los límites del dominio de entrada. Los puntos mínimos, máximos y los valores adyacentes tienden a generar más errores. Por ello, esta técnica verifica que el sistema maneje correctamente las transiciones en esos bordes.",
+  "objectives": ["Definir el análisis de valores frontera", "Identificar límites y valores adyacentes"]
+}', 8),
+
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'book' AND position = 1), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "El BVA se concentra en los ____, los ____ y los valores ____ a esos límites.",
+  "answerTiles": ["mínimos", "cercanos", "distantes", "máximos"],
+  "correctAnswerIndices": [0, 3, 1]
+}', 9);
+
+-- ==================== UNIT 1 - LESSON 2 (DUMBBELL) ====================
+-- Bloque Teórico 1: La lógica de dividir el dominio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "La lógica de dividir el dominio",
+  "introduction": "En Particiones de Equivalencia, dividir el dominio significa separar todos los valores posibles de entrada en grupos según el comportamiento que el sistema aplica a cada uno. En lugar de analizar cada valor individualmente, el tester identifica qué valores activan las mismas reglas, validaciones o resultados, y los agrupa como equivalentes. Esta división incluye tanto valores válidos como inválidos y permite organizar el análisis del dominio, reduciendo la cantidad de pruebas sin perder cobertura técnica.",
+  "objectives": ["Comprender cómo dividir el dominio", "Organizar valores en particiones"]
+}', 1),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Dividir el dominio permite organizar valores en ____ que comparten un mismo ____.",
+  "answerTiles": ["grupos", "comportamiento", "código", "nivel"],
+  "correctAnswerIndices": [0, 1]
+}', 2),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un formulario acepta edades entre 18 y 60 años. ¿Qué conjunto de valores puede representar una misma partición válida según Particiones de Equivalencia?",
+  "answers": [
+    {"name": "Cualquier edad entre 18 y 60, ya que todas generan la misma respuesta del sistema."},
+    {"name": "18 y 19 porque están cerca entre sí."},
+    {"name": "12 y 90 porque son edades extremas."},
+    {"name": "60 y 61 porque están cerca del límite."}
+  ],
+  "correctAnswer": 0
+}', 3);
+
+-- Bloque Teórico 2: Clases válidas e inválidas
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Clases válidas e inválidas",
+  "introduction": "En Particiones de Equivalencia, el dominio de entrada se divide en clases válidas e inválidas según el comportamiento esperado del sistema. Una clase válida agrupa valores que el sistema acepta y procesa correctamente, mientras que una clase inválida agrupa valores que el sistema debe rechazar o manejar como incorrectos. Ambas clases representan comportamientos distintos y deben considerarse en el diseño de pruebas para asegurar que el sistema responde correctamente tanto ante entradas permitidas como no permitidas.",
+  "objectives": ["Diferenciar clases válidas e inválidas", "Cubrir comportamientos correctos y fallas"]
+}', 4),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Una clase inválida agrupa valores que el sistema debe ____ o tratar como ____.",
+  "answerTiles": ["rechazar", "incorrectos", "aceptar", "válidos"],
+  "correctAnswerIndices": [0, 1]
+}', 5),
+
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un campo de número de documento acepta únicamente valores con 8 dígitos exactos. ¿Qué opción representa un valor de una clase inválida por longitud?",
+  "answers": [
+    {"name": "12345678"},
+    {"name": "1234567"},
+    {"name": "87654321"},
+    {"name": "00000000"}
+  ],
+  "correctAnswer": 1
+}', 6);
+
+-- Bloque Teórico 3: Cómo identificar una partición
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Cómo identificar una partición",
+  "introduction": "Una partición se identifica cuando distintos valores provocan exactamente el mismo comportamiento en el sistema. Para reconocer una partición, el tester debe enfocarse en cómo responde el sistema ante los valores de entrada, no en si los valores se parecen entre sí. Si varios valores activan la misma regla, validación o resultado, pueden agruparse en una misma partición. Los criterios más comunes para identificar particiones incluyen conjuntos de valores permitidos, condiciones lógicas, rangos definidos y restricciones del negocio. Valores que generan comportamientos distintos nunca deben pertenecer a la misma partición.",
+  "objectives": ["Identificar particiones", "Definir criterios comunes para particiones"]
+}', 7),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Una partición se identifica cuando un conjunto de valores produce el mismo ____ y responde bajo la misma ____.",
+  "answerTiles": ["resultado", "regla", "código", "formato"],
+  "correctAnswerIndices": [0, 1]
+}', 8);
+
+-- Bloque Teórico 3: Clases válidas e inválidas (Pregunta CORREGIDA)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema de inventario permite vender productos solo cuando su estado es \"disponible\". Los productos \"agotados\" y \"descontinuados\" no pueden venderse. ¿Cuál agrupación forma una clase INVÁLIDA según Particiones de Equivalencia para la operación \"vender producto\"?",
+  "answers": [
+    {"name": "{agotado, descontinuado}"},
+    {"name": "{disponible, agotado}"},
+    {"name": "{reservado}"},
+    {"name": "{disponible, vendido}"}
+  ],
+  "correctAnswer": 0
+}', 9);
+
+-- Bloque Teórico 4: El valor representativo
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "El valor representativo",
+  "introduction": "Un valor representativo es un único dato seleccionado para comprobar el comportamiento de una partición completa. Se utiliza porque todos los valores dentro de una misma partición están definidos para generar el mismo resultado en el sistema. Por esta razón, probar un valor representativo permite verificar el comportamiento esperado de toda la clase, siempre que la partición haya sido correctamente definida.",
+  "objectives": ["Definir valor representativo", "Reducir pruebas redundantes"]
+}', 10),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'dumbbell' AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "La cantidad de ítems permite valores entre 1 y 10. Considerando que un valor representativo es un único valor que se utiliza para representar el comportamiento de todos los valores válidos de una partición, ¿cuál de las siguientes opciones es un valor representativo válido?",
+  "answers": [
+    {"name": "5, porque está dentro del rango permitido."},
+    {"name": "0, porque esta fuera del limite inferior del rango."},
+    {"name": "12, porque está fuera del limite superior del rango."},
+    {"name": "1 y 10 porque son los límites del rango."}
+  ],
+  "correctAnswer": 0
+}', 11);
+
+-- ==================== UNIT 1 - LESSON 3 (TROPHY) ====================
+-- Bloque Teórico 1: Límites y fronteras en dominios acotados (TEXTO CORREGIDO - SIN SÍMBOLOS < >)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Límites y fronteras en dominios acotados",
+  "introduction": "Los límites marcan los puntos exactos donde una condición del sistema cambia de válida a inválida, o viceversa, dentro de un dominio que tiene reglas claramente definidas. En el Análisis de Valores Frontera (BVA), se prueban el valor del límite y los valores inmediatamente cercanos a ese punto, ya que son los más propensos a revelar errores de implementación, como interpretar incorrectamente si un límite está incluido o excluido en la condición.",
+  "objectives": ["Comprender qué son los límites en BVA", "Identificar valores frontera críticos", "Reconocer por qué los límites generan errores frecuentes"]
+}', 1),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema acepta valores entre 10 y 50 (inclusive). Considerando que un valor frontera es aquel donde cambia la validez de una condición, ¿cuál opción identifica correctamente un valor frontera?",
+  "answers": [
+    {"name": "10, porque es el límite inferior exacto del rango permitido."},
+    {"name": "25, porque está en el medio del rango."},
+    {"name": "100, porque está muy lejos del rango."},
+    {"name": "5, porque es menor que el límite."}
+  ],
+  "correctAnswer": 0
+}', 2);
+
+-- Bloque Teórico 2: Cómo identificar valores adyacentes
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Cómo identificar valores adyacentes",
+  "introduction": "Los valores adyacentes son aquellos que se encuentran inmediatamente antes o inmediatamente después de un límite definido por una regla del sistema. Representan el punto exacto donde el comportamiento puede cambiar de válido a inválido, o viceversa. Por ejemplo, si una regla define un límite específico, los valores adyacentes son los que quedan justo a cada lado de ese límite. Probar estos valores permite verificar que el sistema maneja correctamente las transiciones.",
+  "objectives": ["Definir valores adyacentes", "Identificar adyacentes en límites", "Comprender su importancia en BVA"]
+}', 3),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "Un valor adyacente es aquel que se encuentra inmediatamente antes o después de un límite. Si el límite superior de un rango es 100, el valor adyacente ____ es 99 y el valor adyacente ____ es 101.",
+  "answerTiles": ["inferior", "superior", "central", "extremo"],
+  "correctAnswerIndices": [0, 1]
+}', 4),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un campo acepta contraseñas de 8 a 20 caracteres. ¿Cuáles valores representan correctamente los adyacentes del límite inferior?",
+  "answers": [
+    {"name": "7 (antes del mínimo) y 8 (el mínimo exacto)."},
+    {"name": "8 (el mínimo) y 9 (después del mínimo)."},
+    {"name": "1 (muy corto) y 30 (muy largo)."},
+    {"name": "8 y 20 porque son los límites."}
+  ],
+  "correctAnswer": 1
+}', 5);
+
+-- Bloque Teórico 3: BVA aplicado a rangos numéricos
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "BVA aplicado a rangos numéricos",
+  "introduction": "En rangos numéricos, el BVA se centra en el mínimo permitido, el máximo permitido, y los valores adyacentes (justo antes del mínimo y justo después del máximo). Esto asegura que las condiciones de rango se implementen correctamente sin errores de cálculo o comparación.",
+  "objectives": ["Aplicar BVA a rangos numéricos", "Identificar límites mínimos y máximos", "Seleccionar valores frontera correctos"]
+}', 6),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'FILL_IN_THE_BLANK', '{
+  "type": "FILL_IN_THE_BLANK",
+  "question": "En un rango de 1 a 100, los valores frontera son: ____ (mínimo), ____ (máximo), ____ (antes del mínimo) y ____ (después del máximo).",
+  "answerTiles": ["1", "100", "0", "101", "50"],
+  "correctAnswerIndices": [0, 1, 2, 3]
+}', 7),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un sistema permite descargas de archivos de 1 MB a 500 MB. ¿Cuál conjunto de valores representa correctamente el BVA completo?",
+  "answers": [
+    {"name": "0 MB, 1 MB, 500 MB, 501 MB (límites y adyacentes)."},
+    {"name": "1 MB, 250 MB, 500 MB (límites y punto medio)."},
+    {"name": "100 MB, 200 MB, 300 MB (valores intermedios)."},
+    {"name": "0 MB y 1000 MB (extremos del espacio de almacenamiento)."}
+  ],
+  "correctAnswer": 0
+}', 8);
+
+-- Bloque Teórico 4: Relación entre EP y BVA
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Relación entre EP y BVA",
+  "introduction": "EP y BVA son técnicas complementarias que se utilizan de forma conjunta. Primero, EP permite dividir el dominio de entrada en clases de valores que generan el mismo comportamiento del sistema. Luego, BVA se aplica sobre esas clases para seleccionar valores cercanos a sus límites, donde es más probable encontrar errores. Esta combinación permite diseñar pruebas estructuradas y eficientes.",
+  "objectives": ["Comprender cómo EP y BVA se complementan", "Aplicar ambas técnicas en conjunto", "Maximizar cobertura de pruebas"]
+}', 9),
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleA') AND unit_number = 1) AND type = 'trophy' AND position = 3), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Un campo de edad permite valores de 18 a 65 años. Considerando que EP divide el dominio en clases y que BVA selecciona valores en los límites de esas clases, ¿cuál estrategia combina EP y BVA correctamente?",
+  "answers": [
+    {"name": "EP: [18-65] válido, [menor a 18 o mayor a 65] inválido; BVA: 17, 18, 65, 66."},
+    {"name": "EP: cualquier edad; BVA: solo 18 y 65."},
+    {"name": "EP: [18-65]; BVA: solo 18."},
+    {"name": "EP: dividir en décadas; BVA: no aplicar."}
+  ],
+  "correctAnswer": 0
+}', 10);
+
+-- ============================================================================
+-- FIN DE LA MIGRACIÓN V6
+-- ============================================================================
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V7__Seed_Module_B_Decision_Table.sql
+📄 CONTENIDO DE: db\migration\V7__Seed_Module_B_Decision_Table.sql
 ================================================================================
 -- ============================================================================
--- Migration: V5__Seed_Module_B_Decision_Tables.sql
--- Description: Inserta el contenido del Módulo B (Tablas de Decisión)
--- Author: BugHunter Saga Team
+-- Migration: V7__Seed_Module_B_Decision_Tables.sql
+-- Description: Inserta el contenido teórico y práctico del Módulo B (Tablas de Decisión)
+--              Estructura basada en el Syllabus ISTQB y Marco GOAL
+-- Author: BugHunter Saga Team (Max Carrion)
+-- Date: 2025-12-14
 -- ============================================================================
 
 -- 1. CREAR MÓDULO B
+-- Se usa una configuración visual verde para diferenciarlo del Módulo A (Azul)
 INSERT INTO modules (code, name, description, ui_config) VALUES
     ('moduleB', 'Tablas de Decisión',
-     'Técnica de caja negra para reglas de negocio complejas.',
-     '{"backgroundColor": "bg-green-500", "icon": "🔲", "color": "green"}');
+     'Domina la técnica para validar reglas de negocio complejas y combinaciones lógicas de condiciones.',
+     '{
+       "icon": "🔲",
+       "color": "green",
+       "backgroundColor": "bg-green-500",
+       "borderColor": "border-green-700",
+       "textColor": "text-white"
+     }');
 
--- 2. CREAR UNIDADES
+-- ============================================================================
+-- 2. CREAR UNIDADES (3 UNITS)
+-- ============================================================================
 INSERT INTO units (module_id, unit_number, description) VALUES
-    (2, 1, 'Modelando Lógica Compleja');
+                                                            ((SELECT id FROM modules WHERE code = 'moduleB'), 1, 'Fundamentos: Estructura y Lógica de las Tablas de Decisión'),
+                                                            ((SELECT id FROM modules WHERE code = 'moduleB'), 2, 'Optimización: Simplificación de Tablas y el Símbolo "No Importa"'),
+                                                            ((SELECT id FROM modules WHERE code = 'moduleB'), 3, 'Aplicación Profesional: Casos de Negocio y Cobertura');
 
--- 3. CREAR LECCIONES (IDs 9, 10, 11)
+-- ============================================================================
+-- 3. CREAR LECCIONES (4 POR UNIDAD)
+-- ============================================================================
+
+-- === UNIT 1: FUNDAMENTOS ===
 INSERT INTO lessons (unit_id, type, description, position) VALUES
-                                                               (5, 'book', 'Introducción a Tablas de Decisión', 1),
-                                                               (5, 'star', 'Crea tu Primera Tabla', 2),
-                                                               (5, 'fast-forward', 'Desafío Rápido: Reglas Complejas', 3);
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'book', 'Anatomía de una Tabla de Decisión', 1),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'dumbbell', 'Identificando Condiciones y Acciones', 2),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'trophy', 'Cálculo de Reglas y Combinaciones', 3),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 1), 'treasure', 'Cofre del Tesoro: Unidad 1', 4);
 
--- 4. CREAR PROBLEMAS
+-- === UNIT 2: OPTIMIZACIÓN ===
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'book', 'Técnicas de Simplificación de Tablas', 1),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'dumbbell', 'Uso del Comodín "-" (Don''t Care)', 2),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'trophy', 'Evaluación: Reduciendo la Complejidad', 3),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 2), 'treasure', 'Cofre del Tesoro: Unidad 2', 4);
+
+-- === UNIT 3: APLICACIÓN ===
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'book', 'De Requisitos a Tablas: Casos Reales', 1),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'dumbbell', 'Práctica: Lógica de Negocio Compleja', 2),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'trophy', 'Evaluación Final de Tablas de Decisión', 3),
+                                                               ((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleB') AND unit_number = 3), 'treasure', 'Cofre del Tesoro: Unidad 3', 4);
+
+-- ============================================================================
+-- 4. CREAR PROBLEMAS - UNIT 1 (FUNDAMENTOS)
+-- ============================================================================
+
+-- LESSON 1 (BOOK): Teoría Básica
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-                                                              (9, 'INFO', '{"title": "Tablas de Decisión", "content": "Las tablas de decisión modelan lógica compleja con múltiples condiciones...", "example": "Sistema de descuentos: Cliente VIP + Compra > $100 + Cupón = 30% descuento"}', 1),
-                                                              (10, 'SELECT_1_OF_3', '{"question": "Si tienes 3 condiciones de entrada (ej. V/F, V/F, V/F), ¿cuántas reglas (columnas) necesitas?", "options": [{"id": "a", "text": "3 reglas"}, {"id": "b", "text": "6 reglas"}, {"id": "c", "text": "8 reglas (2^3)"}], "correctAnswer": "c", "explanation": "El número de reglas es 2 elevado al número de condiciones binarias (2^3 = 8)."}', 1),
-                                                              (10, 'FILL_IN_THE_BLANK', '{"question": "Una tabla de decisión se divide en 4 cuadrantes: Condiciones, Acciones, Reglas de Condición y Reglas de ___.", "blanks": ["respuesta"], "correctAnswers": ["Acción"], "hint": "Las condiciones de entrada guían a las... de salida."}', 2),
-                                                              (11, 'MATCH_PAIRS', '{"title": "Empareja la Regla con la Acción", "prompt": "Para un descuento de aerolínea:", "pairs": [{"id": "p1", "prompt": "Regla 1: (VIP = SI, Vuelo Lleno = SI)"}, {"id": "p2", "prompt": "Regla 2: (VIP = SI, Vuelo Lleno = NO)"}, {"id": "p3", "prompt": "Regla 3: (VIP = NO, Vuelo Lleno = SI)"}, {"id": "p4", "prompt": "Regla 4: (VIP = NO, Vuelo Lleno = NO)"}], "answers": [{"id": "a1", "text": "Acción: Dar Upgrade a 1ra Clase"}, {"id": "a2", "text": "Acción: Ofrecer 10% descuento"}, {"id": "a3", "text": "Acción: Poner en lista de espera"}, {"id": "a4", "text": "Acción: No hacer nada"}], "correctMapping": {"p1": "a1", "p2": "a2", "p3": "a3", "p4": "a4"}}', 1),
-                                                              (11, 'SELECT_1_OF_3', '{"question": "¿Cuál es el principal beneficio de las Tablas de Decisión?", "options": [{"id": "a", "text": "Probar el rendimiento."}, {"id": "b", "text": "Garantizar que no se olvide ninguna combinación de reglas de negocio."}, {"id": "c", "text": "Probar cada línea de código."}], "correctAnswer": "b", "explanation": "Son ideales para sistemas con lógica de negocio compleja (muchos IF-ELSE)."}', 2),
-                                                              (11, 'INFO', '{"title": "Simplificación de Reglas", "content": "A veces, el valor de una condición no importa (se marca con ''-'')...", "example": "Regla: (Condición: VIP = NO, Condición: Compra > 100 = ''-''), Acción: (Acceso Denegado = SÍ)"}', 3);
+                                                              ((SELECT id FROM lessons WHERE description = 'Anatomía de una Tabla de Decisión'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "¿Qué es una Tabla de Decisión?",
+                                                                "introduction": "Es una técnica de prueba de caja negra utilizada para modelar lógica de negocio compleja. Permite representar combinaciones de entradas (Condiciones) y sus respuestas esperadas (Acciones) en un formato tabular ordenado. Es ideal cuando el sistema tiene diferentes resultados dependiendo de la combinación de varias reglas.",
+                                                                "objectives": ["Definir qué es una Tabla de Decisión", "Entender su utilidad en lógica compleja"]
+                                                              }', 1),
+                                                              ((SELECT id FROM lessons WHERE description = 'Anatomía de una Tabla de Decisión'), 'FILL_IN_THE_BLANK', '{
+                                                                "type": "FILL_IN_THE_BLANK",
+                                                                "question": "Una tabla de decisión relaciona una combinación de ____ con sus respectivas ____.",
+                                                                "answerTiles": ["condiciones", "acciones", "errores", "bugs"],
+                                                                "correctAnswerIndices": [0, 1]
+                                                              }', 2),
+                                                              ((SELECT id FROM lessons WHERE description = 'Anatomía de una Tabla de Decisión'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "Estructura: Condiciones y Acciones",
+                                                                "introduction": "La tabla se divide en cuatro cuadrantes. La parte superior lista las CONDICIONES (entradas o estados del sistema). La parte inferior lista las ACCIONES (lo que el sistema debe hacer). Las columnas verticales se llaman REGLAS, y cada una representa un caso de prueba único.",
+                                                                "objectives": ["Identificar los cuatro cuadrantes", "Comprender el concepto de Regla"]
+                                                              }', 3),
+                                                              ((SELECT id FROM lessons WHERE description = 'Anatomía de una Tabla de Decisión'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "¿Qué representa una columna vertical en una tabla de decisión?",
+                                                                "answers": [
+                                                                  {"name": "Una Regla de Negocio (Caso de Prueba)."},
+                                                                  {"name": "Una única condición aislada."},
+                                                                  {"name": "El resultado final del test."},
+                                                                  {"name": "Un error del sistema."}
+                                                                ],
+                                                                "correctAnswer": 0
+                                                              }', 4);
+
+-- LESSON 2 (DUMBBELL): Práctica de Estructura
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT id FROM lessons WHERE description = 'Identificando Condiciones y Acciones'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "Entradas vs Salidas",
+                                                                "introduction": "Para construir una tabla, primero debes leer los requisitos y separar los \"Si...\" (Condiciones) de los \"Entonces...\" (Acciones). Las condiciones suelen ser preguntas con respuesta Verdadero/Falso (Booleanas).",
+                                                                "objectives": ["Distinguir condiciones de acciones", "Analizar requisitos textuales"]
+                                                              }', 1),
+                                                              ((SELECT id FROM lessons WHERE description = 'Identificando Condiciones y Acciones'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "En el requisito: \"Si el usuario es Premium y tiene saldo, aplicar 10% de descuento\". ¿Cuál es la Acción?",
+                                                                "answers": [
+                                                                  {"name": "Usuario es Premium."},
+                                                                  {"name": "Tiene saldo."},
+                                                                  {"name": "Aplicar 10% de descuento."},
+                                                                  {"name": "Ninguna de las anteriores."}
+                                                                ],
+                                                                "correctAnswer": 2
+                                                              }', 2),
+                                                              ((SELECT id FROM lessons WHERE description = 'Identificando Condiciones y Acciones'), 'FILL_IN_THE_BLANK', '{
+                                                                "type": "FILL_IN_THE_BLANK",
+                                                                "question": "Las ____ son los inputs o estados que evaluamos, mientras que las ____ son las respuestas del sistema.",
+                                                                "answerTiles": ["condiciones", "acciones", "tablas", "pruebas"],
+                                                                "correctAnswerIndices": [0, 1]
+                                                              }', 3);
+
+-- LESSON 3 (TROPHY): Matemática de las Tablas
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT id FROM lessons WHERE description = 'Cálculo de Reglas y Combinaciones'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "La fórmula de la cobertura",
+                                                                "introduction": "Si tenemos condiciones binarias (Verdadero/Falso), el número total de reglas posibles se calcula como 2 elevado a la N, donde N es el número de condiciones. Por ejemplo, si hay 3 condiciones, tendremos 2^3 = 8 reglas posibles.",
+                                                                "objectives": ["Calcular el número de reglas", "Entender la cobertura exhaustiva"]
+                                                              }', 1),
+                                                              ((SELECT id FROM lessons WHERE description = 'Cálculo de Reglas y Combinaciones'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "Si un sistema tiene 4 condiciones binarias (Si/No), ¿cuántas reglas (columnas) tendrá la tabla completa inicial?",
+                                                                "answers": [
+                                                                  {"name": "4 reglas."},
+                                                                  {"name": "8 reglas."},
+                                                                  {"name": "16 reglas (2^4)."},
+                                                                  {"name": "12 reglas."}
+                                                                ],
+                                                                "correctAnswer": 2
+                                                              }', 2),
+                                                              ((SELECT id FROM lessons WHERE description = 'Cálculo de Reglas y Combinaciones'), 'FILL_IN_THE_BLANK', '{
+                                                                "type": "FILL_IN_THE_BLANK",
+                                                                "question": "Para asegurar una cobertura completa, debemos considerar ____ las combinaciones posibles de las ____.",
+                                                                "answerTiles": ["todas", "condiciones", "algunas", "acciones"],
+                                                                "correctAnswerIndices": [0, 1]
+                                                              }', 3);
+
+-- LESSON 4 (TREASURE): Review Unit 1
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+    ((SELECT id FROM lessons WHERE description = 'Cofre del Tesoro: Unidad 1'), 'MULTIPLE_CHOICE', '{
+      "type": "MULTIPLE_CHOICE",
+      "question": "¿Cuál es la principal ventaja de las Tablas de Decisión sobre otras técnicas?",
+      "answers": [
+        {"name": "Son más rápidas de escribir."},
+        {"name": "Aseguran que no se olviden combinaciones lógicas complejas."},
+        {"name": "Prueban la interfaz de usuario visualmente."},
+        {"name": "No requieren conocer los requisitos."}
+      ],
+      "correctAnswer": 1
+    }', 1);
+
+-- ============================================================================
+-- 5. CREAR PROBLEMAS - UNIT 2 (OPTIMIZACIÓN)
+-- ============================================================================
+
+-- LESSON 1 (BOOK): Simplificación
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT id FROM lessons WHERE description = 'Técnicas de Simplificación de Tablas'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "¿Por qué simplificar?",
+                                                                "introduction": "Las tablas completas pueden ser enormes. A menudo, el valor de una condición no afecta el resultado si otras condiciones ya determinan la acción. Simplificar reduce el número de casos de prueba sin reducir la cobertura lógica del negocio.",
+                                                                "objectives": ["Entender la necesidad de simplificar", "Identificar redundancias"]
+                                                              }', 1),
+                                                              ((SELECT id FROM lessons WHERE description = 'Técnicas de Simplificación de Tablas'), 'FILL_IN_THE_BLANK', '{
+                                                                "type": "FILL_IN_THE_BLANK",
+                                                                "question": "Simplificar una tabla permite reducir el número de ____ de prueba sin perder ____ de la lógica.",
+                                                                "answerTiles": ["casos", "cobertura", "errores", "datos"],
+                                                                "correctAnswerIndices": [0, 1]
+                                                              }', 2);
+
+-- LESSON 2 (DUMBBELL): El símbolo "-"
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT id FROM lessons WHERE description = 'Uso del Comodín "-" (Don''t Care)'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "El símbolo Don''t Care (-)",
+                                                                "introduction": "Cuando una acción ocurre independientemente del valor de una condición específica (sea Verdadero o Falso), podemos combinar esas reglas y marcar esa condición con un guion (-). Esto significa \"No importa\" o \"Don''t Care\".",
+                                                                "objectives": ["Usar el símbolo -", "Combinar reglas adyacentes"]
+                                                              }', 1),
+                                                              ((SELECT id FROM lessons WHERE description = 'Uso del Comodín "-" (Don''t Care)'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "Si para la Condición A=Verdadero y Condición A=Falso la acción es la misma, ¿cómo se simplifica?",
+                                                                "answers": [
+                                                                  {"name": "Se eliminan ambas reglas."},
+                                                                  {"name": "Se combinan en una sola columna con ''-'' en la Condición A."},
+                                                                  {"name": "Se deja solo la regla con Verdadero."},
+                                                                  {"name": "Se marca como error."}
+                                                                ],
+                                                                "correctAnswer": 1
+                                                              }', 2),
+                                                              ((SELECT id FROM lessons WHERE description = 'Uso del Comodín "-" (Don''t Care)'), 'FILL_IN_THE_BLANK', '{
+                                                                "type": "FILL_IN_THE_BLANK",
+                                                                "question": "El símbolo ''-'' indica que el valor de esa condición es ____ para el resultado de esa regla.",
+                                                                "answerTiles": ["irrelevante", "crítico", "falso", "verdadero"],
+                                                                "correctAnswerIndices": [0]
+                                                              }', 3);
+
+-- LESSON 3 (TROPHY): Evaluación de Optimización
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT id FROM lessons WHERE description = 'Evaluación: Reduciendo la Complejidad'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "Riesgos de la simplificación",
+                                                                "introduction": "Al simplificar, debemos tener cuidado de no ocultar condiciones que podrían ser importantes para casos de borde o excepciones. Una tabla simplificada es más eficiente, pero debe ser revisada para asegurar que representa fielmente los requisitos.",
+                                                                "objectives": ["Simplificar con precaución", "Verificar integridad"]
+                                                              }', 1),
+                                                              ((SELECT id FROM lessons WHERE description = 'Evaluación: Reduciendo la Complejidad'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "Tenemos 3 condiciones (8 reglas). Si simplificamos 4 reglas en una sola usando ''-'', ¿cuántas columnas quedan en total?",
+                                                                "answers": [
+                                                                  {"name": "5 columnas (4 originales + 1 combinada)."},
+                                                                  {"name": "8 columnas (no cambia)."},
+                                                                  {"name": "1 columna."},
+                                                                  {"name": "Depende de las acciones, pero serían menos de 8."}
+                                                                ],
+                                                                "correctAnswer": 3
+                                                              }', 2);
+
+-- LESSON 4 (TREASURE): Review Unit 2
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+    ((SELECT id FROM lessons WHERE description = 'Cofre del Tesoro: Unidad 2'), 'FILL_IN_THE_BLANK', '{
+      "type": "FILL_IN_THE_BLANK",
+      "question": "Una tabla ____ contiene menos columnas que una tabla ____, pero cubre la misma lógica.",
+      "answerTiles": ["simplificada", "completa", "errónea", "vacía"],
+      "correctAnswerIndices": [0, 1]
+    }', 1);
+
+-- ============================================================================
+-- 6. CREAR PROBLEMAS - UNIT 3 (APLICACIÓN)
+-- ============================================================================
+
+-- LESSON 1 (BOOK): Casos Reales
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'De Requisitos a Tablas: Casos Reales' AND m.code = 'moduleB'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "Aplicación en Banca y Seguros",
+                                                                "introduction": "Las tablas de decisión son estándar en industrias con reglas estrictas. Ejemplo: Un banco aprueba un crédito SI (Ingresos > 1000) Y (Deuda < 500) Y (Historial = Limpio). Si alguna falla, la acción cambia.",
+                                                                "objectives": ["Aplicar a escenarios reales", "Traducir reglas de negocio"]
+                                                              }', 1),
+                                                              ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'De Requisitos a Tablas: Casos Reales' AND m.code = 'moduleB'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "Un cajero automático dispensa dinero SI: Hay saldo suficiente Y la tarjeta es válida Y el PIN es correcto. ¿Cuántas condiciones hay?",
+                                                                "answers": [
+                                                                  {"name": "1 Condición."},
+                                                                  {"name": "2 Condiciones."},
+                                                                  {"name": "3 Condiciones."},
+                                                                  {"name": "4 Condiciones."}
+                                                                ],
+                                                                "correctAnswer": 2
+                                                              }', 2);
+
+-- LESSON 2 (DUMBBELL): Lógica Compleja
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'Práctica: Lógica de Negocio Compleja' AND m.code = 'moduleB'), 'INFO', '{
+                                                                "type": "INFO",
+                                                                "moduleTitle": "Reglas Imposibles",
+                                                                "introduction": "A veces, matemáticamente existen combinaciones (ej: Edad < 5 Y Edad > 18) que son imposibles en la realidad. Estas reglas deben identificarse y descartarse de la tabla de decisión final.",
+                                                                "objectives": ["Identificar reglas imposibles", "Limpiar la tabla"]
+                                                              }', 1),
+                                                              ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'Práctica: Lógica de Negocio Compleja' AND m.code = 'moduleB'), 'FILL_IN_THE_BLANK', '{
+                                                                "type": "FILL_IN_THE_BLANK",
+                                                                "question": "Una combinación de condiciones que no puede suceder en la realidad se considera una regla ____.",
+                                                                "answerTiles": ["imposible", "válida", "obligatoria", "simple"],
+                                                                "correctAnswerIndices": [0]
+                                                              }', 2);
+
+-- LESSON 3 (TROPHY): Evaluación Final
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+                                                              ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'Evaluación Final de Tablas de Decisión' AND m.code = 'moduleB'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "¿En qué etapa del desarrollo es más útil crear la Tabla de Decisión?",
+                                                                "answers": [
+                                                                  {"name": "Durante el diseño, para clarificar requisitos ambiguos."},
+                                                                  {"name": "Solo después de que el código está terminado."},
+                                                                  {"name": "Al momento de lanzar a producción."}
+                                                                ],
+                                                                "correctAnswer": 0
+                                                              }', 1),
+                                                              ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'Evaluación Final de Tablas de Decisión' AND m.code = 'moduleB'), 'MULTIPLE_CHOICE', '{
+                                                                "type": "MULTIPLE_CHOICE",
+                                                                "question": "¿Qué técnica es complementaria a las Tablas de Decisión para probar los valores específicos de las condiciones?",
+                                                                "answers": [
+                                                                  {"name": "Valores Límite (BVA)."},
+                                                                  {"name": "Pruebas de Estrés."},
+                                                                  {"name": "Pruebas de Usabilidad."}
+                                                                ],
+                                                                "correctAnswer": 0
+                                                              }', 2);
+
+-- LESSON 4 (TREASURE): Final Challenge Unit 3
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+    ((SELECT l.id FROM lessons l JOIN units u ON l.unit_id = u.id JOIN modules m ON u.module_id = m.id WHERE l.description = 'Cofre del Tesoro: Unidad 3' AND m.code = 'moduleB'), 'FILL_IN_THE_BLANK', '{
+      "type": "FILL_IN_THE_BLANK",
+      "question": "Las Tablas de Decisión son excelentes para detectar defectos en la ____ del sistema.",
+      "answerTiles": ["lógica", "interfaz", "velocidad", "instalación"],
+      "correctAnswerIndices": [0]
+    }', 1);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V8__Seed_Module_C_Statement_Testing.sql
+📄 CONTENIDO DE: db\migration\V8__Seed_Module_C_Statement_Testing.sql
 ================================================================================
 -- ============================================================================
 -- Migration: V8__Seed_Module_C_Statement_Testing.sql
--- Description: Inserta el contenido del Módulo C (Pruebas de Sentencia)
+-- Description: Inserta el contenido del Módulo C - Pruebas de Rama (Branch Coverage Testing)
+-- Source: index.html - Material de Testing con Clases y Objetivos de Práctica
 -- Author: BugHunter Saga Team
 -- ============================================================================
 
 -- 1. CREAR MÓDULO C
 INSERT INTO modules (code, name, description, ui_config) VALUES
-    ('moduleC', 'Pruebas de Sentencia',
-     'Técnica de caja blanca para cobertura de código.',
-     '{"backgroundColor": "bg-purple-500", "icon": "📄", "color": "purple"}');
+('moduleC', 'Pruebas de Rama',
+'Técnica de caja blanca enfocada en cobertura de ramas, clases de equivalencia y decisiones en Java.',
+'{
+  "icon": "🔀",
+  "color": "purple",
+  "backgroundColor": "bg-purple-500",
+  "borderColor": "border-purple-700",
+  "textColor": "text-white"
+}');
 
--- 2. CREAR UNIDADES
+-- ============================================================================
+-- 2. CREAR UNIDADES (3): BÁSICO, INTERMEDIO, AVANZADO
+-- ============================================================================
 INSERT INTO units (module_id, unit_number, description) VALUES
-    (3, 1, 'Introducción a Cobertura de Sentencia');
+((SELECT id FROM modules WHERE code = 'moduleC'), 1, 'Nivel Básico: Ramas como Clases de Equivalencia'),
+((SELECT id FROM modules WHERE code = 'moduleC'), 2, 'Nivel Intermedio: Múltiples Clases Secuenciales'),
+((SELECT id FROM modules WHERE code = 'moduleC'), 3, 'Nivel Avanzado: Clases Anidadas y Complejas');
 
--- 3. CREAR LECCIONES (IDs 12, 13, 14)
+-- ============================================================================
+-- 3. CREAR LECCIONES (4 por unidad: book, dumbbell, dumbbell-práctica, treasure)
+-- ============================================================================
+-- UNIT 1: BÁSICO
 INSERT INTO lessons (unit_id, type, description, position) VALUES
-                                                               (6, 'book', '¿Qué es la Cobertura de Sentencia?', 1),
-                                                               (6, 'star', 'Calculando Cobertura', 2),
-                                                               (6, 'star', 'Desafío de Código', 3);
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1 LIMIT 1), 'book', 'Texto 1 + Preguntas Básicas', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1 LIMIT 1), 'dumbbell', 'Texto 2 + Preguntas Avanzadas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1 LIMIT 1), 'dumbbell', 'Práctica de Código - Nivel Básico', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1 LIMIT 1), 'treasure', 'Quiz de Análisis + Práctica', 4);
 
--- 4. CREAR PROBLEMAS
+-- UNIT 2: INTERMEDIO
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2 LIMIT 1), 'book', 'Texto 1 + Preguntas Intermedias', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2 LIMIT 1), 'dumbbell', 'Texto 2 + Preguntas Secuenciales', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2 LIMIT 1), 'dumbbell', 'Práctica de Código - Nivel Intermedio', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2 LIMIT 1), 'treasure', 'Quiz de Análisis + Práctica', 4);
+
+-- UNIT 3: AVANZADO
+INSERT INTO lessons (unit_id, type, description, position) VALUES
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3 LIMIT 1), 'book', 'Texto 1 + Preguntas Avanzadas', 1),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3 LIMIT 1), 'dumbbell', 'Texto 2 + Preguntas Complejas', 2),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3 LIMIT 1), 'dumbbell', 'Práctica de Código - Nivel Avanzado', 3),
+((SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3 LIMIT 1), 'treasure', 'Quiz de Análisis + Práctica Avanzada', 4);
+
+-- ============================================================================
+-- 4. CREAR PROBLEMAS - UNIDAD 1: NIVEL BÁSICO (7 preguntas)
+-- ============================================================================
+
+-- ========== UNIT 1 - BOOK (INFO + 4 preguntas) ==========
 INSERT INTO problems (lesson_id, type, content, position) VALUES
-                                                              (12, 'INFO', '{"title": "Pruebas de Sentencia", "content": "Es una técnica de prueba de CAJA BLANCA que mide el porcentaje de líneas de código...", "image": "/assets/white-box.png"}', 1),
-                                                              (13, 'SELECT_1_OF_3', '{"question": "Un programa tiene 100 líneas ejecutables. Un set de pruebas ejecuta 75. ¿Cuál es la cobertura de sentencia?", "options": [{"id": "a", "text": "75%"}, {"id": "b", "text": "100%"}, {"id": "c", "text": "No se puede saber"}], "correctAnswer": "a", "explanation": "(75 / 100) * 100 = 75%."}', 1),
-                                                              (13, 'FILL_IN_THE_BLANK', '{"question": "Lograr 100% de cobertura de sentencia ___ (garantiza/no garantiza) que el software esté libre de bugs.", "blanks": ["respuesta"], "correctAnswers": ["no garantiza"], "hint": "Puedes ejecutar todas las líneas, pero ¿qué pasa si la lógica es incorrecta?"}', 2),
-                                                              (14, 'CODE_CHALLENGE', '{"title": "Desafío de Cobertura", "code": "public int calcular(int x, int y) {\n  int r = x;  // S1\n  if (x > 5) {  // S2\n    r = x + y;  // S3\n  }\n  return r;   // S4\n}", "question": "¿Qué caso de prueba (x, y) logra 100% de cobertura de sentencia?", "options": [{"id": "a", "text": "x = 4, y = 10"}, {"id": "b", "text": "x = 6, y = 10"}, {"id": "c", "text": "x = 5, y = 10"}], "correctAnswer": "b", "explanation": "El caso (6, 10) hace que ''x > 5'' sea verdadero, ejecutando la línea S3. Los otros casos se saltan la S3."}', 1),
-                                                              (14, 'SELECT_1_OF_3', '{"question": "Usando el mismo código, ¿qué caso de prueba logra la MENOR cobertura de sentencia?", "options": [{"id": "a", "text": "x = 10, y = 2"}, {"id": "b", "text": "x = 2, y = 2"}], "correctAnswer": "b", "explanation": "El caso (2, 2) ejecuta S1, S2 y S4 (3 de 4 sentencias). El caso (10, 2) ejecuta las 4 sentencias."}', 2);
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'book'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Básico - Ramas como Clases de Equivalencia",
+  "introduction": "Una rama es un camino de ejecución en un programa. Cada decisión (if/else) crea dos ramas. Las Clases de Equivalencia son grupos de entradas que se comportan igual.",
+  "objectives": ["Comprender qué es una rama", "Identificar clases válidas e inválidas", "Calcular el número mínimo de pruebas", "Usar valores límite"]
+}', 1);
+
+-- PREGUNTA 1 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Observa la función esPositivo(n). ¿Cuál es el número mínimo de casos de prueba necesarios para asegurar el 100% de cobertura de ramas?",
+  "answers": [
+    {"name": "A. 1"},
+    {"name": "B. 2"},
+    {"name": "C. 3"},
+    {"name": "D. 4"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 2 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Si una función solo tiene una sentencia if sin un else, ¿cuántas ramas existen lógicamente?",
+  "answers": [
+    {"name": "A. 1"},
+    {"name": "B. 2"},
+    {"name": "C. Depende del contenido del if"},
+    {"name": "D. Depende del código dentro del if"}
+  ],
+  "correctAnswer": 1
+}', 3);
+
+-- PREGUNTA 3 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál de los siguientes términos describe el objetivo de que cada resultado posible de una decisión haya sido ejecutado por al menos un caso de prueba?",
+  "answers": [
+    {"name": "A. Cobertura de Tipos"},
+    {"name": "B. Cobertura de Condiciones"},
+    {"name": "C. Cobertura de Ramas"},
+    {"name": "D. Cobertura de Datos"}
+  ],
+  "correctAnswer": 2
+}', 4);
+
+-- PREGUNTA 4 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "La función checkEdad(edad) verifica si la edad es >= 18. Para cubrir la rama Clase Válida, ¿qué valor es el más crítico para probar?",
+  "answers": [
+    {"name": "A. 19"},
+    {"name": "B. 18"},
+    {"name": "C. 17"},
+    {"name": "D. 1"}
+  ],
+  "correctAnswer": 1
+}', 5);
+
+-- ========== UNIT 1 - DUMBBELL (INFO + 3 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Básico - Clases Límite y Cobertura Total",
+  "introduction": "Los valores límite son los casos más críticos para probar. Cada rama debe ser ejecutada por al menos una prueba para lograr el 100% de cobertura.",
+  "objectives": ["Identificar valores límite", "Aplicar teoría de clases al código real", "Diseñar casos de prueba mínimos", "Validar cobertura de ramas"]
+}', 1);
+
+-- PREGUNTA 5 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "En la función esPositivo(n), si se ejecuta la prueba esPositivo(0), ¿qué clase de entrada se está cubriendo?",
+  "answers": [
+    {"name": "A. Una clase que no existe"},
+    {"name": "B. Clase Inválida (Falso)"},
+    {"name": "C. Clase Válida (Verdadero)"},
+    {"name": "D. Una clase no cubierta"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 6 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Para probar la función checkEdad(edad) al 100%, la combinación mínima de entradas debe ser:",
+  "answers": [
+    {"name": "A. Solo 18"},
+    {"name": "B. 18 y 20"},
+    {"name": "C. 18 y 17"},
+    {"name": "D. Solo 17"}
+  ],
+  "correctAnswer": 2
+}', 3);
+
+-- PREGUNTA 7 - Básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "En la función verificarAcceso(esAdmin), que retorna Acceso Total si esAdmin es true. ¿Qué entrada es necesaria y suficiente para cubrir la Clase Inválida?",
+  "answers": [
+    {"name": "A. verificarAcceso(false)"},
+    {"name": "B. verificarAcceso(true)"},
+    {"name": "C. verificarAcceso(null)"},
+    {"name": "D. verificarAcceso(undefined)"}
+  ],
+  "correctAnswer": 0
+}', 4);
+
+-- ========== UNIT 1 - TREASURE (INFO + 2 bonus) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'treasure'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Básico - Quiz de Análisis de Código",
+  "introduction": "Ahora analizaremos código real. Tu objetivo es predecir qué rama se ejecuta con cada entrada.",
+  "objectives": ["Analizar flujo de código", "Predecir resultados", "Identificar casos límite", "Comprender falsy/truthy"]
+}', 1);
+
+-- PREGUNTA 8 - Quiz Análisis Básico 1
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Para alcanzar la Clase Válida (Positivo), ¿cuál es el valor más eficiente?<br><br><code>function esPositivo(n) { if (n > 0) return \"Positivo\"; else return \"No Positivo\"; }</code>",
+  "answers": [
+    {"name": "A. esPositivo(100)"},
+    {"name": "B. esPositivo(1)"},
+    {"name": "C. esPositivo(0)"},
+    {"name": "D. esPositivo(-1)"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 9 - Quiz Análisis Básico 2
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Si la entrada es checkEdad(17), ¿qué rama se ejecuta?<br><br><code>function checkEdad(edad) { if (edad >= 18) return \"Mayor\"; else return \"Menor\"; }</code>",
+  "answers": [
+    {"name": "A. Clase Válida (Mayor de edad)"},
+    {"name": "B. Clase Inválida (Menor de edad)"},
+    {"name": "C. Ambas ramas"},
+    {"name": "D. Ninguna, hay un error"}
+  ],
+  "correctAnswer": 1
+}', 3);
+
+-- ============================================================================
+-- 5. CREAR PROBLEMAS - UNIDAD 2: NIVEL INTERMEDIO (7 preguntas)
+-- ============================================================================
+
+-- ========== UNIT 2 - BOOK (INFO + 4 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'book'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Intermedio - Múltiples Clases Secuenciales",
+  "introduction": "Las estructuras if/else if/else definen múltiples Clases Válidas. Solo una puede ejecutarse. Para el 100% de cobertura, necesitas un caso para cada bloque.",
+  "objectives": ["Cubrir cada clase secuencial", "Diseñar pruebas de frontera", "Satisfacer lógica compleja", "Aplicar operadores booleanos"]
+}', 1);
+
+-- PREGUNTA 11 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "La función obtenerTrimestre(mes) tiene cuatro posibles resultados (1, 2, 3, o 4). ¿Cuántas clases válidas necesita activar para alcanzar el 100% de cobertura?",
+  "answers": [
+    {"name": "A. 3"},
+    {"name": "B. 4"},
+    {"name": "C. 7"},
+    {"name": "D. 8"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 12 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "En un código con if/else if/else, si una prueba cubre el primer if, ¿el resto se consideran cubiertos?",
+  "answers": [
+    {"name": "A. Sí, todos se cubren"},
+    {"name": "B. No, se necesita una prueba para cada rama"},
+    {"name": "C. Solo si hay break"},
+    {"name": "D. Depende de si hay un return"}
+  ],
+  "correctAnswer": 1
+}', 3);
+
+-- PREGUNTA 13 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "La función procesarEntrada(input) genera 3 posibles salidas. ¿Cuál es el número mínimo de casos de prueba para el 100% de cobertura?",
+  "answers": [
+    {"name": "A. 1"},
+    {"name": "B. 2"},
+    {"name": "C. 3"},
+    {"name": "D. 4"}
+  ],
+  "correctAnswer": 2
+}', 4);
+
+-- PREGUNTA 14 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál es un riesgo principal de no alcanzar el 100% de cobertura de ramas?",
+  "answers": [
+    {"name": "A. La compilación falla"},
+    {"name": "B. Se ejecuta más lentamente"},
+    {"name": "C. Una rama no cubierta puede contener bugs"},
+    {"name": "D. El código será más lento"}
+  ],
+  "correctAnswer": 2
+}', 5);
+
+-- ========== UNIT 2 - DUMBBELL (INFO + 3 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Intermedio - Clases con Operadores Lógicos",
+  "introduction": "Los operadores && y || crean expresiones booleanas complejas. Necesitas desglosar las subcondiciones para lograr cobertura total.",
+  "objectives": ["Evaluar precedencia de operadores", "Identificar caminos secuenciales", "Anticipar el flujo de ejecución", "Manejar cláusulas de guardia"]
+}', 1);
+
+-- PREGUNTA 15 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué entradas son la combinación mínima de valores límite para cubrir (1, 4, 7)?<br><br><code>if (mes >= 1 && mes <= 3) return 1; else if (mes >= 4 && mes <= 6) return 2; else return 4;</code>",
+  "answers": [
+    {"name": "A. (1, 4, 13)"},
+    {"name": "B. (3, 6, 7)"},
+    {"name": "C. (1, 4, 10)"},
+    {"name": "D. (3, 5, 9)"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 16 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Si se prueba puedeAplicar(2, 25), ¿qué clase se ejecuta?<br><br><code>if (experiencia >= 2 && edad > 25) return true; return false;</code>",
+  "answers": [
+    {"name": "A. Clase Válida (True)"},
+    {"name": "B. Clase Inválida (False)"},
+    {"name": "C. Error de parámetro"},
+    {"name": "D. Retorna undefined"}
+  ],
+  "correctAnswer": 1
+}', 3);
+
+-- PREGUNTA 17 - Intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál es el propósito de la primera rama en este código?<br><br><code>if (typeof input !== \"string\") return \"Tipo incorrecto\";</code>",
+  "answers": [
+    {"name": "A. Es la clase válida principal"},
+    {"name": "B. Es una clase inválida de tipo (Guard Clause)"},
+    {"name": "C. Se ejecuta solo si la cadena está vacía"},
+    {"name": "D. Es un bug en la función"}
+  ],
+  "correctAnswer": 1
+}', 4);
+
+-- ========== UNIT 2 - TREASURE (INFO + 3 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'treasure'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Intermedio - Quiz de Análisis Intermedio",
+  "introduction": "Analiza código con múltiples clases secuenciales y operadores lógicos complejos.",
+  "objectives": ["Predecir la clase de salida", "Evaluar lógica AND/OR", "Analizar caminos secuenciales"]
+}', 1);
+
+-- PREGUNTA 18 - Quiz Análisis Intermedio 1
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime con mes=5?<br><br><code>function obtenerTrimestre(mes) { if (mes >= 1 && mes <= 3) return 1; else if (mes >= 4 && mes <= 6) return 2; else return 4; }</code>",
+  "answers": [
+    {"name": "A. 1"},
+    {"name": "B. 2"},
+    {"name": "C. 4"},
+    {"name": "D. Error"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 19 - Quiz Análisis Intermedio 2
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime con x=4, y=2, z=8?<br><br><code>if (x>y && y<z && x<z) System.out.println(\"Correcto\"); else System.out.println(\"Incorrecto\");</code>",
+  "answers": [
+    {"name": "A. Correcto"},
+    {"name": "B. Incorrecto"},
+    {"name": "C. Error"},
+    {"name": "D. Nada"}
+  ],
+  "correctAnswer": 0
+}', 3);
+
+-- PREGUNTA 20 - Quiz Análisis Intermedio 3
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál es un ejemplo de prueba de rama?",
+  "answers": [
+    {"name": "A. Verificar si un ciclo termina"},
+    {"name": "B. Probar cada posible camino de decisiones"},
+    {"name": "C. Medir el tiempo del código"},
+    {"name": "D. Revisar comentarios"}
+  ],
+  "correctAnswer": 1
+}', 4);
+
+-- ============================================================================
+-- 6. CREAR PROBLEMAS - UNIDAD 3: NIVEL AVANZADO (7 preguntas)
+-- ============================================================================
+
+-- ========== UNIT 3 - BOOK (INFO + 4 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'book'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Avanzado - Clases Anidadas y Subclases",
+  "introduction": "Los if anidados crean subclases que solo se alcanzan si se cumplen las condiciones superiores. La complejidad aumenta exponencialmente. Cada combinación de True/False necesita una prueba.",
+  "objectives": ["Cubrir subclases anidadas", "Validar guard clauses", "Controlar flujo de bucles", "Resolver casos de excepción"]
+}', 1);
+
+-- PREGUNTA 21 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime si a=5, b=5, c=10?<br><br><code>if (a==b || b==c && a<c) System.out.println(\"OK\");</code>",
+  "answers": [
+    {"name": "A. OK"},
+    {"name": "B. NO"},
+    {"name": "C. Error"},
+    {"name": "D. Nada"}
+  ],
+  "correctAnswer": 0
+}', 2);
+
+-- PREGUNTA 22 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué evalúa primero Java en: a == b || b < c && c > a?",
+  "answers": [
+    {"name": "A. ||"},
+    {"name": "B. &&"},
+    {"name": "C. =="},
+    {"name": "D. Ninguno"}
+  ],
+  "correctAnswer": 1
+}', 3);
+
+-- PREGUNTA 23 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime si x=3, y=9?<br><br><code>if (x<5) if (y>10) System.out.println(\"A\"); else System.out.println(\"B\"); else System.out.println(\"C\");</code>",
+  "answers": [
+    {"name": "A. A"},
+    {"name": "B. B"},
+    {"name": "C. C"},
+    {"name": "D. Nada"}
+  ],
+  "correctAnswer": 1
+}', 4);
+
+-- PREGUNTA 24 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'book'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime si x=0?<br><br><code>if (x >= 0) if (x == 0) System.out.println(\"Cero\"); else System.out.println(\"Positivo\"); else System.out.println(\"Negativo\");</code>",
+  "answers": [
+    {"name": "A. Cero"},
+    {"name": "B. Positivo"},
+    {"name": "C. Negativo"},
+    {"name": "D. Error"}
+  ],
+  "correctAnswer": 0
+}', 5);
+
+-- ========== UNIT 3 - DUMBBELL (INFO + 3 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 2), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Avanzado - Análisis de Ramas Complejas",
+  "introduction": "Resuelve los problemas más desafiantes con negación lógica, equivalencias booleanas y anidamientos profundos.",
+  "objectives": ["Analizar negación lógica", "Aplicar equivalencias lógicas", "Resolver casos anidados complejos"]
+}', 1);
+
+-- PREGUNTA 25 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál condición verifica que un número esté FUERA del rango [1,100]?",
+  "answers": [
+    {"name": "A. x>1 && x<100"},
+    {"name": "B. x<1 || x>100"},
+    {"name": "C. x==50"},
+    {"name": "D. !(x<100)"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 26 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime si a=4, b=2, c=8?<br><br><code>if (a>b && b<c && a<c) System.out.println(\"Correcto\"); else System.out.println(\"Incorrecto\");</code>",
+  "answers": [
+    {"name": "A. Correcto"},
+    {"name": "B. Incorrecto"},
+    {"name": "C. Error"},
+    {"name": "D. Nada"}
+  ],
+  "correctAnswer": 0
+}', 3);
+
+-- PREGUNTA 27 - Avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 2), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Cuál es equivalente a !(x > 5)?",
+  "answers": [
+    {"name": "A. x >= 5"},
+    {"name": "B. x < 5"},
+    {"name": "C. x <= 5"},
+    {"name": "D. x == 5"}
+  ],
+  "correctAnswer": 2
+}', 4);
+
+-- ========== UNIT 3 - TREASURE (INFO + 3 preguntas) ==========
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'treasure'), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Nivel Avanzado - Quiz de Análisis Extremo",
+  "introduction": "El desafío final: analiza código con anidamientos profundos, guard clauses y operadores lógicos complejos.",
+  "objectives": ["Predecir resultado con lógica compleja", "Evaluar anidamientos profundos", "Aplicar todos los conceptos"]
+}', 1);
+
+-- PREGUNTA 28 - Quiz Análisis Avanzado 1
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime si x=12?<br><br><code>if (x%3==0 && x%4==0) System.out.println(\"Múltiplo\"); else System.out.println(\"No\");</code>",
+  "answers": [
+    {"name": "A. No múltiplo"},
+    {"name": "B. Múltiplo de ambos"},
+    {"name": "C. Error"},
+    {"name": "D. Nada"}
+  ],
+  "correctAnswer": 1
+}', 2);
+
+-- PREGUNTA 29 - Quiz Análisis Avanzado 2
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "Si user es { perfil: { activo: false } }, ¿qué retorna?<br><br><code>if (user && user.perfil && user.perfil.activo === true) return \"Activo\"; if (user && user.perfil) return \"Inactivo\"; return \"Inválido\";</code>",
+  "answers": [
+    {"name": "A. Activo"},
+    {"name": "B. Inactivo"},
+    {"name": "C. Inválido"},
+    {"name": "D. Null"}
+  ],
+  "correctAnswer": 1
+}', 3);
+
+-- PREGUNTA 30 - Quiz Análisis Avanzado 3
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND type = 'treasure'), 'MULTIPLE_CHOICE', '{
+  "type": "MULTIPLE_CHOICE",
+  "question": "¿Qué imprime si a=2, b=4, c=6?<br><br><code>if (a<b) if (b<c) System.out.println(\"Cadena\"); else System.out.println(\"Problema\"); else System.out.println(\"Fuera\");</code>",
+  "answers": [
+    {"name": "A. Cadena correcta"},
+    {"name": "B. Problema"},
+    {"name": "C. Fuera"},
+    {"name": "D. Nada"}
+  ],
+  "correctAnswer": 0
+}', 4);
+
+-- ============================================================================
+-- 7. EJERCICIOS PRÁCTICOS DE CÓDIGO - NIVEL BÁSICO
+-- ============================================================================
+
+-- INFO para lección de práctica nivel básico
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Práctica de Código - Nivel Básico",
+  "introduction": "¡Es hora de poner en práctica lo aprendido! Escribe código de prueba que cubra todas las ramas de las funciones. La consola simulada te mostrará los resultados de tus pruebas.",
+  "objectives": ["Escribir llamadas a funciones de prueba", "Cubrir ramas válidas e inválidas", "Usar valores límite para maximizar cobertura"]
+}', 1);
+
+-- EJERCICIO BÁSICO 1: esPositivo(n)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para la función esPositivo(n) que cubra el 100% de ramas (Clase Válida e Inválida).",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llama a esPositivo(n) con valores que cubran:\n// - Clase Válida: n > 0\n// - Clase Inválida: n <= 0\n___BLANK___",
+  "expectedAnswer": "esPositivo(1); esPositivo(0);",
+  "hint": "Necesitas dos llamadas: una para probar la rama Verdadero (n > 0) y otra para la rama Falso (n <= 0). Usa valores límite como 1 y 0.",
+  "explanation": "Para lograr 100% de cobertura de ramas, debes ejecutar ambos caminos: if (n > 0) y else. El valor 1 satisface n > 0, mientras que 0 no la satisface.",
+  "testCases": [
+    {
+      "input": "esPositivo(1)",
+      "expectedOutput": "Positivo",
+      "description": "Clase Válida: n > 0"
+    },
+    {
+      "input": "esPositivo(0)",
+      "expectedOutput": "No Positivo",
+      "description": "Clase Inválida: n ≤ 0"
+    }
+  ]
+}', 2);
+
+-- EJERCICIO BÁSICO 2: verificarAcceso(esAdmin)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para verificarAcceso(esAdmin) cubriendo todas las ramas.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llama a verificarAcceso(esAdmin) con valores que cubran:\n// - Clase Válida: esAdmin = true\n// - Clase Inválida: esAdmin = false\n___BLANK___",
+  "expectedAnswer": "verificarAcceso(true); verificarAcceso(false);",
+  "hint": "Esta función es booleana. Necesitas una prueba con true (rama if) y otra con false (rama else).",
+  "explanation": "Los booleanos tienen dos clases: Verdadero y Falso. Cada una representa una rama diferente del código.",
+  "testCases": [
+    {
+      "input": "verificarAcceso(true)",
+      "expectedOutput": "Acceso Total",
+      "description": "Clase Válida: esAdmin = true"
+    },
+    {
+      "input": "verificarAcceso(false)",
+      "expectedOutput": "Acceso Limitado",
+      "description": "Clase Inválida: esAdmin = false"
+    }
+  ]
+}', 3);
+
+-- EJERCICIO BÁSICO 3: checkEdad(edad)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 1) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para checkEdad(edad) usando valores límite.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llama a checkEdad(edad) con valores límite que cubran:\n// - Clase Válida: edad >= 18\n// - Clase Inválida: edad < 18\n___BLANK___",
+  "expectedAnswer": "checkEdad(18); checkEdad(17);",
+  "hint": "Los valores límite son 17 y 18. El 18 es el primero que cumple la condición >= 18, y el 17 es el último que no la cumple.",
+  "explanation": "Los valores límite son críticos para encontrar bugs en condiciones de desigualdad. Aquí, 18 es el punto de transición entre las clases.",
+  "testCases": [
+    {
+      "input": "checkEdad(18)",
+      "expectedOutput": "Mayor de edad",
+      "description": "Valor límite - Primera Clase Válida (edad >= 18)"
+    },
+    {
+      "input": "checkEdad(17)",
+      "expectedOutput": "Menor de edad",
+      "description": "Valor límite - Última Clase Inválida (edad < 18)"
+    }
+  ]
+}', 4);
+
+-- ============================================================================
+-- 8. EJERCICIOS PRÁCTICOS DE CÓDIGO - NIVEL INTERMEDIO
+-- ============================================================================
+
+-- INFO para lección de práctica nivel intermedio
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Práctica de Código - Nivel Intermedio",
+  "introduction": "Ahora trabajarás con funciones más complejas que tienen múltiples ramas secuenciales, operadores AND/OR y guard clauses. ¡Demuestra tu dominio de cobertura de ramas!",
+  "objectives": ["Cubrir múltiples ramas if/else if/else", "Manejar operadores lógicos AND/OR", "Probar guard clauses defensivas"]
+}', 1);
+
+-- EJERCICIO INTERMEDIO 1: obtenerTrimestre(mes)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para obtenerTrimestre(mes) cubriendo los 4 trimestres.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llama a obtenerTrimestre(mes) con valores que cubran:\n// - Trimestre 1: 1-3\n// - Trimestre 2: 4-6\n// - Trimestre 3: 7-9\n// - Trimestre 4: 10-12 (otros)\n___BLANK___",
+  "expectedAnswer": "obtenerTrimestre(3); obtenerTrimestre(6); obtenerTrimestre(9); obtenerTrimestre(12);",
+  "hint": "Necesitas 4 llamadas: una por cada rama del if/else if/else if/else. Usa los valores límite finales de cada rango (3, 6, 9, 12).",
+  "explanation": "Cada estructura if/else if/else crea clases secuenciales. Para cobertura al 100%, necesitas activar cada bloque con al menos una prueba.",
+  "testCases": [
+    {
+      "input": "obtenerTrimestre(3)",
+      "expectedOutput": "1",
+      "description": "Trimestre 1 (enero-marzo)"
+    },
+    {
+      "input": "obtenerTrimestre(6)",
+      "expectedOutput": "2",
+      "description": "Trimestre 2 (abril-junio)"
+    },
+    {
+      "input": "obtenerTrimestre(9)",
+      "expectedOutput": "3",
+      "description": "Trimestre 3 (julio-septiembre)"
+    },
+    {
+      "input": "obtenerTrimestre(12)",
+      "expectedOutput": "4",
+      "description": "Trimestre 4 (octubre-diciembre)"
+    }
+  ]
+}', 2);
+
+-- EJERCICIO INTERMEDIO 2: puedeAplicar(experiencia, edad, titulo)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para puedeAplicar() con operadores lógicos AND/OR.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a puedeAplicar(exp, edad, titulo) que cubran:\n// - Clase Válida: experiencia >= 2 AND (edad > 25 OR titulo = \"Master\")\n// - Clase Inválida: cualquier otra combinación\n___BLANK___",
+  "expectedAnswer": "puedeAplicar(3, 30, \"Licencia\"); puedeAplicar(3, 20, \"Master\"); puedeAplicar(2, 24, \"Licencia\");",
+  "hint": "Necesitas 3 pruebas: 1) Ambas subcondiciones verdaderas, 2) Segunda subcondición OR verdadera, 3) Alguna condición falsa.",
+  "explanation": "Con AND/OR, debes probar que la expresión complete sea true y false. El OR significa que cualquiera de sus opciones hace que sea verdadera.",
+  "testCases": [
+    {
+      "input": "puedeAplicar(3, 30, \"Licencia\")",
+      "expectedOutput": "true",
+      "description": "Exp >= 2 Y edad > 25 (primer OR verdadero)"
+    },
+    {
+      "input": "puedeAplicar(3, 20, \"Master\")",
+      "expectedOutput": "true",
+      "description": "Exp >= 2 Y titulo = Master (segundo OR verdadero)"
+    },
+    {
+      "input": "puedeAplicar(2, 24, \"Licencia\")",
+      "expectedOutput": "false",
+      "description": "Exp >= 2 PERO edad < 25 Y titulo ≠ Master (ambos OR falsos)"
+    }
+  ]
+}', 3);
+
+-- EJERCICIO INTERMEDIO 3: procesarEntrada(input)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para procesarEntrada() cubriendo guard clauses.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a procesarEntrada(input) que cubran:\n// - Clase Inválida 1: tipo no string\n// - Clase Inválida 2: string vacío\n// - Clase Válida: string con contenido\n___BLANK___",
+  "expectedAnswer": "procesarEntrada(123); procesarEntrada(\"\"); procesarEntrada(\"Hola\");",
+  "hint": "Las guard clauses (chequeos rápidos) manejan clases inválidas primero. Necesitas 3 pruebas para las 3 ramas.",
+  "explanation": "Las funciones con guard clauses manejan excepciones al inicio. Esto es una buena práctica defensiva.",
+  "testCases": [
+    {
+      "input": "procesarEntrada(123)",
+      "expectedOutput": "Tipo de dato incorrecto",
+      "description": "Guard Clause 1: typeof input !== ''string''"
+    },
+    {
+      "input": "procesarEntrada(\"\")",
+      "expectedOutput": "Cadena vacía",
+      "description": "Guard Clause 2: input === \"\""
+    },
+    {
+      "input": "procesarEntrada(\"Hola\")",
+      "expectedOutput": "Cadena procesada",
+      "description": "Clase Válida: string con contenido"
+    }
+  ]
+}', 4);
+
+-- EJERCICIO INTERMEDIO 4: clasificarNota(nota)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 2) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para clasificarNota() con switch/case.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a clasificarNota(nota) que cubran todos los cases:\n// - case 10: \"Excelente\"\n// - cases 9,8: \"Notable\"\n// - case 7: \"Aprobado\"\n// - default: \"Insuficiente o Inválida\"\n___BLANK___",
+  "expectedAnswer": "clasificarNota(10); clasificarNota(8); clasificarNota(7); clasificarNota(5);",
+  "hint": "Cada case es una rama. Necesitas probar cada rama: 10, 9 o 8, 7, y un default (como 5).",
+  "explanation": "Los switch con múltiples cases crean tantas ramas como opciones. El default maneja todos los valores no cubiertos.",
+  "testCases": [
+    {
+      "input": "clasificarNota(10)",
+      "expectedOutput": "Excelente",
+      "description": "Case 10"
+    },
+    {
+      "input": "clasificarNota(8)",
+      "expectedOutput": "Notable",
+      "description": "Case 9/8 (sin break, fall-through)"
+    },
+    {
+      "input": "clasificarNota(7)",
+      "expectedOutput": "Aprobado",
+      "description": "Case 7"
+    },
+    {
+      "input": "clasificarNota(5)",
+      "expectedOutput": "Insuficiente o Inválida",
+      "description": "Default (ningún case coincide)"
+    }
+  ]
+}', 5);
+
+-- ============================================================================
+-- 9. EJERCICIOS PRÁCTICOS DE CÓDIGO - NIVEL AVANZADO
+-- ============================================================================
+
+-- INFO para lección de práctica nivel avanzado
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 3), 'INFO', '{
+  "type": "INFO",
+  "moduleTitle": "Práctica de Código - Nivel Avanzado",
+  "introduction": "El desafío final: funciones con objetos anidados, múltiples condiciones complejas, guard clauses con OR y ciclos. ¡Demuestra que eres un experto en cobertura de ramas!",
+  "objectives": ["Probar objetos con propiedades anidadas", "Cubrir guard clauses con múltiples OR", "Manejar ciclos con salida temprana"]
+}', 1);
+
+-- EJERCICIO AVANZADO 1: checkEstadoUsuario(user)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para checkEstadoUsuario() con objetos anidados.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a checkEstadoUsuario(user) que cubran:\n// - Rama 1: user.perfil.activo === true\n// - Rama 2: user.perfil existe pero activo ≠ true\n// - Rama 3: user.perfil no existe\n___BLANK___",
+  "expectedAnswer": "checkEstadoUsuario({perfil: {activo: true}}); checkEstadoUsuario({perfil: {activo: false}}); checkEstadoUsuario({});",
+  "hint": "Los objetos anidados requieren chequeos encadenados. Necesitas 3 objetos diferentes para las 3 ramas.",
+  "explanation": "Con anidamientos profundos, la primera rama activa solo si TODAS las subcondiciones son verdaderas. Las siguientes se activan cuando falla la anterior.",
+  "testCases": [
+    {
+      "input": "{perfil: {activo: true}}",
+      "expectedOutput": "Activo",
+      "description": "Todas las propiedades existen y activo = true"
+    },
+    {
+      "input": "{perfil: {activo: false}}",
+      "expectedOutput": "Inactivo o Bloqueado",
+      "description": "Perfil existe pero activo ≠ true"
+    },
+    {
+      "input": "{}",
+      "expectedOutput": "Usuario Inválido",
+      "description": "Objeto vacío, sin perfil"
+    }
+  ]
+}', 2);
+
+-- EJERCICIO AVANZADO 2: aplicarTarifa(monto, clientePremium)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para aplicarTarifa() con anidamientos complejos.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a aplicarTarifa(monto, premium) que cubran:\n// - monto > 500 & premium = true → 5%\n// - monto > 1000 & premium = false → 2%\n// - 500 < monto <= 1000 & premium = false → 7%\n// - 100 < monto <= 500 → 8%\n// - monto <= 100 → 10%\n___BLANK___",
+  "expectedAnswer": "aplicarTarifa(600, true); aplicarTarifa(1200, false); aplicarTarifa(750, false); aplicarTarifa(300, false); aplicarTarifa(50, false);",
+  "hint": "Necesitas 5 pruebas para las 5 ramas anidadas. Elige montos que caigan en cada rango y valores de premium que fuerzen la rama correcta.",
+  "explanation": "Los if anidados multiplican las ramas. Cada if interno crea subcondiciones que dependen del if externo.",
+  "testCases": [
+    {
+      "input": "aplicarTarifa(600, true)",
+      "expectedOutput": "605",
+      "description": "Rama 1: monto > 500 & premium = true"
+    },
+    {
+      "input": "aplicarTarifa(1200, false)",
+      "expectedOutput": "1202",
+      "description": "Rama 2: monto > 1000 & premium = false"
+    },
+    {
+      "input": "aplicarTarifa(750, false)",
+      "expectedOutput": "757",
+      "description": "Rama 3: 500 < monto <= 1000 & premium = false"
+    },
+    {
+      "input": "aplicarTarifa(300, false)",
+      "expectedOutput": "308",
+      "description": "Rama 4: 100 < monto <= 500"
+    },
+    {
+      "input": "aplicarTarifa(50, false)",
+      "expectedOutput": "60",
+      "description": "Rama 5: monto <= 100 (default)"
+    }
+  ]
+}', 3);
+
+-- EJERCICIO AVANZADO 3: verificarPermiso(rol, isOwner, status)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para verificarPermiso() con guard clause y OR lógico.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a verificarPermiso(rol, isOwner, status) que cubran:\n// Guard: !rol || status !== \"approved\" || (rol === \"guest\" && !isOwner) → false\n// Else: true\n___BLANK___",
+  "expectedAnswer": "verificarPermiso(\"admin\", true, \"approved\"); verificarPermiso(null, true, \"approved\");",
+  "hint": "Esta es una guard clause con múltiples condiciones OR. Necesitas una prueba que pase (true) y otra que falle (false).",
+  "explanation": "Las guard clauses con OR complejas usan la evaluación perezosa: tan pronto como una subcondición es verdadera, devuelven false.",
+  "testCases": [
+    {
+      "input": "verificarPermiso(\"admin\", true, \"approved\")",
+      "expectedOutput": "true",
+      "description": "Todas las subcondiciones de la guard son falsas → pasa"
+    },
+    {
+      "input": "verificarPermiso(null, true, \"approved\")",
+      "expectedOutput": "false",
+      "description": "!rol = true → guard es true → falla"
+    },
+    {
+      "input": "verificarPermiso(\"admin\", true, \"pending\")",
+      "expectedOutput": "false",
+      "description": "status !== \"approved\" = true → guard es true → falla"
+    }
+  ]
+}', 4);
+
+-- EJERCICIO AVANZADO 4: buscarItem(arr, target)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico: Escribe pruebas para buscarItem() con guard y ciclo.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a buscarItem(arr, target) que cubran:\n// - Guard: no es Array → null\n// - Salida temprana: encontrado en el ciclo → índice\n// - Fin de ciclo: no encontrado → -1\n___BLANK___",
+  "expectedAnswer": "buscarItem(\"no array\", 5); buscarItem([1,2,3], 2); buscarItem([1,2,3], 5);",
+  "hint": "3 pruebas: 1) Guard clause (parámetro inválido), 2) Salida temprana (encontrado), 3) Ciclo completo (no encontrado).",
+  "explanation": "Los ciclos tienen 3 clases: Cero iteraciones (guard), Salida temprana (break), Finalización normal.",
+  "testCases": [
+    {
+      "input": "buscarItem(\"no array\", 5)",
+      "expectedOutput": "null",
+      "description": "Guard: !Array.isArray(arr)"
+    },
+    {
+      "input": "buscarItem([1,2,3], 2)",
+      "expectedOutput": "1",
+      "description": "Salida temprana: encontrado en índice 1"
+    },
+    {
+      "input": "buscarItem([1,2,3], 5)",
+      "expectedOutput": "-1",
+      "description": "Ciclo completo: no encontrado"
+    }
+  ]
+}', 5);
+
+-- EJERCICIO AVANZADO 5: procesarConfig(config)
+INSERT INTO problems (lesson_id, type, content, position) VALUES
+((SELECT id FROM lessons WHERE unit_id = (SELECT id FROM units WHERE module_id = (SELECT id FROM modules WHERE code = 'moduleC') AND unit_number = 3) AND position = 3), 'CODE_CHALLENGE', '{
+  "type": "CODE_CHALLENGE",
+  "question": "📝 Ejercicio Práctico Avanzado: Escribe pruebas para procesarConfig() con chequeos múltiples.",
+  "codeTemplate": "// Tu código de prueba aquí\n// Llamadas a procesarConfig(config) que cubran:\n// - Guard 1: !config || !config.data || config.data.length === 0\n// - Rama 2: config.strictMode === true\n// - Rama 3: procesamiento estándar\n___BLANK___",
+  "expectedAnswer": "procesarConfig(null); procesarConfig({data: [], strictMode: true}); procesarConfig({data: [1], strictMode: false});",
+  "hint": "3 pruebas para las 3 ramas. La primera prueba la guard clause (vacío/inválido), la segunda strictMode, la tercera estándar.",
+  "explanation": "Las guard clauses complejas usan múltiples chequeos encadenados. Si ANY falla, entra a la rama de guardia.",
+  "testCases": [
+    {
+      "input": "{config: null}",
+      "expectedOutput": "Configuración vacía o inválida",
+      "description": "Guard: !config"
+    },
+    {
+      "input": "{data: [], strictMode: true}",
+      "expectedOutput": "Modo estricto aplicado",
+      "description": "Pasa guard pero config.strictMode = true"
+    },
+    {
+      "input": "{data: [1], strictMode: false}",
+      "expectedOutput": "Procesamiento estándar",
+      "description": "Modo normal: estándar"
+    }
+  ]
+}', 6);
 
 ================================================================================
-📄 CONTENIDO DE: db/migration/V9__add_performance_indexes.sql
+📄 CONTENIDO DE: db\migration\V9__add_performance_indexes.sql
 ================================================================================
 /*
  * Índices de rendimiento para las Fases 4 y 6.

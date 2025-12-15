@@ -10,6 +10,7 @@
 │   │   │   ├── 📄 ForgotPasswordCommand.java
 │   │   │   ├── 📄 LoginUserCommand.java
 │   │   │   ├── 📄 RegisterUserCommand.java
+│   │   │   ├── 📄 UnitProgressResponse.java
 │   │   │   ├── 📄 UpdateUserAccountCommand.java
 │   │   │   ├── 📄 UpdateUserSettingsCommand.java
 │   │   ├── 📁 port/
@@ -20,6 +21,7 @@
 │   │   │   │   ├── 📄 CompleteLessonUseCase.java
 │   │   │   │   ├── 📄 ForgotPasswordUseCase.java
 │   │   │   │   ├── 📄 GetLeaderboardUseCase.java
+│   │   │   │   ├── 📄 GetLessonProblemsUseCase.java
 │   │   │   │   ├── 📄 GetModuleProblemsUseCase.java
 │   │   │   │   ├── 📄 GetModuleUnitUseCase.java
 │   │   │   │   ├── 📄 GetModulesUseCase.java
@@ -54,6 +56,7 @@
 │   │   │   ├── 📄 CompleteLessonService.java
 │   │   │   ├── 📄 ForgotPasswordService.java
 │   │   │   ├── 📄 GetLeaderboardService.java
+│   │   │   ├── 📄 GetLessonProblemsService.java
 │   │   │   ├── 📄 GetModuleProblemsService.java
 │   │   │   ├── 📄 GetModuleUnitService.java
 │   │   │   ├── 📄 GetModulesService.java
@@ -69,6 +72,7 @@
 │   │   ├── 📁 exception/
 │   │   │   ├── 📄 EmailAlreadyExistsException.java
 │   │   │   ├── 📄 InsufficientFundsException.java
+│   │   │   ├── 📄 InsufficientScoreException.java
 │   │   │   ├── 📄 InvalidCredentialsException.java
 │   │   │   ├── 📄 LessonAlreadyCompletedException.java
 │   │   │   ├── 📄 LessonNotFoundException.java
@@ -79,6 +83,7 @@
 │   │   │   ├── 📄 UsernameAlreadyExistsException.java
 │   │   ├── 📁 model/
 │   │   │   ├── 📄 AuthToken.java
+│   │   │   ├── 📄 Badge.java
 │   │   │   ├── 📄 FullUserProfile.java
 │   │   │   ├── 📄 Leaderboard.java
 │   │   │   ├── 📄 LeaderboardEntry.java
@@ -168,6 +173,7 @@
 │   │   │   │   ├── 📄 UserController.java
 │   │   │   ├── 📁 dto/
 │   │   │   │   ├── 📄 AuthResponseDTO.java
+│   │   │   │   ├── 📄 BadgeDTO.java
 │   │   │   │   ├── 📄 ErrorDTO.java
 │   │   │   │   ├── 📄 ForgotPasswordDTO.java
 │   │   │   │   ├── 📄 LeaderboardDTO.java
@@ -220,29 +226,29 @@ public class BugHunterSagaApiApplication {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/CompleteLessonCommand.java
+📄 CONTENIDO DE: application\dto\CompleteLessonCommand.java
 ================================================================================
 
-    package com.bughuntersaga.api.application.dto;
+package com.bughuntersaga.api.application.dto;
 
-    import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 
+@Getter
+@Builder
+public class CompleteLessonCommand {
+    private final Integer lessonId;
+    private final Integer correctAnswerCount;
+    private final Integer incorrectAnswerCount;
+    private final Long timeTakenMs;
+    private final Boolean isPractice;
+    private final Integer score;
 
-    @Getter
-    @Builder
-    public class CompleteLessonCommand {
-        private final Integer lessonId;
-        private final Integer correctAnswerCount;
-        private final Integer incorrectAnswerCount;
-        private final Long timeTakenMs;
-        private final Boolean isPractice;
-
-    }
+}
 
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/ForgotPasswordCommand.java
+📄 CONTENIDO DE: application\dto\ForgotPasswordCommand.java
 ================================================================================
 package com.bughuntersaga.api.application.dto;
 
@@ -259,7 +265,7 @@ public class ForgotPasswordCommand {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/LoginUserCommand.java
+📄 CONTENIDO DE: application\dto\LoginUserCommand.java
 ================================================================================
 package com.bughuntersaga.api.application.dto;
 
@@ -274,7 +280,7 @@ public class LoginUserCommand {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/RegisterUserCommand.java
+📄 CONTENIDO DE: application\dto\RegisterUserCommand.java
 ================================================================================
 package com.bughuntersaga.api.application.dto;
 
@@ -292,7 +298,31 @@ public class RegisterUserCommand {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/UpdateUserAccountCommand.java
+📄 CONTENIDO DE: application\dto\UnitProgressResponse.java
+================================================================================
+package com.bughuntersaga.api.application.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UnitProgressResponse {
+    private Integer unitId;
+    private String unitTitle;
+    private Integer currentXp; // XP actual del usuario en esta unidad
+    private Integer totalXpNeeded; // XP total necesario para completar la unidad
+    private Integer completedLessons; // Número de lecciones completadas
+    private Integer totalLessons; // Número total de lecciones en la unidad
+    private Double progressPercentage; // Porcentaje de progreso (0-100)
+}
+
+================================================================================
+📄 CONTENIDO DE: application\dto\UpdateUserAccountCommand.java
 ================================================================================
 package com.bughuntersaga.api.application.dto;
 
@@ -310,7 +340,7 @@ public class UpdateUserAccountCommand {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/dto/UpdateUserSettingsCommand.java
+📄 CONTENIDO DE: application\dto\UpdateUserSettingsCommand.java
 ================================================================================
 package com.bughuntersaga.api.application.dto;
 
@@ -328,7 +358,7 @@ public class UpdateUserSettingsCommand {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/ClaimTreasureResult.java
+📄 CONTENIDO DE: application\port\in\ClaimTreasureResult.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -341,7 +371,7 @@ package com.bughuntersaga.api.application.port.in;
 public record ClaimTreasureResult(int lingotsEarned, int totalLingots) {}
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/ClaimTreasureUseCase.java
+📄 CONTENIDO DE: application\port\in\ClaimTreasureUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -363,7 +393,7 @@ public interface ClaimTreasureUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/CompleteLessonResult.java
+📄 CONTENIDO DE: application\port\in\CompleteLessonResult.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -379,7 +409,7 @@ public record CompleteLessonResult(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/CompleteLessonUseCase.java
+📄 CONTENIDO DE: application\port\in\CompleteLessonUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -401,7 +431,7 @@ public interface CompleteLessonUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/ForgotPasswordUseCase.java
+📄 CONTENIDO DE: application\port\in\ForgotPasswordUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -421,7 +451,7 @@ public interface ForgotPasswordUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetLeaderboardUseCase.java
+📄 CONTENIDO DE: application\port\in\GetLeaderboardUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -438,7 +468,32 @@ public interface GetLeaderboardUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetModuleProblemsUseCase.java
+📄 CONTENIDO DE: application\port\in\GetLessonProblemsUseCase.java
+================================================================================
+// Ubicación: application/port/in/GetLessonProblemsUseCase.java
+package com.bughuntersaga.api.application.port.in;
+
+import com.bughuntersaga.api.domain.model.Problem;
+import java.util.List;
+
+/**
+ * Caso de uso para obtener todos los problemas de una lección específica.
+ */
+public interface GetLessonProblemsUseCase {
+
+    /**
+     * Obtiene todos los problemas ordenados por posición dentro de una lección.
+     *
+     * @param lessonId ID de la lección
+     * @return Lista de Problemas
+     * @throws com.bughuntersaga.api.domain.exception.LessonNotFoundException si la lección no existe.
+     */
+    List<Problem> getProblemsByLessonId(Integer lessonId);
+
+}
+
+================================================================================
+📄 CONTENIDO DE: application\port\in\GetModuleProblemsUseCase.java
 ================================================================================
 
 package com.bughuntersaga.api.application.port.in;
@@ -456,24 +511,20 @@ public interface GetModuleProblemsUseCase {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetModuleUnitUseCase.java
+📄 CONTENIDO DE: application\port\in\GetModuleUnitUseCase.java
 ================================================================================
-
 package com.bughuntersaga.api.application.port.in;
 
-
 import com.bughuntersaga.api.domain.model.Unit;
-
+import java.util.List;
 
 public interface GetModuleUnitUseCase {
-
-    Unit getModuleUnit(String moduleCode);
-
+    List<Unit> getModuleUnits(String moduleCode);
 }
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetModulesUseCase.java
+📄 CONTENIDO DE: application\port\in\GetModulesUseCase.java
 ================================================================================
 
 package com.bughuntersaga.api.application.port.in;
@@ -489,7 +540,7 @@ public interface GetModulesUseCase {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetShopItemsUseCase.java
+📄 CONTENIDO DE: application\port\in\GetShopItemsUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -504,7 +555,7 @@ public interface GetShopItemsUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetUserProfileUseCase.java
+📄 CONTENIDO DE: application\port\in\GetUserProfileUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -518,7 +569,7 @@ public interface GetUserProfileUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/GetUserStatsUseCase.java
+📄 CONTENIDO DE: application\port\in\GetUserStatsUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -536,7 +587,7 @@ public interface GetUserStatsUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/LoginUserUseCase.java
+📄 CONTENIDO DE: application\port\in\LoginUserUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -553,11 +604,11 @@ public interface LoginUserUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/PurchaseItemUseCase.java
+📄 CONTENIDO DE: application\port\in\PurchaseItemUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
-import com.bughuntersaga.api.application.port.in.UserStatsResult; // Importar
+import com.bughuntersaga.api.application.port.in.UserStatsResult;
 
 /**
  * Caso de uso para comprar un artículo de la tienda.
@@ -576,7 +627,7 @@ public interface PurchaseItemUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/RegisterUserUseCase.java
+📄 CONTENIDO DE: application\port\in\RegisterUserUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -589,7 +640,7 @@ public interface RegisterUserUseCase {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/UpdateUserAccountUseCase.java
+📄 CONTENIDO DE: application\port\in\UpdateUserAccountUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -607,7 +658,7 @@ public interface UpdateUserAccountUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/UpdateUserSettingsUseCase.java
+📄 CONTENIDO DE: application\port\in\UpdateUserSettingsUseCase.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -625,7 +676,7 @@ public interface UpdateUserSettingsUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/in/UserStatsResult.java
+📄 CONTENIDO DE: application\port\in\UserStatsResult.java
 ================================================================================
 package com.bughuntersaga.api.application.port.in;
 
@@ -647,7 +698,7 @@ public record UserStatsResult(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/EmailSenderPort.java
+📄 CONTENIDO DE: application\port\out\EmailSenderPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -670,7 +721,7 @@ public interface EmailSenderPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/LeaderboardData.java
+📄 CONTENIDO DE: application\port\out\LeaderboardData.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -687,7 +738,7 @@ public record LeaderboardData(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/LeaderboardRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\LeaderboardRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -710,7 +761,7 @@ public interface LeaderboardRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/LessonRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\LessonRepositoryPort.java
 ================================================================================
 
 package com.bughuntersaga.api.application.port.out;
@@ -728,7 +779,7 @@ public interface LessonRepositoryPort {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/ModuleRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\ModuleRepositoryPort.java
 ================================================================================
 
 package com.bughuntersaga.api.application.port.out;
@@ -748,7 +799,7 @@ public interface ModuleRepositoryPort {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/PasswordEncoderPort.java
+📄 CONTENIDO DE: application\port\out\PasswordEncoderPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -765,7 +816,7 @@ public interface PasswordEncoderPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/ProblemRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\ProblemRepositoryPort.java
 ================================================================================
 
 package com.bughuntersaga.api.application.port.out;
@@ -786,13 +837,14 @@ public interface ProblemRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/ShopItemRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\ShopItemRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
 import com.bughuntersaga.api.domain.model.ShopItem;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ShopItemRepositoryPort {
     /**
@@ -804,10 +856,19 @@ public interface ShopItemRepositoryPort {
      * Busca un artículo por su código único.
      */
     Optional<ShopItem> findByItemCode(String itemCode);
+
+    /**
+     * Obtiene los artículos de la tienda que el usuario NO ha comprado.
+     * Filtra excluyendo items que ya existen en user_inventory para ese usuario.
+     *
+     * @param userId ID del usuario autenticado
+     * @return Lista de artículos disponibles para compra
+     */
+    List<ShopItem> findAvailableItemsForUser(UUID userId);
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/TokenGeneratorPort.java
+📄 CONTENIDO DE: application\port\out\TokenGeneratorPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -819,11 +880,10 @@ public interface TokenGeneratorPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UnitRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UnitRepositoryPort.java
 ================================================================================
 
 package com.bughuntersaga.api.application.port.out;
-
 
 import com.bughuntersaga.api.domain.model.Unit;
 
@@ -831,6 +891,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UnitRepositoryPort {
+
+    /**
+     * Busca una unidad por su ID.
+     *
+     * @param unitId ID de la unidad
+     * @return Unidad encontrada o vacío
+     */
+    Optional<Unit> findById(Integer unitId);
 
     /**
      * Obtiene la primera unidad de un módulo.
@@ -846,26 +914,19 @@ public interface UnitRepositoryPort {
      * @param moduleCode Código del módulo
      * @return Lista de unidades
      */
-    List<Unit> findUnitsByModuleCode(String moduleCode);
-
-    /**
-     * Obtiene una unidad por su ID, incluyendo sus lecciones.
-     *
-     * @param unitId ID de la unidad
-     * @return Unidad con sus lecciones
-     */
-    Optional<Unit> findByIdWithLessons(Integer unitId);
+    List<Unit> findAllUnitsByModuleCode(String moduleCode);
 
 }
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserInventoryRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UserInventoryRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
 import com.bughuntersaga.api.domain.model.UserInventory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -882,10 +943,15 @@ public interface UserInventoryRepositoryPort {
      * Guarda (crea o actualiza) un artículo en el inventario.
      */
     UserInventory save(UserInventory inventory);
+
+    /**
+     * Obtiene todos los items (badges/títulos) del inventario del usuario.
+     */
+    List<UserInventory> findAllByUserId(UUID userId);
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserLessonProgressRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UserLessonProgressRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -911,10 +977,27 @@ public interface UserLessonProgressRepositoryPort {
      * Guarda un nuevo registro de progreso de lección.
      */
     UserLessonProgress save(UserLessonProgress progress);
+
+    /**
+     * Cuenta el número de completaciones exitosas de una lección por un usuario.
+     * Para permitir repetir lecciones con recompensas decrecientes.
+     */
+    int countCompletionsByUserIdAndLessonId(UUID userId, Integer lessonId);
+
+    /**
+     * Obtiene el número del siguiente intento para una lección específica.
+     */
+    int getNextAttemptNumber(UUID userId, Integer lessonId);
+
+    /**
+     * Elimina el progreso existente de una lección para permitir repetirla.
+     * (Opcional - solo usar si necesitas resetear completamente una lección)
+     */
+    void deleteByUserIdAndLessonId(UUID userId, Integer lessonId);
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserProfileRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UserProfileRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -929,7 +1012,7 @@ public interface UserProfileRepositoryPort {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UserRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -963,7 +1046,7 @@ public interface UserRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserStreakRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UserStreakRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -986,7 +1069,7 @@ public interface UserStreakRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/port/out/UserXpHistoryRepositoryPort.java
+📄 CONTENIDO DE: application\port\out\UserXpHistoryRepositoryPort.java
 ================================================================================
 package com.bughuntersaga.api.application.port.out;
 
@@ -1013,7 +1096,7 @@ public interface UserXpHistoryRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/ClaimTreasureService.java
+📄 CONTENIDO DE: application\service\ClaimTreasureService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1084,10 +1167,12 @@ public class ClaimTreasureService implements ClaimTreasureUseCase {
         userProfileRepositoryPort.save(userProfile); // Guardar el perfil actualizado
 
         // 5. Marcar como reclamado (Lógica de Negocio)
+        int attemptNumber = userLessonProgressRepositoryPort.getNextAttemptNumber(currentUser.getId(), lessonId);
         UserLessonProgress progress = UserLessonProgress.builder()
                 .userId(currentUser.getId())
                 .lessonId(lessonId)
                 .completedAt(ZonedDateTime.now())
+                .attemptNumber(attemptNumber)
                 .build();
 
         userLessonProgressRepositoryPort.save(progress);
@@ -1098,7 +1183,7 @@ public class ClaimTreasureService implements ClaimTreasureUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/CompleteLessonService.java
+📄 CONTENIDO DE: application\service\CompleteLessonService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1106,7 +1191,7 @@ import com.bughuntersaga.api.application.dto.CompleteLessonCommand;
 import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
 import com.bughuntersaga.api.application.port.in.CompleteLessonUseCase;
 import com.bughuntersaga.api.application.port.out.*;
-import com.bughuntersaga.api.domain.exception.LessonAlreadyCompletedException;
+import com.bughuntersaga.api.domain.exception.InsufficientScoreException;
 import com.bughuntersaga.api.domain.exception.LessonNotFoundException;
 import com.bughuntersaga.api.domain.exception.UserNotFoundException;
 import com.bughuntersaga.api.domain.model.*;
@@ -1158,39 +1243,111 @@ public class CompleteLessonService implements CompleteLessonUseCase {
         UserProfile userProfile = getUserProfile(currentUser.getId());
 
         validateLesson(command.getLessonId(), currentUser.getId());
+        validateScore(command);
 
-        // 2. CALCULAR RECOMPENSAS
-        int xpEarned = BASE_XP + command.getCorrectAnswerCount();
-        int lingotsEarned = command.getIsPractice() ? 0 : LINGOT_REWARD;
+        // 2. CALCULAR NÚMERO DE INTENTO Y RECOMPENSAS
+        int attemptNumber = userLessonProgressRepositoryPort.getNextAttemptNumber(currentUser.getId(),
+                command.getLessonId());
+        int completionsCount = userLessonProgressRepositoryPort.countCompletionsByUserIdAndLessonId(currentUser.getId(),
+                command.getLessonId());
+
+        System.out.println("🔢 DEBUG: Attempt calculation - userId: " + currentUser.getId() +
+                ", lessonId: " + command.getLessonId() +
+                ", attemptNumber: " + attemptNumber +
+                ", completionsCount: " + completionsCount);
+
+        int xpEarned;
+        int lingotsEarned;
+
+        if (command.getIsPractice()) {
+            // Modo práctica: sin recompensas
+            xpEarned = 0;
+            lingotsEarned = 0;
+        } else {
+            // Lógica de XP proporcional por repetición:
+            // XP base = 10, pero proporcional a respuestas correctas
+            // 1ra vez: XP proporcional completo
+            // 2da vez: 50% del XP proporcional
+            // 3ra vez en adelante: 0 XP
+
+            // Calcular XP proporcional basado en respuestas correctas
+            // Ejemplo: 3/4 correctas = 7.5 XP, 2/4 correctas = 5 XP
+            double baseXpForLesson = 10.0; // XP máximo por lección
+            int totalQuestions = command.getCorrectAnswerCount() + command.getIncorrectAnswerCount();
+            
+            double proportionalXp;
+            if (totalQuestions > 0) {
+                // Usar conteo exacto de respuestas correctas e incorrectas
+                proportionalXp = baseXpForLesson * ((double) command.getCorrectAnswerCount() / totalQuestions);
+                System.out.println("🧮 DEBUG: XP calculation - correctAnswers: " + command.getCorrectAnswerCount() + 
+                                 ", totalQuestions: " + totalQuestions + 
+                                 ", proportionalXp: " + proportionalXp);
+            } else {
+                // Fallback: usar score como porcentaje (score = 75 significa 75%)
+                proportionalXp = baseXpForLesson * (command.getScore() / 100.0);
+                System.out.println("🧮 DEBUG: XP fallback calculation - score: " + command.getScore() + 
+                                 "%, proportionalXp: " + proportionalXp);
+            }
+
+            if (completionsCount == 0) {
+                // Primera completación exitosa - XP proporcional completo
+                xpEarned = (int) Math.round(proportionalXp);
+                lingotsEarned = LINGOT_REWARD;
+            } else if (completionsCount == 1) {
+                // Segunda completación exitosa - 50% del XP proporcional
+                xpEarned = (int) Math.round(proportionalXp * 0.5);
+                lingotsEarned = LINGOT_REWARD / 2;
+            } else {
+                // Tercera completación en adelante - sin recompensas
+                xpEarned = 0;
+                lingotsEarned = 0;
+            }
+        }
 
         // 3. LÓGICA DE PERSISTENCIA
+        System.out.println("🎯 DEBUG: Guardando lección - userId: " + currentUser.getId() +
+                ", lessonId: " + command.getLessonId() +
+                ", score: " + command.getScore() +
+                ", correctAnswers: " + command.getCorrectAnswerCount() +
+                ", incorrectAnswers: " + command.getIncorrectAnswerCount() +
+                ", attemptNumber: " + attemptNumber +
+                ", completionsCount: " + completionsCount +
+                ", xpEarned: " + xpEarned +
+                ", lingotsEarned: " + lingotsEarned);
 
-        // Guardar progreso de lección
+        // Guardar progreso de lección con número de intento
         userLessonProgressRepositoryPort.save(UserLessonProgress.builder()
                 .userId(currentUser.getId())
                 .lessonId(command.getLessonId())
                 .completedAt(now)
+                .score(command.getScore())
+                .attemptNumber(attemptNumber)
                 .build());
 
-        // Guardar historial de XP
-        userXpHistoryRepositoryPort.save(UserXpHistory.builder()
-                .userId(currentUser.getId())
-                .xpEarned(xpEarned)
-                .sourceType("LESSON")
-                .sourceId(command.getLessonId())
-                .createdAt(now)
-                .build());
+        // Guardar historial de XP solo si se ganó XP
+        if (xpEarned > 0) {
+            userXpHistoryRepositoryPort.save(UserXpHistory.builder()
+                    .userId(currentUser.getId())
+                    .xpEarned(xpEarned)
+                    .sourceType("LESSON")
+                    .sourceId(command.getLessonId())
+                    .createdAt(now)
+                    .build());
+        }
 
-        // Actualizar Lingots
-        int newTotalLingots = userProfile.getLingots() + lingotsEarned;
-        userProfile.setLingots(newTotalLingots);
-        userProfileRepositoryPort.save(userProfile);
+        // Actualizar Lingots solo si se ganaron lingots
+        if (lingotsEarned > 0) {
+            int newTotalLingots = userProfile.getLingots() + lingotsEarned;
+            userProfile.setLingots(newTotalLingots);
+            userProfileRepositoryPort.save(userProfile);
+        }
 
-        // 4. LÓGICA DE RACHA
+        // 4. LÓGICA DE RACHA (solo para primera completación del día)
         int newStreak = calculateAndUpdateStreak(currentUser.getId(), today);
 
         // 5. DEVOLVER RESULTADO
-        return new CompleteLessonResult(xpEarned, lingotsEarned, newTotalLingots, newStreak);
+        int currentLingots = userProfile.getLingots() + lingotsEarned;
+        return new CompleteLessonResult(xpEarned, lingotsEarned, currentLingots, newStreak);
     }
 
     private User getCurrentUser() {
@@ -1209,12 +1366,27 @@ public class CompleteLessonService implements CompleteLessonUseCase {
         lessonRepositoryPort.findById(lessonId)
                 .orElseThrow(() -> new LessonNotFoundException(lessonId));
 
-        // Validar que no se haya completado
-        boolean alreadyCompleted = userLessonProgressRepositoryPort
-                .existsByUserIdAndLessonId(userId, lessonId);
+        // Ya no necesitamos eliminar registros anteriores porque la nueva estructura
+        // permite múltiples completaciones con attempt_number
+        int completionsCount = userLessonProgressRepositoryPort.countCompletionsByUserIdAndLessonId(userId, lessonId);
 
-        if (alreadyCompleted) {
-            throw new LessonAlreadyCompletedException("Lección ya completada: " + lessonId);
+        System.out.println("🔄 DEBUG: Lección validada - userId: " + userId +
+                ", lessonId: " + lessonId +
+                ", completaciones previas: " + completionsCount);
+    }
+
+    private void validateScore(CompleteLessonCommand command) {
+        // Validar que el score no sea null cuando no es práctica
+        if (!command.getIsPractice() && command.getScore() == null) {
+            throw new IllegalArgumentException("Score es requerido para lecciones que no son práctica");
+        }
+
+        // Validar que el score sea >= 50% para pasar la lección (solo si no es
+        // práctica)
+        if (!command.getIsPractice() && command.getScore() != null && command.getScore() < 50) {
+            throw new InsufficientScoreException(
+                    "Se requiere al menos 50% de respuestas correctas para completar la lección. Score actual: "
+                            + command.getScore() + "%");
         }
     }
 
@@ -1247,11 +1419,10 @@ public class CompleteLessonService implements CompleteLessonUseCase {
         return currentStreak;
     }
 
-
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/ForgotPasswordService.java
+📄 CONTENIDO DE: application\service\ForgotPasswordService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1323,7 +1494,7 @@ public class ForgotPasswordService implements ForgotPasswordUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/GetLeaderboardService.java
+📄 CONTENIDO DE: application\service\GetLeaderboardService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1417,7 +1588,39 @@ public class GetLeaderboardService implements GetLeaderboardUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/GetModuleProblemsService.java
+📄 CONTENIDO DE: application\service\GetLessonProblemsService.java
+================================================================================
+// Ubicación: application/service/GetLessonProblemsService.java
+package com.bughuntersaga.api.application.service;
+
+import com.bughuntersaga.api.application.port.in.GetLessonProblemsUseCase;
+import com.bughuntersaga.api.application.port.out.ProblemRepositoryPort;
+import com.bughuntersaga.api.domain.exception.LessonNotFoundException;
+import com.bughuntersaga.api.domain.model.Problem;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class GetLessonProblemsService implements GetLessonProblemsUseCase {
+
+    private final ProblemRepositoryPort problemRepositoryPort;
+
+    @Override
+    public List<Problem> getProblemsByLessonId(Integer lessonId) {
+
+        List<Problem> problems = problemRepositoryPort.findByLessonId(lessonId);
+
+        return problems;
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: application\service\GetModuleProblemsService.java
 ================================================================================
 
 package com.bughuntersaga.api.application.service;
@@ -1446,7 +1649,7 @@ public class GetModuleProblemsService implements GetModuleProblemsUseCase {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/service/GetModuleUnitService.java
+📄 CONTENIDO DE: application\service\GetModuleUnitService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1463,8 +1666,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
-
 
 @Service
 @RequiredArgsConstructor
@@ -1476,40 +1679,90 @@ public class GetModuleUnitService implements GetModuleUnitUseCase {
     private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
 
     @Override
-    public Unit getModuleUnit(String moduleCode) {
+    public List<Unit> getModuleUnits(String moduleCode) {
 
         // --- 1. Obtener el usuario autenticado ---
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Esto viene del token JWT
+        String username = authentication.getName(); // viene del JWT
 
         User currentUser = userRepositoryPort.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
 
-        // --- 2. Obtener la unidad (Lógica de Fase 2) ---
-        Unit unit = unitRepository.findFirstUnitByModuleCode(moduleCode)
-                .orElseThrow(() -> new RuntimeException("Módulo no encontrado: " + moduleCode));
+        // --- 2. Obtener todas las unidades del módulo ---
+        List<Unit> units = unitRepository.findAllUnitsByModuleCode(moduleCode);
 
-        // --- 3. Obtener el progreso del usuario (Lógica de Fase 4) ---
-        Set<Integer> completedLessonIds = userLessonProgressRepositoryPort
-                .findCompletedLessonIdsByUserId(currentUser.getId());
-
-        // --- 4. Calcular el 'status' real ---
-        if (unit.getLessons() != null) {
-            unit.getLessons().forEach(lesson -> {
-                if (completedLessonIds.contains(lesson.getId())) {
-                    lesson.setStatus("COMPLETE"); // ¡Correcto!
-                } else {
-                    lesson.setStatus("ACTIVE"); // (Lógica de 'LOCKED' se puede añadir después)
-                }
-            });
+        if (units.isEmpty()) {
+            throw new RuntimeException("No se encontraron unidades para el módulo: " + moduleCode);
         }
 
-        return unit;
+        // --- 3. Obtener el progreso del usuario ---
+        Set<Integer> completedLessonIds =
+                userLessonProgressRepositoryPort.findCompletedLessonIdsByUserId(currentUser.getId());
+
+        // --- 4. Calcular el estado de cada lección basado en progreso secuencial ---
+        for (int unitIndex = 0; unitIndex < units.size(); unitIndex++) {
+            Unit unit = units.get(unitIndex);
+            
+            if (unit.getLessons() == null || unit.getLessons().isEmpty()) {
+                continue;
+            }
+
+            // Verificar si todas las unidades anteriores están completas
+            boolean previousUnitsComplete = true;
+            for (int i = 0; i < unitIndex; i++) {
+                Unit previousUnit = units.get(i);
+                if (previousUnit.getLessons() != null) {
+                    boolean allLessonsComplete = previousUnit.getLessons().stream()
+                            .allMatch(l -> completedLessonIds.contains(l.getId()));
+                    if (!allLessonsComplete) {
+                        previousUnitsComplete = false;
+                        break;
+                    }
+                }
+            }
+
+            // Asignar estado a cada lección en la unidad actual
+            for (int lessonIndex = 0; lessonIndex < unit.getLessons().size(); lessonIndex++) {
+                var lesson = unit.getLessons().get(lessonIndex);
+
+                // Si ya está completa
+                if (completedLessonIds.contains(lesson.getId())) {
+                    lesson.setStatus("COMPLETE");
+                    continue;
+                }
+
+                // Si hay unidades anteriores incompletas, está bloqueada
+                if (!previousUnitsComplete) {
+                    lesson.setStatus("LOCKED");
+                    continue;
+                }
+
+                // Verificar si todas las lecciones anteriores en esta unidad están completas
+                boolean previousLessonsComplete = true;
+                for (int i = 0; i < lessonIndex; i++) {
+                    var previousLesson = unit.getLessons().get(i);
+                    if (!completedLessonIds.contains(previousLesson.getId())) {
+                        previousLessonsComplete = false;
+                        break;
+                    }
+                }
+
+                // Asignar ACTIVE o LOCKED
+                if (previousLessonsComplete) {
+                    lesson.setStatus("ACTIVE");
+                } else {
+                    lesson.setStatus("LOCKED");
+                }
+            }
+        }
+
+        return units;
     }
 }
 
+
 ================================================================================
-📄 CONTENIDO DE: application/service/GetModulesService.java
+📄 CONTENIDO DE: application\service\GetModulesService.java
 ================================================================================
 
 package com.bughuntersaga.api.application.service;
@@ -1541,14 +1794,18 @@ public class GetModulesService implements GetModulesUseCase {
 
 
 ================================================================================
-📄 CONTENIDO DE: application/service/GetShopItemsService.java
+📄 CONTENIDO DE: application\service\GetShopItemsService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
 import com.bughuntersaga.api.application.port.in.GetShopItemsUseCase;
 import com.bughuntersaga.api.application.port.out.ShopItemRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
 import com.bughuntersaga.api.domain.model.ShopItem;
+import com.bughuntersaga.api.domain.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -1560,31 +1817,45 @@ import java.util.List;
 public class GetShopItemsService implements GetShopItemsUseCase {
 
     private final ShopItemRepositoryPort shopItemRepositoryPort;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Override
     public List<ShopItem> getShopItems() {
-        return shopItemRepositoryPort.findAll();
+        // Obtener usuario autenticado desde SecurityContext
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+
+        // Retornar solo items que el usuario NO ha comprado
+        return shopItemRepositoryPort.findAvailableItemsForUser(currentUser.getId());
     }
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/GetUserProfileService.java
+📄 CONTENIDO DE: application\service\GetUserProfileService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
 import com.bughuntersaga.api.application.port.in.GetUserProfileUseCase;
+import com.bughuntersaga.api.application.port.out.ShopItemRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserInventoryRepositoryPort;
 import com.bughuntersaga.api.application.port.out.UserProfileRepositoryPort;
 import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
 import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.Badge;
 import com.bughuntersaga.api.domain.model.FullUserProfile;
+import com.bughuntersaga.api.domain.model.ShopItem;
 import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.domain.model.UserInventory;
 import com.bughuntersaga.api.domain.model.UserProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -1593,6 +1864,8 @@ public class GetUserProfileService implements GetUserProfileUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
     private final UserProfileRepositoryPort userProfileRepositoryPort;
+    private final UserInventoryRepositoryPort userInventoryRepositoryPort;
+    private final ShopItemRepositoryPort shopItemRepositoryPort;
 
     @Override
     public FullUserProfile getProfile() {
@@ -1600,7 +1873,28 @@ public class GetUserProfileService implements GetUserProfileUseCase {
         User currentUser = getCurrentUser();
         UserProfile userProfile = getUserProfile(currentUser.getId());
 
-        // 2. Combinar en el modelo de dominio
+        // 2. Obtener badges del inventario (solo badges, no títulos)
+        List<UserInventory> inventory = userInventoryRepositoryPort.findAllByUserId(currentUser.getId());
+        List<Badge> badges = inventory.stream()
+                .filter(inv -> inv.getItemCode().startsWith("badge-"))
+                .map(inv -> {
+                    // Buscar información del ShopItem para obtener nombre, descripción e icono
+                    ShopItem shopItem = shopItemRepositoryPort.findByItemCode(inv.getItemCode())
+                            .orElse(null);
+                    
+                    if (shopItem == null) return null;
+                    
+                    return Badge.builder()
+                            .itemCode(inv.getItemCode())
+                            .name(shopItem.getName())
+                            .description(shopItem.getDescription())
+                            .icon(shopItem.getIcon())
+                            .build();
+                })
+                .filter(badge -> badge != null)
+                .collect(Collectors.toList());
+
+        // 3. Combinar en el modelo de dominio
         return FullUserProfile.builder()
                 .userId(currentUser.getId())
                 .name(currentUser.getName())
@@ -1610,6 +1904,7 @@ public class GetUserProfileService implements GetUserProfileUseCase {
                 .lingots(userProfile.getLingots())
                 .dailyXpGoal(userProfile.getDailyXpGoal())
                 .soundEffectsEnabled(userProfile.getSoundEffectsEnabled())
+                .badges(badges)
                 .build();
     }
 
@@ -1628,7 +1923,7 @@ public class GetUserProfileService implements GetUserProfileUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/GetUserStatsService.java
+📄 CONTENIDO DE: application\service\GetUserStatsService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1738,7 +2033,7 @@ public class GetUserStatsService implements GetUserStatsUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/LoginUserService.java
+📄 CONTENIDO DE: application\service\LoginUserService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1797,7 +2092,7 @@ public class LoginUserService implements LoginUserUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/PurchaseItemService.java
+📄 CONTENIDO DE: application\service\PurchaseItemService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1899,7 +2194,7 @@ public class PurchaseItemService implements PurchaseItemUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/RegisterUserService.java
+📄 CONTENIDO DE: application\service\RegisterUserService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -1979,7 +2274,7 @@ public class RegisterUserService implements RegisterUserUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/UpdateUserAccountService.java
+📄 CONTENIDO DE: application\service\UpdateUserAccountService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -2032,7 +2327,7 @@ public class UpdateUserAccountService implements UpdateUserAccountUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: application/service/UpdateUserSettingsService.java
+📄 CONTENIDO DE: application\service\UpdateUserSettingsService.java
 ================================================================================
 package com.bughuntersaga.api.application.service;
 
@@ -2117,7 +2412,7 @@ public class UpdateUserSettingsService implements UpdateUserSettingsUseCase {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/EmailAlreadyExistsException.java
+📄 CONTENIDO DE: domain\exception\EmailAlreadyExistsException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2136,7 +2431,7 @@ public EmailAlreadyExistsException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/InsufficientFundsException.java
+📄 CONTENIDO DE: domain\exception\InsufficientFundsException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2155,7 +2450,22 @@ public InsufficientFundsException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/InvalidCredentialsException.java
+📄 CONTENIDO DE: domain\exception\InsufficientScoreException.java
+================================================================================
+package com.bughuntersaga.api.domain.exception;
+
+/**
+ * Excepción para cuando el score de una lección es insuficiente para
+ * completarla.
+ */
+public class InsufficientScoreException extends RuntimeException {
+    public InsufficientScoreException(String message) {
+        super(message);
+    }
+}
+
+================================================================================
+📄 CONTENIDO DE: domain\exception\InvalidCredentialsException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2174,7 +2484,7 @@ public InvalidCredentialsException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/LessonAlreadyCompletedException.java
+📄 CONTENIDO DE: domain\exception\LessonAlreadyCompletedException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2191,7 +2501,7 @@ public class LessonAlreadyCompletedException extends RuntimeException {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/LessonNotFoundException.java
+📄 CONTENIDO DE: domain\exception\LessonNotFoundException.java
 ================================================================================
 package com.bughuntersaga.api.domain.exception;
 
@@ -2203,7 +2513,7 @@ public class LessonNotFoundException extends RuntimeException {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/ModuleNotFoundException.java
+📄 CONTENIDO DE: domain\exception\ModuleNotFoundException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2222,7 +2532,7 @@ public ModuleNotFoundException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/ResourceNotFoundException.java
+📄 CONTENIDO DE: domain\exception\ResourceNotFoundException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2243,7 +2553,7 @@ public class ResourceNotFoundException extends RuntimeException {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/TreasureAlreadyClaimedException.java
+📄 CONTENIDO DE: domain\exception\TreasureAlreadyClaimedException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2262,7 +2572,7 @@ public TreasureAlreadyClaimedException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/UserNotFoundException.java
+📄 CONTENIDO DE: domain\exception\UserNotFoundException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2281,7 +2591,7 @@ public UserNotFoundException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/exception/UsernameAlreadyExistsException.java
+📄 CONTENIDO DE: domain\exception\UsernameAlreadyExistsException.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.exception;
@@ -2300,7 +2610,7 @@ public UsernameAlreadyExistsException(String message) {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/AuthToken.java
+📄 CONTENIDO DE: domain\model\AuthToken.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2318,7 +2628,7 @@ public class AuthToken {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/FullUserProfile.java
+📄 CONTENIDO DE: domain\model\Badge.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2329,6 +2639,37 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
+/**
+ * Modelo de dominio para un badge obtenido por el usuario.
+ * Combina información del ShopItem con la fecha de adquisición.
+ */
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Badge {
+    private String itemCode;
+    private String name;
+    private String description;
+    private String icon;
+}
+
+
+================================================================================
+📄 CONTENIDO DE: domain\model\FullUserProfile.java
+================================================================================
+package com.bughuntersaga.api.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -2352,10 +2693,13 @@ public class FullUserProfile {
     private Integer lingots;
     private Integer dailyXpGoal;
     private Boolean soundEffectsEnabled;
+
+    // Badges obtenidos
+    private List<Badge> badges;
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/Leaderboard.java
+📄 CONTENIDO DE: domain\model\Leaderboard.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2382,7 +2726,7 @@ public class Leaderboard {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/LeaderboardEntry.java
+📄 CONTENIDO DE: domain\model\LeaderboardEntry.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2408,7 +2752,7 @@ public class LeaderboardEntry {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/Lesson.java
+📄 CONTENIDO DE: domain\model\Lesson.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2436,7 +2780,7 @@ public class Lesson {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/Module.java
+📄 CONTENIDO DE: domain\model\Module.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.model;
@@ -2464,7 +2808,7 @@ public class Module {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/Problem.java
+📄 CONTENIDO DE: domain\model\Problem.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.model;
@@ -2472,7 +2816,6 @@ package com.bughuntersaga.api.domain.model;
 import lombok.*;
 
 import java.util.List;
-
 
 /**
  * Entidad de dominio Problem.
@@ -2503,6 +2846,13 @@ public class Problem {
     private List<String> answerTiles;
     private List<Integer> correctAnswerIndices;
 
+    // Campos para CODE_CHALLENGE
+    private String codeTemplate;
+    private String expectedAnswer;
+    private String hint;
+    private String explanation;
+    private List<TestCase> testCases;
+
     /**
      * Opción de respuesta.
      */
@@ -2514,10 +2864,24 @@ public class Problem {
     public static class AnswerOption {
         private String name;
     }
+
+    /**
+     * Caso de prueba para CODE_CHALLENGE.
+     */
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TestCase {
+        private String input;
+        private String expectedOutput;
+        private String description;
+    }
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/ShopItem.java
+📄 CONTENIDO DE: domain\model\ShopItem.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2542,7 +2906,7 @@ public class ShopItem {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/Unit.java
+📄 CONTENIDO DE: domain\model\Unit.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.model;
@@ -2557,6 +2921,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Unit {
     private Integer id;
     private Integer unitNumber;
@@ -2566,7 +2931,7 @@ public class Unit {
 
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/User.java
+📄 CONTENIDO DE: domain\model\User.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2595,7 +2960,7 @@ public class User {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/UserInventory.java
+📄 CONTENIDO DE: domain\model\UserInventory.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2625,7 +2990,7 @@ public class UserInventory {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/UserLessonProgress.java
+📄 CONTENIDO DE: domain\model\UserLessonProgress.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2647,13 +3012,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserLessonProgress {
+    private Long id;
     private UUID userId;
     private Integer lessonId;
     private ZonedDateTime completedAt;
+    private Integer score;
+    private Integer attemptNumber;
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/UserProfile.java
+📄 CONTENIDO DE: domain\model\UserProfile.java
 ================================================================================
 
 package com.bughuntersaga.api.domain.model;
@@ -2685,7 +3053,7 @@ public class UserProfile {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/UserStreak.java
+📄 CONTENIDO DE: domain\model\UserStreak.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2713,7 +3081,7 @@ public class UserStreak {
 }
 
 ================================================================================
-📄 CONTENIDO DE: domain/model/UserXpHistory.java
+📄 CONTENIDO DE: domain\model\UserXpHistory.java
 ================================================================================
 package com.bughuntersaga.api.domain.model;
 
@@ -2744,7 +3112,7 @@ public class UserXpHistory {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/adapters/email/ConsoleEmailSenderAdapter.java
+📄 CONTENIDO DE: infrastructure\adapters\email\ConsoleEmailSenderAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.adapters.email;
 
@@ -2777,7 +3145,7 @@ public class ConsoleEmailSenderAdapter implements EmailSenderPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/config/BeanConfiguration.java
+📄 CONTENIDO DE: infrastructure\config\BeanConfiguration.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.config;
 
@@ -2796,7 +3164,7 @@ public class BeanConfiguration {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/config/OpenAPIConfig.java
+📄 CONTENIDO DE: infrastructure\config\OpenAPIConfig.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.config;
 
@@ -2847,7 +3215,7 @@ public class OpenAPIConfig {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/LeaderboardRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\LeaderboardRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -2886,7 +3254,7 @@ public class LeaderboardRepositoryAdapter implements LeaderboardRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/LessonRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\LessonRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -2923,7 +3291,7 @@ public class LessonRepositoryAdapter implements LessonRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/ModuleRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\ModuleRepositoryAdapter.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
@@ -2966,7 +3334,7 @@ public class ModuleRepositoryAdapter implements ModuleRepositoryPort {
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/ProblemRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\ProblemRepositoryAdapter.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
@@ -3016,7 +3384,7 @@ public class ProblemRepositoryAdapter implements ProblemRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/ShopItemRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\ShopItemRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3029,6 +3397,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
@@ -3050,10 +3419,17 @@ public class ShopItemRepositoryAdapter implements ShopItemRepositoryPort {
         return jpaRepository.findByItemCode(itemCode)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public List<ShopItem> findAvailableItemsForUser(UUID userId) {
+        return jpaRepository.findAvailableForUser(userId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UnitRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UnitRepositoryAdapter.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
@@ -3087,6 +3463,12 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
     private final ContentPersistenceMapper mapper;
 
     @Override
+    public Optional<Unit> findById(Integer unitId) {
+        return unitJpaRepository.findById(unitId)
+                .map(this::mapUnitWithLessons);
+    }
+
+    @Override
     public Optional<Unit> findFirstUnitByModuleCode(String moduleCode) {
         return unitJpaRepository.findByModuleCodeOrderByUnitNumber(moduleCode).stream()
                 .findFirst()
@@ -3094,18 +3476,10 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
     }
 
     @Override
-    public List<Unit> findUnitsByModuleCode(String moduleCode) {
-
+    public List<Unit> findAllUnitsByModuleCode(String moduleCode) {
         return unitJpaRepository.findByModuleCode(moduleCode).stream()
                 .map(this::mapUnitWithLessons)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<Unit> findByIdWithLessons(Integer unitId) {
-
-        return unitJpaRepository.findById(unitId)
-                .map(this::mapUnitWithLessons);
     }
 
     /**
@@ -3122,7 +3496,6 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
         List<Lesson> lessons = lessonEntities.stream()
                 .map(mapper::lessonToDomain)
                 .collect(Collectors.toList());
-
         unit.setLessons(lessons);
 
         return unit;
@@ -3130,7 +3503,7 @@ public class UnitRepositoryAdapter implements UnitRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserInventoryRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UserInventoryRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3184,10 +3557,17 @@ public class UserInventoryRepositoryAdapter implements UserInventoryRepositoryPo
         // Mapear de vuelta a Dominio
         return mapper.toDomain(savedEntity);
     }
+
+    @Override
+    public java.util.List<UserInventory> findAllByUserId(UUID userId) {
+        return jpaRepository.findAllByUserId(userId).stream()
+                .map(mapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserLessonProgressRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UserLessonProgressRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3196,13 +3576,13 @@ import com.bughuntersaga.api.domain.model.UserLessonProgress;
 import com.bughuntersaga.api.infrastructure.persistence.entity.LessonEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserEntity;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
-import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressId;
 import com.bughuntersaga.api.infrastructure.persistence.mapper.ProgressPersistenceMapper;
 import com.bughuntersaga.api.infrastructure.persistence.repository.LessonJpaRepository;
 import com.bughuntersaga.api.infrastructure.persistence.repository.UserJpaRepository;
 import com.bughuntersaga.api.infrastructure.persistence.repository.UserLessonProgressJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
@@ -3218,39 +3598,67 @@ public class UserLessonProgressRepositoryAdapter implements UserLessonProgressRe
 
     @Override
     public Set<Integer> findCompletedLessonIdsByUserId(UUID userId) {
-        return jpaRepository.findCompletedLessonIdsByUserId(userId);
+        Set<Integer> completed = jpaRepository.findCompletedLessonIdsByUserId(userId);
+        System.out.println("🔍 DEBUG: Lecciones completadas para userId " + userId + ": " + completed);
+        return completed;
     }
 
     @Override
     public boolean existsByUserIdAndLessonId(UUID userId, Integer lessonId) {
-        return jpaRepository.existsById_UserIdAndId_LessonId(userId, lessonId);
+        return jpaRepository.existsByUserIdAndLessonId(userId, lessonId);
     }
 
     @Override
     public UserLessonProgress save(UserLessonProgress progress) {
-        // Para manejar @MapsId correctamente, debemos cargar las entidades padre
+        // Para la nueva estructura con ID auto-incremental
         UserEntity userEntity = userJpaRepository.findById(progress.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado para guardar progreso: " + progress.getUserId()));
+                .orElseThrow(() -> new RuntimeException(
+                        "Usuario no encontrado para guardar progreso: " + progress.getUserId()));
 
         LessonEntity lessonEntity = lessonJpaRepository.findById(progress.getLessonId())
-                .orElseThrow(() -> new RuntimeException("Lección no encontrada para guardar progreso: " + progress.getLessonId()));
+                .orElseThrow(() -> new RuntimeException(
+                        "Lección no encontrada para guardar progreso: " + progress.getLessonId()));
 
-        // Construimos la entidad
-        UserLessonProgressEntity entity = new UserLessonProgressEntity();
-        entity.setId(new UserLessonProgressId(progress.getUserId(), progress.getLessonId()));
-        entity.setUser(userEntity);
-        entity.setLesson(lessonEntity);
-        entity.setCompletedAt(progress.getCompletedAt()); // O ZonedDateTime.now() si se prefiere
+        // Construimos la entidad con la nueva estructura
+        UserLessonProgressEntity entity = UserLessonProgressEntity.builder()
+                .userId(progress.getUserId())
+                .lessonId(progress.getLessonId())
+                .user(userEntity)
+                .lesson(lessonEntity)
+                .completedAt(progress.getCompletedAt())
+                .score(progress.getScore())
+                .attemptNumber(progress.getAttemptNumber())
+                .build();
 
         UserLessonProgressEntity savedEntity = jpaRepository.save(entity);
 
         // Devolvemos el modelo de dominio
         return mapper.toDomain(savedEntity);
     }
+
+    @Override
+    public int countCompletionsByUserIdAndLessonId(UUID userId, Integer lessonId) {
+        return jpaRepository.countCompletionsByUserIdAndLessonId(userId, lessonId);
+    }
+
+    @Override
+    public int getNextAttemptNumber(UUID userId, Integer lessonId) {
+        int nextAttempt = jpaRepository.getNextAttemptNumber(userId, lessonId);
+        System.out.println("🔢 DEBUG: Repository getNextAttemptNumber - userId: " + userId + 
+                         ", lessonId: " + lessonId + 
+                         ", result: " + nextAttempt);
+        return nextAttempt;
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUserIdAndLessonId(UUID userId, Integer lessonId) {
+        jpaRepository.deleteByUserIdAndLessonId(userId, lessonId);
+    }
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserProfileRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UserProfileRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3308,7 +3716,7 @@ public class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UserRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3358,6 +3766,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findByUsernameOrEmail(username, email)
                 .map(userPersistenceMapper::toUserDomain);
     }
+
     @Override
     public boolean existsByUsernameAndIdNot(String username, UUID userId) {
         return userJpaRepository.existsByUsernameAndIdNot(username, userId);
@@ -3365,7 +3774,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserStreakRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UserStreakRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3414,7 +3823,7 @@ public class UserStreakRepositoryAdapter implements UserStreakRepositoryPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/adapter/UserXpHistoryRepositoryAdapter.java
+📄 CONTENIDO DE: infrastructure\persistence\adapter\UserXpHistoryRepositoryAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.adapter;
 
@@ -3463,7 +3872,7 @@ public class UserXpHistoryRepositoryAdapter implements UserXpHistoryRepositoryPo
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/LeagueEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\LeagueEntity.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.entity;
 
@@ -3498,7 +3907,7 @@ public class LeagueEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/LessonEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\LessonEntity.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.entity;
 
@@ -3534,7 +3943,7 @@ public class LessonEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/ModuleEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\ModuleEntity.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3584,7 +3993,7 @@ public class ModuleEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/ProblemEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\ProblemEntity.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3627,7 +4036,7 @@ public class ProblemEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/ShopItemEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\ShopItemEntity.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.entity;
 
@@ -3665,7 +4074,7 @@ public class ShopItemEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UnitEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UnitEntity.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3703,7 +4112,7 @@ public class UnitEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserEntity.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.entity;
 
@@ -3773,7 +4182,7 @@ public class UserEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserInventoryEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserInventoryEntity.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.entity;
 
@@ -3815,46 +4224,57 @@ public class UserInventoryEntity {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserLessonProgressEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserLessonProgressEntity.java
 ================================================================================
 
-    package com.bughuntersaga.api.infrastructure.persistence.entity;
+package com.bughuntersaga.api.infrastructure.persistence.entity;
 
-    import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
-
-    @Entity
+@Entity
 @Table(name = "user_lesson_progress")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-    public class UserLessonProgressEntity {
+public class UserLessonProgressEntity {
 
-    @EmbeddedId
-    private UserLessonProgressId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
+
+    @Column(name = "lesson_id", nullable = false)
+    private Integer lessonId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("lessonId")
-    @JoinColumn(name = "lesson_id")
+    @JoinColumn(name = "lesson_id", insertable = false, updatable = false)
     private LessonEntity lesson;
 
     @Column(name = "completed_at", columnDefinition = "timestamptz DEFAULT (now())")
     private ZonedDateTime completedAt;
 
-    }
+    @Column(name = "score")
+    private Integer score;
+
+    @Column(name = "attempt_number", nullable = false)
+    private Integer attemptNumber;
+
+}
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserLessonProgressId.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserLessonProgressId.java
 ================================================================================
 
     package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3880,7 +4300,7 @@ import java.util.UUID;
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserProfileEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserProfileEntity.java
 ================================================================================
 
     package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3922,7 +4342,7 @@ import java.util.UUID;
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserStreakEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserStreakEntity.java
 ================================================================================
 
     package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3952,7 +4372,7 @@ import lombok.*;
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserStreakId.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserStreakId.java
 ================================================================================
 
     package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -3979,7 +4399,7 @@ import java.time.LocalDate;
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/entity/UserXpHistoryEntity.java
+📄 CONTENIDO DE: infrastructure\persistence\entity\UserXpHistoryEntity.java
 ================================================================================
 
     package com.bughuntersaga.api.infrastructure.persistence.entity;
@@ -4023,10 +4443,10 @@ import java.time.ZonedDateTime;
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/mapper/ContentPersistenceMapper.java
+📄 CONTENIDO DE: infrastructure\persistence\mapper\ContentPersistenceMapper.java
 ================================================================================
-
 package com.bughuntersaga.api.infrastructure.persistence.mapper;
+
 import com.bughuntersaga.api.domain.model.Lesson;
 import com.bughuntersaga.api.domain.model.Module;
 import com.bughuntersaga.api.domain.model.Problem;
@@ -4044,188 +4464,174 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Mapper consolidado para entidades de persistencia de Content.
- *
- * Usa nombres ESPECÍFICOS para evitar ambigüedad:
- * - moduleToDomain() / moduleToEntity() ← Para Module
- * - problemToDomain() / problemToEntity() ← Para Problem
- *
+ * Mapper consolidado para entidades de persistencia de contenido.
+ * 
+ * Mapea entidades ↔ modelos de dominio para modules, units, lessons y problems.
+ * 
  * Configuración:
- * - componentModel = "spring": Genera bean de Spring
- * - unmappedTargetPolicy = IGNORE: Ignora campos sin mapear
+ * - componentModel = "spring"
+ * - unmappedTargetPolicy = IGNORE
  */
-@Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
-)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContentPersistenceMapper {
 
-    // ========================================
-    // Mapeo de Module (Automático)
-    // ========================================
+    // ============================================================
+    // MODULE
+    // ============================================================
 
-    /**
-     * Convierte ModuleEntity → Module.
-     * MapStruct genera el código automáticamente.
-     */
     Module moduleToDomain(ModuleEntity moduleEntity);
 
-    /**
-     * Convierte Module → ModuleEntity.
-     * MapStruct genera el código automáticamente.
-     */
     ModuleEntity moduleToEntity(Module module);
 
+    // ============================================================
+    // UNIT
+    // ============================================================
 
-    // ========================================
-    // Mapeo de Unit
-    // ========================================
-
-    /**
-     * Convierte UnitEntity → Unit.
-     *
-     * NOTA: El campo 'lessons' no se mapea automáticamente.
-     * Se debe cargar y asignar manualmente en el adaptador.
-     */
     @Mapping(target = "lessons", ignore = true)
     Unit unitToDomain(UnitEntity entity);
 
     UnitEntity unitToEntity(Unit domain);
 
-    // ========================================
-    // Mapeo de Lesson
-    // ========================================
+    // ============================================================
+    // LESSON
+    // ============================================================
 
-    /**
-     * Convierte LessonEntity → Lesson.
-     *
-     * NOTA: El campo 'status' no existe en la BD.
-     * Se debe asignar manualmente según la lógica de negocio.
-     */
     @Mapping(target = "status", ignore = true)
     Lesson lessonToDomain(LessonEntity entity);
 
     LessonEntity lessonToEntity(Lesson domain);
 
+    // ============================================================
+    // PROBLEM
+    // ============================================================
 
-    // ========================================
-    // Mapeo de Problem
-    // ========================================
-
+    /**
+     * Convierte ProblemEntity → Problem (dominio).
+     * Mapea dinámicamente según el tipo definido en el JSON.
+     */
     default Problem problemToDomain(ProblemEntity entity) {
-        if (entity == null) return null;
-
-        Problem.ProblemBuilder builder = Problem.builder()
-                .type(entity.getType());
+        if (entity == null)
+            return null;
 
         Map<String, Object> content = entity.getContent();
-        if (content == null) return builder.build();
+        if (content == null) {
+            return Problem.builder()
+                    .type(entity.getType())
+                    .build();
+        }
 
-        // Extraer campos comunes primero (como 'question')
-        builder.question((String) content.get("question"));
+        Problem.ProblemBuilder builder = Problem.builder()
+                .type(entity.getType())
+                .question((String) content.get("question"))
+                .moduleTitle((String) content.get("moduleTitle"))
+                .introduction((String) content.get("introduction"))
+                .objectives((List<String>) content.get("objectives"));
 
-        // Extraer campos específicos del tipo
         switch (entity.getType()) {
-            case "INFO" -> mapInfoType(builder, content);
-            case "SELECT_1_OF_3" -> mapSelectType(builder, content);
-            case "FILL_IN_THE_BLANK" -> mapFillInBlankType(builder, content);
+            case "INFO" -> mapInfo(builder, content);
+            case "MULTIPLE_CHOICE" -> mapMultipleChoice(builder, content);
+            case "FILL_IN_THE_BLANK" -> mapFillInBlank(builder, content);
+            case "CODE_CHALLENGE" -> mapCodeChallenge(builder, content);
         }
 
         return builder.build();
     }
 
-    // ... (problemToEntity está bien) ...
+    // ============================================================
+    // Métodos auxiliares por tipo
+    // ============================================================
 
-    // ========================================
-    // Métodos Auxiliares (Corregidos)
-    // ========================================
-
-    /**
-     * Mapea campos para tipo INFO.
-     * CORREGIDO: Extrae: title, content
-     */
     @SuppressWarnings("unchecked")
-    default void mapInfoType(Problem.ProblemBuilder builder, Map<String, Object> content) {
-        // Tu SQL usa 'title', no 'moduleTitle' en el problema
-        builder.introduction((String) content.get("title"));
-
-        // Aquí puedes decidir cómo mapear 'content' y 'example'
-        // Por ejemplo, podrías concatenarlos o usar 'introduction' para 'content'
-        // Asumamos que 'introduction' en el dominio es el 'title' de la BD
-        // y 'moduleTitle' es el 'content' de la BD.
-        builder.moduleTitle((String) content.get("content"));
-
-        // 'objectives' no existe en tu SQL.
+    private void mapInfo(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        // INFO ya tiene moduleTitle, introduction y objectives, nada extra.
     }
 
-    /**
-     * Mapea campos para tipo SELECT_1_OF_3.
-     * CORREGIDO: Extrae: question, options (como answers), correctAnswer
-     */
     @SuppressWarnings("unchecked")
-    default void mapSelectType(Problem.ProblemBuilder builder, Map<String, Object> content) {
-        // 'question' ya se mapea arriba
-
-        // CORREGIDO: Tu SQL usa "options", no "answers"
-        Object answersObj = content.get("options");
-        if (answersObj instanceof List) {
-            List<Map<String, Object>> answersRaw = (List<Map<String, Object>>) answersObj;
-            List<Problem.AnswerOption> answers = answersRaw.stream()
+    private void mapMultipleChoice(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        Object answersObj = content.get("answers");
+        if (answersObj instanceof List<?> answersList) {
+            List<Map<String, Object>> rawAnswers = (List<Map<String, Object>>) answersList;
+            List<Problem.AnswerOption> answers = rawAnswers.stream()
                     .map(map -> Problem.AnswerOption.builder()
-                            // CORREGIDO: Tu SQL usa "text", no "name"
-                            .name((String) map.get("text"))
+                            .name((String) map.get("name"))
                             .build())
                     .collect(Collectors.toList());
             builder.answers(answers);
         }
 
-        // Mapear respuesta correcta
-        // Tu SQL la tiene como String ("b"), pero tu dominio la espera como Integer.
-        // Aquí necesitarás una lógica para convertir "a"->0, "b"->1, "c"->2
         Object correctAnswer = content.get("correctAnswer");
-        if (correctAnswer instanceof String) {
-            switch ((String) correctAnswer) {
-                case "a" -> builder.correctAnswer(0);
-                case "b" -> builder.correctAnswer(1);
-                case "c" -> builder.correctAnswer(2);
-                // Añade más casos si es necesario
-            }
+        if (correctAnswer instanceof Number number) {
+            builder.correctAnswer(number.intValue());
         }
     }
 
-    /**
-     * Mapea campos para tipo FILL_IN_THE_BLANK.
-     * CORREGIDO: Extrae: question, blanks, correctAnswers
-     */
     @SuppressWarnings("unchecked")
-    default void mapFillInBlankType(Problem.ProblemBuilder builder, Map<String, Object> content) {
-        // 'question' ya se mapea arriba
-
-        // CORREGIDO: Tu SQL usa "blanks", no "answerTiles"
-        Object answerTiles = content.get("blanks");
-        if (answerTiles instanceof List) {
-            builder.answerTiles((List<String>) answerTiles);
+    private void mapFillInBlank(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        Object tiles = content.get("answerTiles");
+        if (tiles instanceof List<?> tileList) {
+            builder.answerTiles((List<String>) tileList);
         }
 
-        // CORREGIDO: Tu SQL usa "correctAnswers" (lista de Strings)
-        // pero tu dominio espera "correctAnswerIndices" (lista de Integers)
-        // Por ahora, asumiré que "correctAnswers" de tu SQL *debería*
-        // haber sido "correctAnswerIndices" con números.
-        // Si no, la lógica de conversión es más compleja.
-        Object correctIndices = content.get("correctAnswerIndices"); // Asumiendo que cambias el SQL
-        if (correctIndices instanceof List) {
-            List<Integer> indices = ((List<?>) correctIndices).stream()
-                    .filter(obj -> obj instanceof Number)
-                    .map(obj -> ((Number) obj).intValue())
+        Object indices = content.get("correctAnswerIndices");
+        if (indices instanceof List<?> indexList) {
+            List<Integer> parsed = ((List<?>) indexList).stream()
+                    .filter(o -> o instanceof Number)
+                    .map(o -> ((Number) o).intValue())
                     .collect(Collectors.toList());
-            builder.correctAnswerIndices(indices);
+            builder.correctAnswerIndices(parsed);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void mapCodeChallenge(Problem.ProblemBuilder builder, Map<String, Object> content) {
+        builder.codeTemplate((String) content.get("codeTemplate"));
+        builder.expectedAnswer((String) content.get("expectedAnswer"));
+        builder.hint((String) content.get("hint"));
+        builder.explanation((String) content.get("explanation"));
+
+        Object testCasesObj = content.get("testCases");
+        if (testCasesObj instanceof List<?> testCasesList) {
+            List<Map<String, Object>> rawTestCases = (List<Map<String, Object>>) testCasesList;
+            List<Problem.TestCase> testCases = rawTestCases.stream()
+                    .map(map -> Problem.TestCase.builder()
+                            .input((String) map.get("input"))
+                            .expectedOutput((String) map.get("expectedOutput"))
+                            .description((String) map.get("description"))
+                            .build())
+                    .collect(Collectors.toList());
+            builder.testCases(testCases);
+        }
+    }
+
+    // ============================================================
+    // problemToEntity
+    // ============================================================
+
+    default ProblemEntity problemToEntity(Problem domain) {
+        if (domain == null)
+            return null;
+
+        Map<String, Object> content = Map.ofEntries(
+                Map.entry("type", domain.getType()),
+                Map.entry("moduleTitle", domain.getModuleTitle()),
+                Map.entry("introduction", domain.getIntroduction()),
+                Map.entry("objectives", domain.getObjectives()),
+                Map.entry("question", domain.getQuestion()),
+                Map.entry("answers", domain.getAnswers()),
+                Map.entry("correctAnswer", domain.getCorrectAnswer()),
+                Map.entry("answerTiles", domain.getAnswerTiles()),
+                Map.entry("correctAnswerIndices", domain.getCorrectAnswerIndices()));
+
+        return ProblemEntity.builder()
+                .type(domain.getType())
+                .content(content)
+                .build();
     }
 }
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/mapper/GamificationPersistenceMapper.java
+📄 CONTENIDO DE: infrastructure\persistence\mapper\GamificationPersistenceMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.mapper;
 
@@ -4270,14 +4676,13 @@ public interface GamificationPersistenceMapper {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/mapper/ProgressPersistenceMapper.java
+📄 CONTENIDO DE: infrastructure\persistence\mapper\ProgressPersistenceMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.mapper;
 
 import com.bughuntersaga.api.domain.model.UserLessonProgress;
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -4285,17 +4690,14 @@ public interface ProgressPersistenceMapper {
 
     /**
      * Mapea de Entidad (JPA) a Dominio.
-     * Maneja la clave compuesta @EmbeddedId.
+     * Usa la nueva estructura con ID auto-incremental.
      */
-    @Mapping(source = "id.userId", target = "userId")
-    @Mapping(source = "id.lessonId", target = "lessonId")
     UserLessonProgress toDomain(UserLessonProgressEntity entity);
-
 
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/mapper/UserPersistenceMapper.java
+📄 CONTENIDO DE: infrastructure\persistence\mapper\UserPersistenceMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.mapper;
 
@@ -4326,7 +4728,7 @@ public interface UserPersistenceMapper {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/LessonJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\LessonJpaRepository.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.repository;
@@ -4360,7 +4762,7 @@ public interface LessonJpaRepository extends JpaRepository<LessonEntity, Integer
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/ModuleJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\ModuleJpaRepository.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.repository;
@@ -4385,7 +4787,7 @@ public interface ModuleJpaRepository extends JpaRepository<ModuleEntity, Integer
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/ProblemJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\ProblemJpaRepository.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.repository;
@@ -4432,15 +4834,19 @@ public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Integ
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/ShopItemJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\ShopItemJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
 
 import com.bughuntersaga.api.infrastructure.persistence.entity.ShopItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface ShopItemJpaRepository extends JpaRepository<ShopItemEntity, Integer> {
@@ -4448,10 +4854,24 @@ public interface ShopItemJpaRepository extends JpaRepository<ShopItemEntity, Int
      * Busca un artículo por su código de item.
      */
     Optional<ShopItemEntity> findByItemCode(String itemCode);
+
+    /**
+     * Obtiene todos los items de la tienda que el usuario NO ha comprado.
+     * Usa NOT EXISTS para filtrar items que ya están en user_inventory.
+     */
+    @Query("""
+        SELECT s FROM ShopItemEntity s
+        WHERE NOT EXISTS (
+            SELECT 1 FROM UserInventoryEntity inv
+            WHERE inv.itemCode = s.itemCode AND inv.user.id = :userId
+        )
+        ORDER BY s.cost ASC
+    """)
+    List<ShopItemEntity> findAvailableForUser(@Param("userId") UUID userId);
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UnitJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UnitJpaRepository.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.persistence.repository;
@@ -4504,7 +4924,7 @@ public interface UnitJpaRepository extends JpaRepository<UnitEntity, Integer> {
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserInventoryJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UserInventoryJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
 
@@ -4514,6 +4934,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -4525,10 +4946,16 @@ public interface UserInventoryJpaRepository extends JpaRepository<UserInventoryE
      */
     @Query("SELECT inv FROM UserInventoryEntity inv WHERE inv.user.id = :userId AND inv.itemCode = :itemCode")
     Optional<UserInventoryEntity> findByUserIdAndItemCode(@Param("userId") UUID userId, @Param("itemCode") String itemCode);
+
+    /**
+     * Obtiene todos los items del inventario de un usuario.
+     */
+    @Query("SELECT inv FROM UserInventoryEntity inv WHERE inv.user.id = :userId ORDER BY inv.createdAt DESC")
+    List<UserInventoryEntity> findAllByUserId(@Param("userId") UUID userId);
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UserJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
 
@@ -4551,13 +4978,13 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserLessonProgressJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UserLessonProgressJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
 
 import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressEntity;
-import com.bughuntersaga.api.infrastructure.persistence.entity.UserLessonProgressId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -4566,27 +4993,68 @@ import java.util.Set;
 import java.util.UUID;
 
 @Repository
-public interface UserLessonProgressJpaRepository extends JpaRepository<UserLessonProgressEntity, UserLessonProgressId> {
+public interface UserLessonProgressJpaRepository extends JpaRepository<UserLessonProgressEntity, Long> {
 
     /**
      * Obtiene un conjunto de IDs de lecciones completadas por un usuario.
+     * Solo considera la primera completación exitosa (score >= 50).
      */
     @Query("""
-        SELECT ulp.id.lessonId 
-        FROM UserLessonProgressEntity ulp 
-        WHERE ulp.id.userId = :userId
-    """)
+                SELECT DISTINCT ulp.lessonId
+                FROM UserLessonProgressEntity ulp
+                WHERE ulp.userId = :userId
+                AND (ulp.score IS NULL OR ulp.score >= 50)
+            """)
     Set<Integer> findCompletedLessonIdsByUserId(@Param("userId") UUID userId);
 
     /**
-     * Verifica la existencia por la clave compuesta.
-     * Spring Data JPA genera este query automáticamente basado en el nombre.
+     * Verifica si existe al menos una completación exitosa de la lección por el
+     * usuario.
      */
-    boolean existsById_UserIdAndId_LessonId(UUID userId, Integer lessonId);
+    @Query("""
+                SELECT COUNT(ulp) > 0
+                FROM UserLessonProgressEntity ulp
+                WHERE ulp.userId = :userId
+                AND ulp.lessonId = :lessonId
+                AND (ulp.score IS NULL OR ulp.score >= 50)
+            """)
+    boolean existsByUserIdAndLessonId(@Param("userId") UUID userId, @Param("lessonId") Integer lessonId);
+
+    /**
+     * Cuenta el número de completaciones exitosas de una lección por un usuario.
+     */
+    @Query("""
+                SELECT COUNT(ulp)
+                FROM UserLessonProgressEntity ulp
+                WHERE ulp.userId = :userId
+                AND ulp.lessonId = :lessonId
+                AND (ulp.score IS NULL OR ulp.score >= 50)
+            """)
+    int countCompletionsByUserIdAndLessonId(@Param("userId") UUID userId, @Param("lessonId") Integer lessonId);
+
+    /**
+     * Obtiene el número del siguiente intento para una lección específica.
+     */
+    @Query("""
+                SELECT COALESCE(MAX(ulp.attemptNumber), 0) + 1
+                FROM UserLessonProgressEntity ulp
+                WHERE ulp.userId = :userId
+                AND ulp.lessonId = :lessonId
+            """)
+    int getNextAttemptNumber(@Param("userId") UUID userId, @Param("lessonId") Integer lessonId);
+
+    /**
+     * Elimina todas las completaciones de una lección específica para permitir
+     * reiniciarla.
+     * (Solo si necesitas resetear completamente - normalmente no usarás esto)
+     */
+    @Modifying
+    @Query("DELETE FROM UserLessonProgressEntity ulp WHERE ulp.userId = :userId AND ulp.lessonId = :lessonId")
+    void deleteByUserIdAndLessonId(@Param("userId") UUID userId, @Param("lessonId") Integer lessonId);
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserProfileJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UserProfileJpaRepository.java
 ================================================================================
 
     package com.bughuntersaga.api.infrastructure.persistence.repository;
@@ -4606,7 +5074,7 @@ public interface UserProfileJpaRepository extends JpaRepository<UserProfileEntit
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserStreakJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UserStreakJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
 
@@ -4633,7 +5101,7 @@ public interface UserStreakJpaRepository extends JpaRepository<UserStreakEntity,
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/UserXpHistoryJpaRepository.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\UserXpHistoryJpaRepository.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository;
 
@@ -4675,7 +5143,7 @@ public interface UserXpHistoryJpaRepository extends JpaRepository<UserXpHistoryE
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/persistence/repository/projections/LeaderboardProjection.java
+📄 CONTENIDO DE: infrastructure\persistence\repository\projections\LeaderboardProjection.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.persistence.repository.projections;
 
@@ -4692,7 +5160,7 @@ public interface LeaderboardProjection {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/security/adapter/JwtTokenGeneratorAdapter.java
+📄 CONTENIDO DE: infrastructure\security\adapter\JwtTokenGeneratorAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.security.adapter;
 
@@ -4715,7 +5183,7 @@ public class JwtTokenGeneratorAdapter implements TokenGeneratorPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/security/adapter/SpringPasswordEncoderAdapter.java
+📄 CONTENIDO DE: infrastructure\security\adapter\SpringPasswordEncoderAdapter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.security.adapter;
 
@@ -4743,7 +5211,7 @@ public class SpringPasswordEncoderAdapter implements PasswordEncoderPort {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/security/config/SecurityConfiguration.java
+📄 CONTENIDO DE: infrastructure\security\config\SecurityConfiguration.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.security.config;
@@ -4814,7 +5282,7 @@ public class SecurityConfiguration {
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/security/filter/JwtAuthenticationFilter.java
+📄 CONTENIDO DE: infrastructure\security\filter\JwtAuthenticationFilter.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.security.filter;
 
@@ -4870,7 +5338,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/security/jwt/JwtUtil.java
+📄 CONTENIDO DE: infrastructure\security\jwt\JwtUtil.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.security.jwt;
 
@@ -4932,7 +5400,7 @@ public class JwtUtil {
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/controller/AuthController.java
+📄 CONTENIDO DE: infrastructure\web\controller\AuthController.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
@@ -5008,10 +5476,11 @@ public class AuthController {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/controller/ContentController.java
+📄 CONTENIDO DE: infrastructure\web\controller\ContentController.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
+import com.bughuntersaga.api.application.port.in.GetLessonProblemsUseCase;
 import com.bughuntersaga.api.application.port.in.GetModuleProblemsUseCase;
 import com.bughuntersaga.api.application.port.in.GetModuleUnitUseCase;
 import com.bughuntersaga.api.application.port.in.GetModulesUseCase;
@@ -5030,6 +5499,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -5041,6 +5511,7 @@ public class ContentController {
     private final GetModulesUseCase getModulesUseCase;
     private final GetModuleProblemsUseCase getModuleProblemsUseCase;
     private final GetModuleUnitUseCase getModuleUnitUseCase;
+    private final GetLessonProblemsUseCase getLessonProblemsUseCase;
 
 
     @GetMapping("")
@@ -5061,20 +5532,32 @@ public class ContentController {
 
 
     @GetMapping("/{moduleCode}/unit")
-    public ResponseEntity<UnitDetailDTO> getUnitsByModule(@PathVariable("moduleCode") String moduleCode) {
+    public ResponseEntity<List<UnitDetailDTO>> getUnitsByModule(@PathVariable("moduleCode") String moduleCode) {
         // Ejecutar caso de uso
-        Unit unit = getModuleUnitUseCase.getModuleUnit(moduleCode);
-
+        List<Unit>units = getModuleUnitUseCase.getModuleUnits(moduleCode);
         // Convertir a DTO
-        UnitDetailDTO response = contentApiMapper.toUnitDTO(unit);
-        return ResponseEntity.ok(response);
+        List<UnitDetailDTO> responses = units.stream().map(contentApiMapper::toUnitDetailDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/lessons/{lessonId}/problems")
+    public ResponseEntity<List<ProblemDTO>> getProblemsByLesson(@PathVariable("lessonId") Integer lessonId) {
+
+
+        List<Problem> problems = getLessonProblemsUseCase.getProblemsByLessonId(lessonId);
+
+        List<ProblemDTO> problemDTOS = problems.stream()
+                .map(contentApiMapper::toProblemDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(problemDTOS);
     }
 
 }
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/controller/GamificationController.java
+📄 CONTENIDO DE: infrastructure\web\controller\GamificationController.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
@@ -5150,21 +5633,29 @@ public class GamificationController {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/controller/ProgressController.java
+📄 CONTENIDO DE: infrastructure\web\controller\ProgressController.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
 import com.bughuntersaga.api.application.dto.CompleteLessonCommand;
+import com.bughuntersaga.api.application.dto.UnitProgressResponse;
 import com.bughuntersaga.api.application.port.in.ClaimTreasureResult;
 import com.bughuntersaga.api.application.port.in.ClaimTreasureUseCase;
 import com.bughuntersaga.api.application.port.in.CompleteLessonResult;
 import com.bughuntersaga.api.application.port.in.CompleteLessonUseCase;
+import com.bughuntersaga.api.application.port.out.LessonRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UnitRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserLessonProgressRepositoryPort;
+import com.bughuntersaga.api.application.port.out.UserRepositoryPort;
+import com.bughuntersaga.api.domain.exception.UserNotFoundException;
+import com.bughuntersaga.api.domain.model.User;
 import com.bughuntersaga.api.infrastructure.web.dto.LessonCompletionResponseDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.LessonResultDTO;
 import com.bughuntersaga.api.infrastructure.web.mapper.ProgressApiMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -5177,6 +5668,12 @@ public class ProgressController {
     private final CompleteLessonUseCase completeLessonUseCase;
     private final ClaimTreasureUseCase claimTreasureUseCase;
     private final ProgressApiMapper progressApiMapper; // Añadido
+
+    // Dependencias para el progreso de unidad
+    private final UserRepositoryPort userRepositoryPort;
+    private final LessonRepositoryPort lessonRepositoryPort;
+    private final UserLessonProgressRepositoryPort userLessonProgressRepositoryPort;
+    private final UnitRepositoryPort unitRepositoryPort;
 
     /**
      * Endpoint para registrar la finalización de una lección (Fase 3).
@@ -5209,15 +5706,82 @@ public class ProgressController {
 
         Map<String, Integer> response = Map.of(
                 "lingotsEarned", result.lingotsEarned(),
-                "totalLingots", result.totalLingots()
-        );
+                "totalLingots", result.totalLingots());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Endpoint para obtener el progreso de una unidad específica.
+     * GET /api/progress/unit/{unitId}
+     */
+    @GetMapping("/unit/{unitId}")
+    public ResponseEntity<UnitProgressResponse> getUnitProgress(@PathVariable("unitId") Integer unitId) {
+
+        // Obtener usuario actual
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepositoryPort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+
+        // Obtener la unidad para conseguir su unit_number
+        var unitOpt = unitRepositoryPort.findById(unitId);
+        int unitNumber = unitOpt.map(u -> u.getUnitNumber()).orElse(unitId);
+
+        // Obtener todas las lecciones de la unidad
+        var lessonsInUnit = lessonRepositoryPort.findByUnitId(unitId);
+        int totalLessons = lessonsInUnit.size();
+
+        if (totalLessons == 0) {
+            // Unidad vacía o no existe
+            return ResponseEntity.ok(UnitProgressResponse.builder()
+                    .unitId(unitId)
+                    .unitTitle("Unidad " + unitNumber)
+                    .currentXp(0)
+                    .totalXpNeeded(0)
+                    .completedLessons(0)
+                    .totalLessons(0)
+                    .progressPercentage(0.0)
+                    .build());
+        }
+
+        // Calcular XP total necesario (máximo 10 XP por lección)
+        int totalXpNeeded = totalLessons * 10;
+
+        // Calcular XP actual y lecciones completadas
+        int currentXp = 0;
+        int completedLessons = 0;
+
+        for (var lesson : lessonsInUnit) {
+            int completions = userLessonProgressRepositoryPort.countCompletionsByUserIdAndLessonId(
+                    currentUser.getId(), lesson.getId());
+
+            if (completions > 0) {
+                completedLessons++;
+                // Para el XP actual, obtener el mejor score de todas las completaciones
+                // Asumiendo que el primer intento da el XP máximo
+                currentXp += 10; // TODO: Obtener el XP real basado en el mejor score
+            }
+        }
+
+        // Calcular porcentaje de progreso
+        double progressPercentage = totalXpNeeded > 0 ? (double) currentXp / totalXpNeeded * 100.0 : 0.0;
+
+        UnitProgressResponse response = UnitProgressResponse.builder()
+                .unitId(unitId)
+                .unitTitle("Unidad " + unitNumber)
+                .currentXp(currentXp)
+                .totalXpNeeded(totalXpNeeded)
+                .completedLessons(completedLessons)
+                .totalLessons(totalLessons)
+                .progressPercentage(progressPercentage)
+                .build();
 
         return ResponseEntity.ok(response);
     }
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/controller/SwaggerRedirectController.java
+📄 CONTENIDO DE: infrastructure\web\controller\SwaggerRedirectController.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 import org.springframework.stereotype.Controller;
@@ -5234,7 +5798,7 @@ public class SwaggerRedirectController {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/controller/UserController.java
+📄 CONTENIDO DE: infrastructure\web\controller\UserController.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.controller;
 
@@ -5316,7 +5880,7 @@ public class UserController {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/AuthResponseDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\AuthResponseDTO.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.dto;
@@ -5338,7 +5902,27 @@ public record AuthResponseDTO(
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/ErrorDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\BadgeDTO.java
+================================================================================
+package com.bughuntersaga.api.infrastructure.web.dto;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+
+/**
+ * DTO para representar un badge obtenido por el usuario.
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record BadgeDTO(
+        String itemCode,
+        String name,
+        String description,
+        String icon
+) {}
+
+
+================================================================================
+📄 CONTENIDO DE: infrastructure\web\dto\ErrorDTO.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.dto;
@@ -5365,7 +5949,7 @@ public class ErrorDTO {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/ForgotPasswordDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\ForgotPasswordDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5381,7 +5965,7 @@ public record ForgotPasswordDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/LeaderboardDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\LeaderboardDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5396,7 +5980,7 @@ public record LeaderboardDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/LeaderboardEntryDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\LeaderboardEntryDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5411,7 +5995,7 @@ public record LeaderboardEntryDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/LessonCompletionResponseDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\LessonCompletionResponseDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5427,39 +6011,32 @@ public record LessonCompletionResponseDTO(
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/LessonResultDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\LessonResultDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record LessonResultDTO(
-        @NotNull(message = "Lesson ID is required")
-        @Min(value = 1, message = "Lesson ID must be positive")
-        Integer lessonId,
+                @NotNull(message = "Lesson ID is required") @Min(value = 1, message = "Lesson ID must be positive") Integer lessonId,
 
-        @NotNull(message = "Correct answer count is required")
-        @Min(value = 0, message = "Correct answer count cannot be negative")
-        Integer correctAnswerCount,
+                @NotNull(message = "Correct answer count is required") @Min(value = 0, message = "Correct answer count cannot be negative") Integer correctAnswerCount,
 
-        @NotNull(message = "Incorrect answer count is required")
-        @Min(value = 0, message = "Incorrect answer count cannot be negative")
-        Integer incorrectAnswerCount,
+                @NotNull(message = "Incorrect answer count is required") @Min(value = 0, message = "Incorrect answer count cannot be negative") Integer incorrectAnswerCount,
 
-        @NotNull(message = "Time taken is required")
-        @Min(value = 0, message = "Time taken cannot be negative")
-        Long timeTakenMs,
+                @NotNull(message = "Time taken is required") @Min(value = 0, message = "Time taken cannot be negative") Long timeTakenMs,
 
-        @NotNull(message = "Is practice flag is required")
-        Boolean isPractice
-) {
+                @NotNull(message = "Is practice flag is required") Boolean isPractice,
+
+                @Min(value = 0, message = "Score cannot be negative") @Max(value = 100, message = "Score cannot be greater than 100") Integer score) {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/LessonTileDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\LessonTileDTO.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.dto;
@@ -5482,7 +6059,7 @@ public record LessonTileDTO(
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/ModuleResponseDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\ModuleResponseDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5500,7 +6077,7 @@ public record ModuleResponseDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/ProblemDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\ProblemDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5518,14 +6095,25 @@ public record ProblemDTO(
         List<AnswerOption> answers,
         Integer correctAnswer,
         List<String> answerTiles,
-        List<Integer> correctAnswerIndices
-)
-{
-    public record AnswerOption(String name) {}
+        List<Integer> correctAnswerIndices,
+        // Campos para CODE_CHALLENGE
+        String codeTemplate,
+        String expectedAnswer,
+        String hint,
+        String explanation,
+        List<TestCase> testCases) {
+    public record AnswerOption(String name) {
+    }
+
+    public record TestCase(
+            String input,
+            String expectedOutput,
+            String description) {
+    }
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/ShopItemDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\ShopItemDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5540,7 +6128,7 @@ public record ShopItemDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UnitDetailDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UnitDetailDTO.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.dto;
@@ -5557,18 +6145,18 @@ import java.util.List;
  * Schema: UnitDetailDTO de OpenAPI
  */
 public record UnitDetailDTO(
-        Integer unitNumber,
-        String description,
-        String backgroundColor,
-        String textColor,
-        String borderColor,
-        List<LessonTileDTO> tiles
-) {
+                Integer unitId,
+                Integer unitNumber,
+                String description,
+                String backgroundColor,
+                String textColor,
+                String borderColor,
+                List<LessonTileDTO> tiles) {
 }
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserAccountUpdateDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserAccountUpdateDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5585,7 +6173,7 @@ public record UserAccountUpdateDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserInfoDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserInfoDTO.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.dto;
@@ -5609,7 +6197,7 @@ public record UserInfoDTO(
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserLoginDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserLoginDTO.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.dto;
@@ -5631,12 +6219,13 @@ public record UserLoginDTO(
 
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserProfileDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserProfileDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -5648,11 +6237,12 @@ public record UserProfileDTO(
         LocalDateTime joinedAt,
         Integer lingots,
         Integer dailyXpGoal,
-        Boolean soundEffectsEnabled
+        Boolean soundEffectsEnabled,
+        List<BadgeDTO> badges
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserRegistrationDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserRegistrationDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5678,7 +6268,7 @@ public record UserRegistrationDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserSettingsUpdateDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserSettingsUpdateDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5693,7 +6283,7 @@ public record UserSettingsUpdateDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/dto/UserStatsDTO.java
+📄 CONTENIDO DE: infrastructure\web\dto\UserStatsDTO.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.dto;
 
@@ -5713,7 +6303,7 @@ public record UserStatsDTO(
 ) {}
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/exception/GlobalApiExceptionHandler.java
+📄 CONTENIDO DE: infrastructure\web\exception\GlobalApiExceptionHandler.java
 ================================================================================
 
 package com.bughuntersaga.api.infrastructure.web.exception;
@@ -5742,9 +6332,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalApiExceptionHandler {
-
-
-
 
     /**
      * Maneja UserAlreadyExistsException (400 Bad Request).
@@ -5813,7 +6400,8 @@ public class GlobalApiExceptionHandler {
 
     /**
      * Maneja LessonAlreadyCompletedException (409 Conflict).
-     * Se lanza cuando un usuario intenta completar una lección que ya completó previamente.
+     * Se lanza cuando un usuario intenta completar una lección que ya completó
+     * previamente.
      */
     @ExceptionHandler(LessonAlreadyCompletedException.class)
     public ResponseEntity<ErrorDTO> handleLessonAlreadyCompleted(LessonAlreadyCompletedException ex) {
@@ -5827,6 +6415,21 @@ public class GlobalApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    /**
+     * Maneja InsufficientScoreException (400 Bad Request).
+     * Se lanza cuando el score de la lección es insuficiente para completarla.
+     */
+    @ExceptionHandler(InsufficientScoreException.class)
+    public ResponseEntity<ErrorDTO> handleInsufficientScore(InsufficientScoreException ex) {
+        ErrorDTO error = ErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
     /**
      * Maneja errores de validación de Spring (400 Bad Request).
@@ -5846,6 +6449,7 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorDTO> handleIllegalArgument(IllegalArgumentException ex) {
         ErrorDTO error = ErrorDTO.builder()
@@ -5857,12 +6461,12 @@ public class GlobalApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
     /**
      * Maneja CUALQUIER otra excepción no capturada (500 Internal Server Error).
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleGenericException(Exception ex) {
-
 
         log.error("Error 500 no controlado: {}", ex.getMessage(), ex);
 
@@ -5912,7 +6516,7 @@ public class GlobalApiExceptionHandler {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/mapper/AuthApiMapper.java
+📄 CONTENIDO DE: infrastructure\web\mapper\AuthApiMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
@@ -5946,16 +6550,16 @@ public interface AuthApiMapper {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/mapper/ContentApiMapper.java
+📄 CONTENIDO DE: infrastructure\web\mapper\ContentApiMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
 import com.bughuntersaga.api.domain.model.Lesson;
 import com.bughuntersaga.api.domain.model.Problem;
 import com.bughuntersaga.api.domain.model.Unit;
+import com.bughuntersaga.api.domain.model.Module;
 import com.bughuntersaga.api.infrastructure.web.dto.LessonTileDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.ModuleResponseDTO;
-import com.bughuntersaga.api.domain.model.Module;
 import com.bughuntersaga.api.infrastructure.web.dto.ProblemDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UnitDetailDTO;
 import org.mapstruct.Mapper;
@@ -5964,46 +6568,46 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.stream.Collectors;
 
-
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContentApiMapper {
 
     @Mapping(source = "name", target = "shortName")
     ModuleResponseDTO toModuleResponseDTO(Module module);
 
-
-    UnitDetailDTO toUnitDetailDTO(Unit unit);
-
-    @Mapping(target = "answers", expression = "java(mapAnswers(problem))")
-    ProblemDTO toProblemDTO(Problem problem);
-
-    default java.util.List<ProblemDTO.AnswerOption> mapAnswers(Problem problem) {
-        if (problem.getAnswers() == null) return null;
-        return problem.getAnswers().stream()
-                .map(answer -> new ProblemDTO.AnswerOption(answer.getName()))
-                .collect(Collectors.toList());
-    }
-    /**
-     * Convierte Unit → UnitDTO
-     * NOTA: Los colores (backgroundColor, textColor, borderColor)
-     * no están en el dominio Unit. Deben ser configurados
-     * manualmente o venir del módulo.
-     */
+    @Mapping(target = "unitId", source = "id")
     @Mapping(target = "backgroundColor", constant = "bg-blue-500")
     @Mapping(target = "textColor", constant = "text-white")
     @Mapping(target = "borderColor", constant = "border-blue-700")
     @Mapping(target = "tiles", source = "lessons")
-    UnitDetailDTO toUnitDTO(Unit unit);
+    UnitDetailDTO toUnitDetailDTO(Unit unit);
 
-    /**
-     * Convierte Lesson → LessonTileDTO.
-     */
     @Mapping(target = "lessonId", source = "id")
     LessonTileDTO toLessonTileDTO(Lesson lesson);
+
+    @Mapping(target = "answers", expression = "java(mapAnswers(problem))")
+    @Mapping(target = "testCases", expression = "java(mapTestCases(problem))")
+    ProblemDTO toProblemDTO(Problem problem);
+
+    default java.util.List<ProblemDTO.AnswerOption> mapAnswers(Problem problem) {
+        if (problem.getAnswers() == null)
+            return null;
+        return problem.getAnswers().stream()
+                .map(answer -> new ProblemDTO.AnswerOption(answer.getName()))
+                .collect(Collectors.toList());
+    }
+
+    default java.util.List<ProblemDTO.TestCase> mapTestCases(Problem problem) {
+        if (problem.getTestCases() == null)
+            return null;
+        return problem.getTestCases().stream()
+                .map(tc -> new ProblemDTO.TestCase(tc.getInput(), tc.getExpectedOutput(), tc.getDescription()))
+                .collect(Collectors.toList());
+    }
 }
 
+
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/mapper/GamificationApiMapper.java
+📄 CONTENIDO DE: infrastructure\web\mapper\GamificationApiMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
@@ -6031,7 +6635,7 @@ public interface GamificationApiMapper {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/mapper/ProgressApiMapper.java
+📄 CONTENIDO DE: infrastructure\web\mapper\ProgressApiMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
@@ -6057,15 +6661,17 @@ public interface ProgressApiMapper {
 }
 
 ================================================================================
-📄 CONTENIDO DE: infrastructure/web/mapper/UserApiMapper.java
+📄 CONTENIDO DE: infrastructure\web\mapper\UserApiMapper.java
 ================================================================================
 package com.bughuntersaga.api.infrastructure.web.mapper;
 
 import com.bughuntersaga.api.application.dto.UpdateUserAccountCommand;
 import com.bughuntersaga.api.application.dto.UpdateUserSettingsCommand;
 import com.bughuntersaga.api.application.port.in.UserStatsResult;
+import com.bughuntersaga.api.domain.model.Badge;
 import com.bughuntersaga.api.domain.model.FullUserProfile;
 import com.bughuntersaga.api.domain.model.User;
+import com.bughuntersaga.api.infrastructure.web.dto.BadgeDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UserAccountUpdateDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UserInfoDTO;
 import com.bughuntersaga.api.infrastructure.web.dto.UserProfileDTO;
@@ -6085,6 +6691,11 @@ public interface UserApiMapper {
      * Mapea el modelo de dominio combinado al DTO de respuesta.
      */
     UserProfileDTO toProfileDTO(FullUserProfile domain);
+
+    /**
+     * Mapea Badge de dominio a BadgeDTO.
+     */
+    BadgeDTO toBadgeDTO(Badge badge);
 
     /**
      * Mapea el DTO de entrada de settings al Comando de aplicación.
